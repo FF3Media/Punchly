@@ -1,0 +1,124 @@
+a.btn_sec_all {float: right; background-color: #2BC0BA; border-color: #2BC0BA; color: #fff; padding: 0.375rem 0.75rem; font-size: 1rem; line-height: 1.5; border-radius: 0.25rem;
+transition: color 0.15s ease-in-out, background-color 0.15s ease-in-out, border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;}
+a.btn_sec_all:hover {background-color: #0069d9; border-color: #0069d9;}
+.card.card-custom .card-header .card-title {display: flex; align-items: center; width: 100%;}
+.card.card-custom .card-header .card-title .row { width: 100%;}
+form#user-list-modal-form button.btn.btn-outline-light {background-color: #403e3e;}
+form#user-list-modal-form button.btn.btn-outline-light:hover {background-color: #000; color: #fff;}
+form#user-list-modal-form input.btn.btn-outline-light {background-color: #2BC0BA;}
+form#user-list-modal-form input.btn.btn-outline-light:hover {background-color: #0069d9; color: #fff;}
+li.user-footer a:last-child{margin-bottom: 0px !important;}
+li.user-footer a {width: 100%; margin-bottom: 10px;}
+section.content {margin-top: 10px;}
+div#paymentModal label div#card-element {margin-top: 5px;}
+div#paymentModal label { width: 100%;}
+
+/* Loader-css-strats-here */
+.loader {position: fixed;left: 0px;top: 0px;width: 100%;height: 100%;z-index: 9999;
+background: url('//upload.wikimedia.org/wikipedia/commons/thumb/e/e5/Phi_fenomeni.gif/50px-Phi_fenomeni.gif') 50% 50% no-repeat rgb(249,249,249);}
+#loading-bar-spinner.spinner, .loading-bar-spinner {left: 50%; margin-left: -20px; top: 50%; margin-top: -20px; position: fixed; z-index: 19 !important;animation: loading-bar-spinner 400ms linear infinite;}
+#loading-bar-spinner.spinner .spinner-icon, .loading-bar-spinner .spinner-icon {width: 40px; height: 40px; border:  solid 4px transparent; border-top-color:  #00C8B1 !important; border-left-color: #00C8B1 !important;
+border-radius: 50%;}
+@keyframes loading-bar-spinner {0%   { transform: rotate(0deg);   transform: rotate(0deg); }
+100% { transform: rotate(360deg); transform: rotate(360deg); }
+}
+
+/* Loader-css-ends-here */
+
+.sweet-alert button.cancel {color: #ffffff; background-color: #bd2130 !important; border-color: #b21f2d !important;}
+.sweet-alert button.cancel:hover {background-color: #c34955 !important; border-color: #c34955 !important;}
+.payment_cards .itemside.mb-3 .aside {width: 65px; float: left; margin-right: 10px; vertical-align: middle; border-radius: 3px; border-color: #fff;}
+.yajra-datatable td {vertical-align: middle;}
+.payment_cards .itemside.mb-3 .aside img {width: 118px;}
+.payment_cards .itemside.mb-3 .text-wrap.small.text-muted {line-height: 15px;}
+.payment_cards .itemside.mb-3 .text-wrap.small.text-muted p {margin-bottom: 0;}
+.card-body .form-group.row .new_order_submit {text-align: right;}
+.order_btns{float: right!important;}
+
+/** DATE-PICKER-CSS-STARTS-HERE**/
+select#card_link_select {background: no-repeat; color: #2BC0BA; font-weight: 500; max-width: 149px; border: 1px solid #2BC0BA; width: 149px;}
+
+dl.dlist-align.h4 {display: flex; margin: 0px !important;}
+.dlist-align.h4 dt {width: 50%;}
+.dlist-align.h4 .text-right {width: 50%; margin: 0;}
+.section-content.bg.padding-y.border-top .mb-4 {margin-bottom: 15px !important;}
+
+/********* 28 12 2020 ********************/
+
+.main-sidebar .brand-link .brand-image { width: 33px;height: 33px;}
+.profile-user-img{width:100px; height:100px;}
+#DataTables_Table_0_wrapper .table-bordered thead th::before, #DataTables_Table_0_wrapper .table-bordered thead th::after{display:none;}
+
+/****** CODE ******/
+
+.file-upload{display:block;text-align:center;font-family: Helvetica, Arial, sans-serif;font-size: 12px;}
+.file-upload .file-select{display:block;border: 1px solid #dce4ec;color: #34495e;cursor:pointer;height:40px;line-height:40px;text-align:left;background:#FFFFFF;overflow:hidden;position:relative; border-radius: 4px; border-left:none;}
+.file-upload .file-select .file-select-button{background:#dce4ec;padding:0 10px;display:inline-block;height:40px;line-height:40px;}
+.file-upload .file-select .file-select-name{line-height:40px;display:inline-block;padding:0 10px;}
+.file-upload .file-select:hover{border-color:#34495e;transition:all .2s ease-in-out;-moz-transition:all .2s ease-in-out;-webkit-transition:all .2s ease-in-out;-o-transition:all .2s ease-in-out;}
+.file-upload .file-select:hover .file-select-button{background:#34495e;color:#FFFFFF;transition:all .2s ease-in-out;-moz-transition:all .2s ease-in-out;-webkit-transition:all .2s ease-in-out;-o-transition:all .2s ease-in-out;}
+.file-upload.active .file-select{border-color:#3fa46a;transition:all .2s ease-in-out;-moz-transition:all .2s ease-in-out;-webkit-transition:all .2s ease-in-out;-o-transition:all .2s ease-in-out;}
+.file-upload.active .file-select .file-select-button{background:#3fa46a;color:#FFFFFF;transition:all .2s ease-in-out;-moz-transition:all .2s ease-in-out;-webkit-transition:all .2s ease-in-out;-o-transition:all .2s ease-in-out;}
+.file-upload .file-select input[type=file]{z-index:100;cursor:pointer;position:absolute;height:100%;width:100%;top:0;left:0;opacity:0;filter:alpha(opacity=0);}
+.file-upload .file-select.file-select-disabled{opacity:0.65;}
+.file-upload .file-select.file-select-disabled:hover{cursor:default;display:block;border: 2px solid #dce4ec;color: #34495e;cursor:pointer;height:40px;line-height:40px;margin-top:5px;text-align:left;background:#FFFFFF;overflow:hidden;position:relative;}
+.file-upload .file-select.file-select-disabled:hover .file-select-button{background:#dce4ec;color:#666666;padding:0 10px;display:inline-block;height:40px;line-height:40px;}
+.file-upload .file-select.file-select-disabled:hover .file-select-name{line-height:40px;display:inline-block;padding:0 10px;}
+.payment-methods .lead{font-weight:600;}
+.sidebar-collapse .sidebar .nav-sidebar .nav-item .nav-link {text-align: center;}
+.invoice-info address p {border-bottom: 1px solid #eee; max-width: 80%;width: 100%; margin: 0px; padding: 10px 0px;}
+.invoice-info address p .order_index {display: inline-block; width: 100%; max-width: 200px;}
+
+/******* table css start heree **************/
+
+.table-order-detail-list img.img-fluid {width: 70px; height: 40px;}
+.table-order-detail-list .btn {padding: 0px; align-items: center; height: 22px; justify-content: center; width: 20px !important; margin: 0 auto !important; margin-bottom: 5px !important;
+float: left; margin-right: 4px !important;}
+
+
+/****** message popup css start here *********/
+
+span.icon-circle {display: block; width: 58px; height: 58px; border-radius: 50%; display: flex; align-items: center; justify-content: center; background: #2BC0BA; color: #fff; margin: 0 auto; }
+
+.message-popup .modal-content {border-radius: 8px; }
+.message-popup .modal-content .modal-header .close {position: absolute; right: 0; top: 0; padding: 0; width: 50px; height: 50px; background: #FFFFFF; opacity: 1; border-radius: 50%; border: 5px solid #757575;    z-index: 999; }
+
+.message-popup .modal-content .modal-header {border: none; padding: 0px;}
+.message-popup .modal-content .card-body .form-group {margin-bottom: 0px; }
+.message-popup .modal-content h4.title {width: 100%; text-align: center; margin: 24px 0px 1rem 0; font-weight: 600; color: #3A3836; font-size: 24px; line-height: 28px;}
+.message-popup .modal-content p {font-size: 16px; line-height: 26px; font-weight: 400; color: #708DA8; text-align: center;     width: 100%;}
+.message-popup .modal-content button.btn {background: #2BC0BA; border: none; font-size: 14px; display: block; width: 100%; padding: 15px 15px; }
+
+.error-message span.icon-circle {
+    background: #FFA048;
+}
+
+.error-message .modal-content button.btn-purple{background: #B53DD7;}
+
+.error-message .modal-content h4.title{font-size: 36px; line-height: 40px;}
+.error-message .modal-dialog.common-width-popup {max-width: 521px; }
+
+
+.delete-message .icon-circle {background: #d43f3a; }
+.delete-message .btn-danger{background: #d43f3a !important;}
+
+
+
+@media screen and (max-width:991px) {
+.profile-name {height: 84px;width: 84px;font-size: 20px;}
+.profile-username {font-size: 14px;}
+.custom-shadow p {font-size: 12px;}
+.account-setting-cls .form-group {margin: 0;}
+.account-setting-cls .form-group .my-error {margin-bottom: 15px;}
+}
+
+@media screen and (max-width:767px) {
+.col-md-4.position-sticky {position: relative !important;top: 0 !important;margin-bottom: 20px;}
+}
+
+@media screen and (max-width: 414px) {
+	
+.invoice-info address p .order_index{max-width:100%; display:block;}
+.invoice-info address p{max-width:100%;}
+
+}
