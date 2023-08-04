@@ -61,6 +61,11 @@
                     <input type="hidden" value="{{$data->id}}" name="c_id">
                   </div>
                   <div class="form-group col-md-4">
+                    <label for="exampleInputName1">Coupon</label>
+                    <input type="text" value="{{$data->coupon_id}}" name="coupon"  onkeyup="CheckcouponBeforeApply();" pattern="[A-Za-z0-9]+" class="form-control" id="coupon" placeholder="Please Enter Coupon">
+                    <div style="color:red"  class="errorcoupone"></div>
+                  </div>
+                  <div class="form-group col-md-4">
                     <label class = "checkbox-inline">Discount Type</label><br>
                      <input type="radio" id="discount_type_percentage" name="discount_type" value="percentage" {{ ($data->percent_off)? "checked" : "" }} class="input-control discount_type"> Percentage Discount
                      <input type="radio" name="discount_type" value="fixedamt" {{ ($data->amount_off)? "checked" : "" }} class="input-control discount_type"> Fix Amount Discount
@@ -145,22 +150,26 @@ $(document).ready(function () {
    $(function () {
     $("#start_date").datepicker({
         numberOfMonths: 1,
+        dateFormat: "yy-mm-dd",
         onSelect: function (selected) {
             var dt = new Date(selected);
             dt.setDate(dt.getDate() + 1);
             $("#end_date").datepicker("option", "minDate", dt,{
-            dateFormat: 'mm-dd-yy'
+            
         });
+       
         }
     });
     $("#end_date").datepicker({
         numberOfMonths: 1,
+        dateFormat: "yy-mm-dd",
         onSelect: function (selected) {
             var dt = new Date(selected);
             dt.setDate(dt.getDate() - 1);
             $("#start_date").datepicker("option", "maxDate", dt,{
-            dateFormat: 'mm-dd-yy'
+          
         });
+        
         }
     });
 });
@@ -230,5 +239,45 @@ $(document).ready(function () {
       }
     });
 });
+
+function CheckcouponBeforeApply(){
+           var coupon = $('#coupon').val();   
+
+         if (coupon) {              
+          $.ajax({
+            type: "POST",
+            url: "{{ route('admin-check-coupon') }}",
+            data: {coupon:coupon},
+            dataType: "json",
+             headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          },
+            success: function(res) {
+                if(res.coupan_exist == 1){   
+                  $('.errorcoupone').text('Coupon Already Exist');
+                                console.log(res);
+                }else{                                                    
+                   $('.errorcoupone').text('');
+                    
+                } 
+            },
+            error: function (jqXHR, exception) {
+
+              console.log(jqXHR);
+            }
+        });
+      }else{
+          $('.checkoutBtn').removeAttr('disabled');
+          $('.checkoutBtnWithoutFormSubmit').removeAttr('disabled');
+          $('.errorcoupone').text(' ');
+      }
+    }
+
+ $('#coupon').on('keypress', function(e) {
+            if (e.which == 32){
+                console.log('Space Detected');
+                return false;
+            }
+        });
 </script>
 @endsection

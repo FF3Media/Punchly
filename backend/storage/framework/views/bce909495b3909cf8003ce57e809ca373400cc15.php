@@ -1,17 +1,8 @@
+
+
 <?php $__env->startSection('content'); ?>
 <div class="order-history-list-grid">
 <div class="container-fluid">
- <?php if(session()->has('success')): ?>
-                <div class="alert alert-success cus-msg-cls" style="text-align: left;">
-                    <?php echo e(session()->get('success')); ?>
-
-                </div>
-                <?php elseif(session()->has('failure')): ?>
-                <div class="alert alert-danger cus-msg-cls" style="text-align: left;">
-                    <?php echo e(session()->get('failure')); ?>
-
-                </div>
-                <?php endif; ?>
    
             <div class="row">
                 <div class="col-lg-12 my-3">
@@ -24,7 +15,7 @@
                       <button class="btn active" id="list">List View</button>
                       <button class="btn" id="grid">Grid View</button>
                       </div>
-                    <!-- <button class="filter-btn" data-toggle="modal" data-target="#filterModal">Filters <i class="fas fa-filter"></i> -->
+                    <button class="filter-btn" data-toggle="modal" data-target="#filterModal">Filters <i class="fas fa-filter"></i>
                     </div>
                   </div>
                 </div>
@@ -65,7 +56,7 @@
                           <label>Status</label>
                           <select class="form-control minimal-select" id="status">
                           <option value="">Select</option>
-                                  <option value="1">Awaiting Approval</option>
+                                  <option value="1">Waiting for approval</option>
                                   <option value="2">In progress</option>
                                   <option value="3">Rejected</option>
                                   <!-- <option value="4">Completed</option> -->
@@ -132,7 +123,14 @@
     });
     
     function filter_data(page){
-      status = $('#status').val();
+      filterstatus = $('#status').val();
+      status = '';
+      if(filterstatus == ""){ 
+         status = "<?php echo e($status); ?>";
+      }else{ 
+         status = filterstatus;
+      }
+      
       desired_output = $('#desired_output').val();
         $.ajax({
           headers: {
@@ -220,7 +218,7 @@ function rejectOrderForm (){
      $('#desired_height').text(data.desired_height);
      $('#desired_width').text(data.desired_width);
      $('#order_unique_id').text(data.order_unique_id);
-     $('#order_amount').text('$'+data.amount);
+     $('#order_amount').text('$'+data.total_amount);
      $('#order_message').text(data.order_message);
      $('#order_image_name').text(data.order_name);
      if(data.desired_old_height > 0 && data.desired_old_width > 0 ) {
@@ -231,7 +229,7 @@ function rejectOrderForm (){
      }
       if(data.status == 1){
       check = 'paid-tag';
-      status = 'Awaiting Approval';
+      status = 'Waiting for Approval';
       }else if(data.status == 2){
       check = 'in-progress-tag';
       status = 'In progress';
@@ -306,10 +304,10 @@ function rejectOrderForm (){
         }else if(data.payment_details.pay_authorization_id){
 
           if(data.amount_after_coupon > 0){
-            $('#pay_order_amount').val(data.total_amount); 
+            $('#pay_order_amount').val(data.amount_after_coupon); 
           }else{
 
-            $('#pay_order_amount').val(data.total_amount); 
+            $('#pay_order_amount').val(data.amount); 
           }
 
            
@@ -446,7 +444,8 @@ function selectFromDropdown(selector, text) {
             field_name = "select[name=reason_id]"; 
         }   
         error=1;
-      }else{      
+      }else{    
+        
         jQuery("textarea[name=reason_id]").css('border','1px solid #cacaca');
        }
        if(jQuery("textarea[name=comment]").val() == '') {    
@@ -457,6 +456,7 @@ function selectFromDropdown(selector, text) {
         }   
         error=1;
       }else{      
+        
         jQuery("textarea[name=comment]").css('border','1px solid #cacaca');
        }
         
@@ -466,7 +466,9 @@ function selectFromDropdown(selector, text) {
               jQuery(field_name).focus(); 
           }        
             return false;
-         } 
+         } else{
+                   $("#rejectBtn").attr("disabled", true); 
+             } 
 }
  function assignDigitizerValidation(data){
         jQuery('.error2').remove();
@@ -479,7 +481,8 @@ function selectFromDropdown(selector, text) {
             field_name = "select[name=order_digitizer_id]"; 
         }   
         error=1;
-      }else{           
+      }else{    
+        $("#aprvbtn").attr("disabled", true);       
         jQuery("select[name=order_digitizer_id]").css('border','1px solid #cacaca');
        }
         
@@ -505,6 +508,7 @@ function reassignDigitizerValidation(data){
         }   
         error=1;
       }else{      
+        $("#aprvbtn").attr("disabled", true);
         jQuery("select[name=order_digitizer_id]").css('border','1px solid #cacaca');
        } 
          if(error==1){

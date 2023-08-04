@@ -16,7 +16,7 @@ class Blog extends Model
      * @var array
      */
     
-   // use SoftDeletes;
+    use SoftDeletes;
     protected $softDelete = true;
 
 

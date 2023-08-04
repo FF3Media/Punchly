@@ -56,7 +56,7 @@
                   <label>Status</label>
                   <select class="form-control minimal-select" id="status">
                   <option value="">Select</option>
-                          <option value="1">Awaiting Approval</option>
+                          <option value="1">Waiting for approval</option>
                           <option value="2">In process</option>
                           <option value="3">Rejected</option>
                           <option value="4">Completed</option>
@@ -230,7 +230,7 @@ function showOrderDetail(data){
      }
       if(data.status == 1){
       check = 'paid-tag';
-      status = 'Awaiting Approval';
+      status = 'Waiting for Approval';
       }else if(data.status == 2){
       check = 'in-progress-tag';
       status = 'In progress';

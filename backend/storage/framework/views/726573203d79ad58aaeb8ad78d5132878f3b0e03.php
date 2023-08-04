@@ -1,3 +1,7 @@
+
+
+
+
 <?php $__env->startSection('content'); ?>
 <div class="row">
     <div class="col-lg-12">

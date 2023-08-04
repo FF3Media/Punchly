@@ -1,3 +1,6 @@
+
+
+
 <?php $__env->startSection('content'); ?>
 <style type="text/css">
 	.dataTables_wrapper .dataTable th:before {content:none !important;}

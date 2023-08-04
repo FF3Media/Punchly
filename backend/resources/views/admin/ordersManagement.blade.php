@@ -219,7 +219,7 @@ function rejectOrderForm (){
          $('#desired_height').text(data.desired_height);
          $('#desired_width').text(data.desired_width);
          $('#order_unique_id').text(data.order_unique_id);
-         $('#order_amount').text('$'+data.amount);
+         $('#order_amount').text('$'+data.total_amount);
          $('#order_message').text(data.order_message);
          $('#order_image_name').text(data.order_name);
      if(data.desired_old_height > 0 && data.desired_old_width > 0 ) {
@@ -420,7 +420,8 @@ function rejectOrderForm (){
                 field_name = "select[name=reason_id]"; 
             }   
             error=1;
-          }else{      
+          }else{   
+            
             jQuery("textarea[name=reason_id]").css('border','1px solid #cacaca');
            }
            if(jQuery("textarea[name=comment]").val() == '') {    
@@ -431,6 +432,7 @@ function rejectOrderForm (){
             }   
             error=1;
           }else{      
+             
             jQuery("textarea[name=comment]").css('border','1px solid #cacaca');
            }
             
@@ -440,7 +442,9 @@ function rejectOrderForm (){
                   jQuery(field_name).focus(); 
               }        
                 return false;
-             } 
+             } else{
+              $("#rejectBtn").attr("disabled", true); 
+             }
     }
      function assignDigitizerValidation(data){
             jQuery('.error2').remove();
@@ -453,7 +457,9 @@ function rejectOrderForm (){
                 field_name = "select[name=order_digitizer_id]"; 
             }   
             error=1;
-          }else{      
+          }else{    
+            
+            $("#aprvbtn").attr("disabled", true);
             jQuery("select[name=order_digitizer_id]").css('border','1px solid #cacaca');
            }           
             
@@ -476,7 +482,8 @@ function rejectOrderForm (){
                   field_name = "select[name=order_digitizer_id]"; 
               }   
             error=1;
-          }else{      
+          }else{    
+             $("#aprvbtn").attr("disabled", true);  
               jQuery("select[name=order_digitizer_id]").css('border','1px solid #cacaca');
            }           
             

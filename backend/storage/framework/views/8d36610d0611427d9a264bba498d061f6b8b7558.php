@@ -1,5 +1,7 @@
 <?php if(isset($orderList) && count($orderList)): ?>
 	<?php $__currentLoopData = $orderList; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $order): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+  
+
 		<div class="item col-xs-4 col-lg-4">
 			<div class="thumbnail card">
 				<div class="order-content-row">
@@ -11,12 +13,12 @@
 					</div>
 					<div class="order-content">
 						<label class="order-date-label">Order date</label>
-						<h3><?php echo e(date('m-d-Y',strtotime($order->created_at))); ?></h3>
+						<h3><?php echo e(isset($order->payment_details->created_at) ? date('m-d-Y',strtotime($order->payment_details->created_at)): date('m-d-Y',strtotime($order->created_at))); ?></h3>
 					</div>
 	 				<div class="order-content">
 						<label class="order-status-label">Status</label>
 					  <?php if($order->status == '1'): ?>
-                <h3><span class="paid-tag">Awaiting Approval</span></h3>
+                <h3><span class="paid-tag">Waiting for Approval</span></h3>
             <?php elseif($order->status == '2'): ?>
                 <h3><span class="in-progress-tag">In progress</span></h3>
             <?php elseif($order->status == '3'): ?>
@@ -104,7 +106,10 @@
                             <select name="order_digitizer_id" id="order_digitizer_id" class="form-control">
                               <option value="">Select Digitizer</option>
                                 <?php $__empty_1 = true; $__currentLoopData = $digitizerList; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $digitizer): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                                    <option value="<?php echo e($digitizer->id); ?>"><?php echo e($digitizer->first_name.' '.$digitizer->last_name); ?></option>
+                                    <option value="<?php echo e($digitizer->id); ?>">
+                                        <?php echo e($digitizer->first_name.' '.$digitizer->last_name); ?>
+
+                                    </option>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                 <?php endif; ?>
                             </select>
@@ -163,10 +168,12 @@
                                     <option value="<?php echo e($digitizer->id); ?>"><?php echo e($digitizer->first_name.' '.$digitizer->last_name); ?></option>
                                 <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
                                 <?php endif; ?>
+                                <!-- <option value="<?php echo e(Auth::id()); ?>"><?php echo e(Auth::user()->first_name.' '.Auth::user()->last_name); ?></option> -->
+                                <option value="<?php echo e(Auth::id()); ?>">Self</option>  
                             </select>
                         </div>
                     </div>  
-                   <input type="submit" value="Approve Order" class="btn btn-success">
+                   <input type="submit" id="aprvbtn" value="Approve Order" class="btn btn-success">
              
        </form>  
        </div>
@@ -195,7 +202,7 @@
                         <textarea name="comment"  class="form-control"  rows="6" cols="50" placeholder="Leave a comment here"></textarea>
                       </div>
                     </div>                         
-                    <input type="submit" value="Reject Order" class="btn btn-success">                   
+                    <input type="submit" id="rejectBtn" value="Reject Order" class="btn btn-success">                   
             </form>
        </div>
 	   <div class="ftr-modal-box">

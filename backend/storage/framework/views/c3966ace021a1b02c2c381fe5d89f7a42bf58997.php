@@ -8,14 +8,14 @@
       <?php
   $coupon_amount = '';
   $discount = '';
-  // if($data['amount_after_coupon'] > 0 ){
+  if($data['amount_after_coupon'] > 0 ){
   
-  //  $coupon_amount = $data['amount_after_coupon'];
-  //  $discount = $data['discount'];
-  //  }else{    
-  //   $coupon_amount = $data['amount'];   
-  //   // $discount = "0";
-  //  }
+   $coupon_amount = $data['amount_after_coupon'];
+   $discount = $data['discount'];
+   }else{    
+    $coupon_amount = $data['amount'];   
+    // $discount = "0";
+   }
   ?>
         <div style="max-width: 855px;margin: 50px auto; background: #fff; padding: 25px">
             <div style="display: flex;justify-content: space-between;align-items: center;">
@@ -39,13 +39,13 @@
                    <!--  <p style="font-size: 20px;font-weight: 400;margin:0;"><b>Customer invoice No.</b> 21-0001</p> -->
                     
                     <p style="font-size: 20px;font-weight: 400;margin:0;"><b>Date:</b><?php echo e($data['completed_date']); ?></p>
-                    <p style="font-size: 20px;font-weight: 400;margin: 30px 0 0 0;"> 123 Street 2174 City</p>
+                    <p style="font-size: 20px;font-weight: 400;margin: 30px 0 0 0;"> 123 Street 2174 City</p></br>
                 </div>
                 <div style="text-align: right;display: inline-flex;flex-flow: column;align-items: flex-end;">
                     <div style="width: 145px;text-align: center;"> 
                     </div>
-                    <p style="font-size: 20px;font-weight: 400;margin:32px 0 0;text-align: right;"><b style="font-weight:600;">Punchuly Contact:</b> 0123 2542 2546</p>
-                    <p style="font-size: 20px;font-weight: 400;margin:32px 0 0;text-align: right;"><b style="font-weight:600;">Punchuly Email:</b>  hello@punchly.com</p>
+                    <p style="font-size: 20px;font-weight: 400;margin:32px 0 0;text-align: right;"><b style="font-weight:600;">Punchly Contact:</b> 0123 2542 2546</p></br>
+                    <p style="font-size: 20px;font-weight: 400;margin:32px 0 0;text-align: right;"><b style="font-weight:600;">Punchly Email:</b>  hello@punchly.com</p></br>
                     
                 </div>
             </div>
@@ -58,42 +58,6 @@
                 <p style="margin: 0;font-weight: 600;">Amount:</p>
                 <p style="margin: 0;"><?php echo e(isset($data) ? $data['amount'] : ''); ?></p>
             </div>
-            <?php if($data['gst'] != 0.00 ) {   ?>
-             <div style="background-color: #ffffff;font-size: 20px;padding: 26px 20px;display: flex;justify-content: space-between;border-radius: 8px;"> 
-                <p style="margin: 0;font-weight: 600;">GST:</p>
-                <p style="margin: 0;"><?php echo e(isset($data) ? round($data['gst'],0) : ''); ?>%</p> 
-            </div>
-            <?php  }   ?>
-
-          <?php if($data['rst'] != 0.00 ) {   ?>
-             <div style="background-color: #f4f4f4;font-size: 20px;padding: 26px 20px;display: flex;justify-content: space-between;border-radius: 8px;">
-                <p style="margin: 0;font-weight: 600;">RST:</p>
-                <p style="margin: 0;"><?php echo e(isset($data) ? round($data['rst'],0) : ''); ?>%</p>
-            </div>
-            <?php  }   ?>
-
-             <?php if($data['qst'] != 0.00 ) {   ?>
-             <div style="background-color: #ffffff;font-size: 20px;padding: 26px 20px;display: flex;justify-content: space-between;border-radius: 8px;"> 
-                <p style="margin: 0;font-weight: 600;">QST:</p>
-                <p style="margin: 0;"><?php echo e(isset($data) ? round($data['qst'],0) : ''); ?>%</p> 
-            </div>
-            <?php  }   ?>
-
-            <?php if($data['pst'] != 0.00 ) {   ?>
-             <div style="background-color: #f4f4f4;font-size: 20px;padding: 26px 20px;display: flex;justify-content: space-between;border-radius: 8px;">
-                <p style="margin: 0;font-weight: 600;">PST:</p>
-                <p style="margin: 0;"><?php echo e(isset($data) ? round($data['pst'],0): ''); ?>%</p>
-            </div>
-            <?php  }   ?>
-
-            <?php if($data['hst'] != 0.00 ) {   ?>
-             <div style="background-color: #ffffff;font-size: 20px;padding: 26px 20px;display: flex;justify-content: space-between;border-radius: 8px;"> 
-                <p style="margin: 0;font-weight: 600;">HST:</p>
-                <p style="margin: 0;"><?php echo e(isset($data) ? round($data['hst'],0) : ''); ?>%</p> 
-            </div>
-            <?php  }   ?>
-
-
             <?php
             if(!empty($discount)){
             ?>
@@ -107,7 +71,7 @@
             <h3 style="text-align: center;font-size: 26.67px;margin: 35px 0 28px 0;">Total</h3>
             <div style="background-color: #f4f4f4;font-size: 20px;padding: 10px 20px;display: flex;justify-content: space-between;border-radius: 8px;">
                 <p style="margin: 0;font-weight: 400;font-size: 16.67px;text-align: right;"><b style="font-size: 26.67px;font-weight: 500;display: block;">Total amount:</b></p>
-                <p style="margin: 0;font-weight: 400;font-size: 16.67px;text-align: right;"><b style="font-size: 26.67px;font-weight: 500;display: block;">USD <?php echo e($data['total_amount']); ?></b></p>
+                <p style="margin: 0;font-weight: 400;font-size: 16.67px;text-align: right;"><b style="font-size: 26.67px;font-weight: 500;display: block;">USD <?php echo e($coupon_amount); ?></b></p>
             </div>
             
         </div>

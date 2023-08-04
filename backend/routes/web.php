@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', 'FrontendController@homePage')->name('/');
+Route::get('/register-successfully', 'FrontendController@afterRegisterConfirmationPage')->name('register-confirmation');
 Route::post('/checkEmailExist','FrontendController@checkEmailExist')->name('check-email-exist');
 Route::post('/checkMobileExist','FrontendController@checkMobileExist')->name('check-mobile-exist');
 Route::get('/privacy','FrontendController@privacy')->name('privacy');
@@ -28,36 +29,47 @@ Route::get('/auth/social', 'Auth\LoginController@show')->name('social.login');
 Route::get('/oauth/{driver}', 'Auth\LoginController@redirectToProvider')->name('social.oauth');
 Route::get('/oauth/{driver}/callback', 'Auth\LoginController@handleProviderCallback')->name('social.callback');
 
-Route::any('test','FrontendController@test'); 
- 
+Route::any('test','FrontendController@test');
+
 Route::get('/getStates/{id}','FrontendController@getStates')->name('regiter-getStates');
 Route::get('/getCities/{id}','FrontendController@getCities');
 Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout')->name('logoutall');
 
 
-/*******************Admin******************************/ 
+/*******************Admin******************************/
 
     Route::group(['prefix' => 'admin','middleware' => ['auth','admin']], function() {
-    Route::get('/dashboard', 'AdminController@dashboard')->name('admin-dashboard');    
-    Route::get('/users-list', 'AdminController@usersList')->name('admin-users-list');     
+    Route::get('/dashboard', 'AdminController@dashboard')->name('admin-dashboard');
+    Route::get('/users-list', 'AdminController@usersList')->name('admin-users-list');
+    Route::post('/admin-check-coupon', 'AdminController@checkCouponName')->name('admin-check-coupon');
+
+
     Route::get('/mailsend', 'AdminController@sendMail2')->name('admin-mailsend');
     Route::post('/edit-user', 'AdminController@editUser')->name('admin-edit-user');
     Route::post('/add-user', 'AdminController@addUser')->name('admin-add-user');
     Route::get('/user-form', 'AdminController@userForm')->name('admin-user-form');
     Route::post('/delete-user', 'AdminController@deleteUser')->name('admin-delete-user');
     Route::post('/change-user-status', 'AdminController@changeUserStatus')->name('admin-change-user-status');
+
+
     Route::get('/search-order','AdminController@searchOrder')->name('admin-search-order');
     Route::get('/searchOrderRepresent','AdminController@searchOrderRepresent');
     Route::get('/orderRepresent','AdminController@orderRepresent');
     Route::get('/send-order-id', 'AdminController@submittedOrderDetail')->name('admin-send-order-id');
     Route::get('/order-represent-submitted', 'AdminController@submittedWorkManagement');
     Route::get('/submitted-work','AdminController@submittedOrderDetail')->name('admin-submitted-work-management');
-    /*******orders*******/    
+    Route::get('/review-work','AdminController@reviewOrderDetail')->name('admin-review-work-management');
+    Route::get('/reworking-work','AdminController@reworkingOrderDetail')->name('admin-reworking-work-management');
+    Route::get('/in-progress','AdminController@inProgressOrderDetail')->name('admin-in-progress-management');
+    Route::get('/reject-work','AdminController@rejectOrderDetail')->name('admin-reject-work-management');
+    Route::get('/completed-work','AdminController@completedOrderDetail')->name('admin-completed-work-management');
+    /*******orders*******/
+
     Route::get('/order-management','AdminController@orderManagement')->name('admin-order-management');
     Route::get('/order-detail/{id}','AdminController@orderDetail')->name('admin-order-detail');
     Route::post('/reject-order', 'AdminController@rejectOrder')->name('admin-reject-order');
     Route::post('/reject-submitted-work', 'AdminController@rejectSubmittedWork')->name('admin-reject-submitted-work');
-    Route::post('/accept-digitizer', 'AdminController@acceptWorkFromManager')->name('admin-accept-submitted-work');    
+    Route::post('/accept-digitizer', 'AdminController@acceptWorkFromManager')->name('admin-accept-submitted-work');
     Route::post('/update-order', 'AdminController@updateOrder')->name('admin-update-order');
     Route::post('/cancel-order','AdminController@cancelOrder')->name('admin-cancel-order');
     Route::post('/order-image','AdminController@orderImage')->name('admin-order-image');
@@ -67,7 +79,7 @@ Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout')->name(
     Route::post('/delete-order-image','AdminController@deleteOrderImage')->name('admin-delete-order-image');
 
      /*******cms*******/
-   
+
    Route::get('/cms/blog-management','AdminController@blogList')->name('admin-blog-list');
    Route::get('/cms//blog-management/blog-form/','AdminController@addBlogForm')->name('admin-blog-form');
 
@@ -106,7 +118,7 @@ Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout')->name(
    //Blog listing
    Route::get('/general-setting/{id}','AdminController@generalSetting')->name('admin-general-setting');
    Route::post('/update-general-setting-page/{id}','AdminController@updateGeneralSetting')->name('admin-update-general-setting-page');
-  
+
    // Route::post('/update-cms-pages', 'AdminController@updateCmsPages')->name('admin-update-cms-pages');
    Route::get('/get-blog-category-list', 'AdminController@blogCategoryList')->name('admin-blog-categories-list');
    Route::post('/delete-blog-category', 'AdminController@deleteBlogCategory')->name('admin-delete-blog-category');
@@ -130,7 +142,7 @@ Route::get('logout', '\App\Http\Controllers\Auth\LoginController@logout')->name(
 
 
 });
- 
+
  /*******************Digitizer******************************/
 
 Route::group(['prefix' => 'digitizer','middleware' => ['auth','digitizer']], function() {
@@ -159,86 +171,86 @@ Route::group(['prefix' => 'digitizer-manager','middleware' => ['auth','digitizer
 
     Route::post('/reject-submitted-work', 'DigitizerManagerController@rejectSubmittedWork')->name('digitizer-manager-reject-submitted-work');
     Route::get('/orderRepresent','DigitizerManagerController@orderRepresent');
+    Route::get('/orderRepresentInProgress','DigitizerManagerController@orderRepresentInProgress');
 
     Route::post('/accept-digitizer', 'DigitizerManagerController@acceptWorkFromManager')->name('digitizer-manager-accept-submitted-work');
     Route::get('/send-order-id', 'DigitizerManagerController@submittedOrderDetail')->name('digitizer-manager-send-order-id');
     Route::get('/order-represent-submitted', 'DigitizerManagerController@submittedWorkManagement');
-    
+
     Route::post('/update-order', 'DigitizerManagerController@updateOrder')->name('digitizer-manager-update-order');
     Route::post('/cancel-order','DigitizerManagerController@cancelOrder')->name('digitizer-manager-cancel-order');
     Route::post('/order-image','DigitizerManagerController@orderImage')->name('digitizer-manager-order-image');
     Route::get('/downlaod-image/{feature_image}','DigitizerManagerController@downloadImage')->name('digitizer-manager-download-image');
     Route::post('approve-order','DigitizerManagerController@approveOrder')->name('digitizer-manager-approve-order');
     Route::get('/submitted-work','DigitizerManagerController@submittedOrderDetail')->name('digitizer-manager-submitted-work-management');
+    Route::post('/reassign-digitizer','DigitizerManagerController@reassignDigitizer')->name('digitizer-manager-reassign-digitizer');
+
+      Route::get('/review-work','DigitizerManagerController@reviewOrderDetail')->name('digitizer-manager-review-work-management');
+    Route::get('/reworking-work','DigitizerManagerController@reworkingOrderDetail')->name('digitizer-manager-reworking-work-management');
+    Route::get('/in-progress','DigitizerManagerController@inProgressOrderDetail')->name('digitizer-manager-in-progress-management');
+    Route::get('/self-assign','DigitizerManagerController@selfAssinedWork')->name('digitizer-manager-in-self-assign');
+    Route::get('/selfAssingedRepresent','DigitizerManagerController@selfAssingedRepresent');
+    
+    Route::get('/reject-work','DigitizerManagerController@rejectOrderDetail')->name('digitizer-manager-reject-work-management');
     Route::get('/completed-work','DigitizerManagerController@completedOrderDetail')->name('digitizer-manager-completed-work-management');
-     Route::get('/order-represent-completed', 'DigitizerManagerController@completedWorkManagement');
-
-     Route::get('/inprogress-orderRepresent','DigitizerManagerController@OrderRepresentInProgress');
-     Route::get('/inprogress','DigitizerManagerController@InProgressOrderManagement')->name('digitizer-manager-order-management-inprogress');
-
-     Route::get('/rejected-orderRepresent','DigitizerManagerController@OrderRepresentRejected');
-     Route::get('/rejected','DigitizerManagerController@rejectedOrderManagement')->name('digitizer-manager-order-management-rejected');
-
-      Route::get('/canceled-orderRepresent','DigitizerManagerController@OrderRepresentCanceled');
-
-      Route::get('/canceled','DigitizerManagerController@canceledOrderManagement')->name('digitizer-manager-order-management-canceled');
-
-      Route::get('/reworking-orderRepresent','DigitizerManagerController@OrderRepresentReworking');
-      
-      Route::get('/reworking','DigitizerManagerController@reworkingOrderManagement')->name('digitizer-manager-order-management-reworking');
-
-      Route::post('/reassign-digitizer','DigitizerManagerController@reassignDigitizer')->name('digitizer-manager-reassign-digitizer');
+    Route::post('/self-submitted-work','DigitizerManagerController@selfSubmittedWork')->name('digitizer-manager-self-submitted-work');
 });
 
 /*******************Embroiderer******************************/
 
-     Route::group(['prefix' => 'embroiderer','middleware' => ['verified','auth','embroiderer']], function() {
-     Route::get('/test','EmbroidererController@test');
-     Route::get('/orderRepresent','EmbroidererController@orderRepresent');
-     Route::get('/createNew','EmbroidererController@createNew');
+Route::group(['prefix' => 'embroiderer'], function() {
+    Route::get('/dashboard', 'EmbroidererController@dashboard')->name('embroiderer-dashboard');
+    Route::get('/search-order', 'EmbroidererController@searchOrder')->name('embroiderer-search-order');
+    Route::get('/searchOrderRepresent', 'EmbroidererController@searchOrderRepresent');
 
-     Route::get('/confirmation/{id}','EmbroidererController@confirmationPage');
+    Route::get('/order-management', 'EmbroidererController@orderManagement')->name('embroiderer-order-management');
 
-     Route::get('/search-order','EmbroidererController@searchOrder')->name('embroiderer-search-order');
-     Route::get('/searchOrderRepresent','EmbroidererController@searchOrderRepresent');
-    
-     Route::post('/create-order-paypal','EmbroidererController@createOrderPaypal')->name('embroiderer-create-order-paypal');
-     Route::get('/authorize-order','EmbroidererController@authorizeOrder')->name('embroiderer-authorize-order');
-     Route::get('/capture-authrize-request','EmbroidererController@captureAuthrizeRequest')->name('embroiderer-capture-authrize-request');
-     Route::get('/reauthrize-request/{authorization_id}','EmbroidererController@reauthrizeRequest')->name('embroiderer-reauthrize-request');
-     Route::get('/return-authorize-payment/{authorization_id}','EmbroidererController@returnAuthorizePayment')->name('embroiderer-return-authorize-payment');
+    Route::group(['middleware' => ['verified', 'auth', 'embroiderer']], function(){
+        Route::get('/test', 'EmbroidererController@test');
+        Route::get('/orderRepresent', 'EmbroidererController@orderRepresent');
+        
 
-    Route::post('/update-cart-order', 'EmbroidererController@updateCartOrder')->name('embroiderer-update-cart-order'); 
-    Route::post('/get-cart-order', 'EmbroidererController@getCartOrder')->name('embroiderer-get-cart-order');
-    
-    Route::get('/cancelingIntent','EmbroidererController@cancelingIntent');
+        Route::post('/create-order-paypal', 'EmbroidererController@createOrderPaypal')->name('embroiderer-create-order-paypal');
+        Route::get('/authorize-order', 'EmbroidererController@authorizeOrder')->name('embroiderer-authorize-order');
+        Route::get('/capture-authrize-request', 'EmbroidererController@captureAuthrizeRequest')->name('embroiderer-capture-authrize-request');
+        Route::get('/reauthrize-request/{authorization_id}', 'EmbroidererController@reauthrizeRequest')->name('embroiderer-reauthrize-request');
+        Route::get('/return-authorize-payment/{authorization_id}', 'EmbroidererController@returnAuthorizePayment')->name('embroiderer-return-authorize-payment');
 
-    Route::get('/dashboard', 'EmbroidererController@dashboard')->name('embroiderer-dashboard');  
-    Route::post('/create-payment-intent','EmbroidererController@createPaymentIntent')->name('embroiderer-create-charge');
-     Route::post('/embroiderer-create-zero-charge','EmbroidererController@embroidererCreateZeroCharge')->name('embroiderer-create-zero-charge');
-    Route::get('/cards-management','EmbroidererController@cardsManagement')->name('embroiderer-cards-management');
-    Route::post('/set-default-card','EmbroidererController@setDefaultCard')->name('embroiderer-set-default-card'); 
-    Route::post('/add-card','EmbroidererController@addCard')->name('embroiderer-add-card');
-    Route::post('/delete-card','EmbroidererController@deleteCard')->name('embroiderer-delete-card'); 
-    Route::get('/card-list','EmbroidererController@cardList')->name('embroiderer-card-list');
-    Route::get('/order-management','EmbroidererController@orderManagement')->name('embroiderer-order-management');
-    Route::get('/order-detail/{id}','EmbroidererController@embroidererOrderDetail')->name('embroiderer-order-detail');
-    Route::get('/order-form', 'EmbroidererController@orderForm')->name('embroiderer-order-form');
-    Route::post('/create-order','EmbroidererController@createOrder')->name('embroiderer-create-order');
-    Route::post('/cancel-order','EmbroidererController@cancelOrder')->name('embroiderer-cancel-order');
-    Route::post('/order-image','EmbroidererController@orderImage')->name('embroiderer-order-image');
-    Route::get('/cart','EmbroidererController@cart')->name('embroiderer-cart');
-    Route::post('/remove-item', 'EmbroidererController@removeItem')->name('embroiderer-cart-remove');
-    Route::post('/place-order','EmbroidererController@placeOrder')->name('embroiderer-place-order');
-    Route::get('/clear-cart', 'EmbroidererController@clearCart')->name('embroiderer-clear-cart');
-    Route::get('/checkout-payment', 'EmbroidererController@checkoutPayment')->name('embroiderer-checkout-payment');
+        Route::post('/update-cart-order', 'EmbroidererController@updateCartOrder')->name('embroiderer-update-cart-order');
+        Route::post('/get-cart-order', 'EmbroidererController@getCartOrder')->name('embroiderer-get-cart-order');
 
-    Route::post('/check-coupon', 'EmbroidererController@checkCoupon')->name('embroiderer-check-coupon');
-    Route::post('/reorder', 'EmbroidererController@reOrder')->name('embroiderer-reorder');
-    Route::post('/create-reorder', 'EmbroidererController@createReOrder')->name('embroiderer-create-reorder');
-    Route::get('pdf-create','PdfController@create')->name('embroiderer-pdf-create');
-    Route::get('send-invoice-data','PdfController@pdfdta')->name('embroiderer-send-invoice-data');
-    
-    Route::get('/downlaod-image/{feature_image}','EmbroidererController@downloadImage')->name('embroiderer-download-image');
-    Route::get('/send-order-id', 'EmbroidererController@completedImagesDetail')->name('embroiderer-send-order-id');
+        Route::get('/cancelingIntent', 'EmbroidererController@cancelingIntent');
+        Route::post('/create-payment-intent', 'EmbroidererController@createPaymentIntent')->name('embroiderer-create-charge');
+        Route::get('/cards-management', 'EmbroidererController@cardsManagement')->name('embroiderer-cards-management');
+        Route::post('/set-default-card', 'EmbroidererController@setDefaultCard')->name('embroiderer-set-default-card');
+        Route::post('/add-card', 'EmbroidererController@addCard')->name('embroiderer-add-card');
+        Route::post('/delete-card', 'EmbroidererController@deleteCard')->name('embroiderer-delete-card');
+        Route::get('/card-list', 'EmbroidererController@cardList')->name('embroiderer-card-list');
+        Route::get('/order-detail/{id}', 'EmbroidererController@embroidererOrderDetail')->name('embroiderer-order-detail');
+        Route::get('/order-form', 'EmbroidererController@orderForm')->name('embroiderer-order-form');
+        Route::post('/create-order', 'EmbroidererController@createOrder')->name('embroiderer-create-order');
+        Route::post('/cancel-order', 'EmbroidererController@cancelOrder')->name('embroiderer-cancel-order');
+        Route::post('/order-image', 'EmbroidererController@orderImage')->name('embroiderer-order-image');
+        Route::get('/cart', 'EmbroidererController@cart')->name('embroiderer-cart');
+        Route::post('/remove-item', 'EmbroidererController@removeItem')->name('embroiderer-cart-remove');
+        Route::post('/place-order', 'EmbroidererController@placeOrder')->name('embroiderer-place-order');
+        Route::get('/successfully-place-order', 'EmbroidererController@successfullyPlaceOrder')->name('embroiderer-successfully-place-order');
+        Route::get('/clear-cart', 'EmbroidererController@clearCart')->name('embroiderer-clear-cart');
+        Route::get('/checkout-payment', 'EmbroidererController@checkoutPayment')->name('embroiderer-checkout-payment');
+
+        Route::post('/check-coupon', 'EmbroidererController@checkCoupon')->name('embroiderer-check-coupon');
+        Route::post('/reorder', 'EmbroidererController@reOrder')->name('embroiderer-reorder');
+        Route::post('/create-reorder', 'EmbroidererController@createReOrder')->name('embroiderer-create-reorder');
+        Route::get('pdf-create', 'PdfController@create')->name('embroiderer-pdf-create');
+        Route::get('send-invoice-data', 'PdfController@pdfdta')->name('embroiderer-send-invoice-data');
+
+        Route::get('/downlaod-image/{feature_image}', 'EmbroidererController@downloadImage')->name('embroiderer-download-image');
+        Route::get('/send-order-id', 'EmbroidererController@completedImagesDetail')->name('embroiderer-send-order-id');
+    });
+});
+
+Route::get('clear_config_cache_command', function(){
+    Artisan::call('config:clear');
+    //Artisan::call('cache:clear');
+    echo app()['Illuminate\Contracts\Console\Kernel']->output();
 });

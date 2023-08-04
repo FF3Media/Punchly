@@ -328,7 +328,7 @@
      $('#order_image_name').text(data.order_name);
       if(data.status == 1){
       check = 'in-progress-tag';
-      status = 'Awaiting Approval';
+      status = 'Waiting for Approval';
       }else if(data.status == 2){
       check = 'in-progress-tag';
       status = 'In progress';

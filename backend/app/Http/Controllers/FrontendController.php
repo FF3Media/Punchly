@@ -33,7 +33,9 @@ class FrontendController extends Controller
     * HomePage
     */
     public function homePage(Request $request){
-        return view('welcome');
+      
+        $page_title = 'Welcome';
+        return view('welcome',compact('page_title'));
     }
 
     /**
@@ -41,11 +43,12 @@ class FrontendController extends Controller
     */
     public function test(){
         $data['first_name'] = 'Tester';
-        $data['last_name'] = 'User';        
+        $data['last_name'] = 'User';
         $data['email'] = 'test@yopmail.com';
         $data['mobile'] = '9865321470';
         $data['user_role'] = 'Embroiderer';
-        return view('embroiderer.test',compact('data'));
+        $page_title = 'test';
+        return view('embroiderer.test',compact('data','page_title'));
     }
 
 
@@ -60,17 +63,23 @@ class FrontendController extends Controller
         }
     }
 
+    public function afterRegisterConfirmationPage(){
+        
+        return view('afterRegisterConfirmation');
+
+    }
+
     /**
      * Check mobile number exist
      */
     public function checkMobileExist(Request $request)
     {
-        
+
         if ($request->isMethod('post')) {
             $mobileExist = User::where(['mobile' => $request->mobile])->first();
             if($request->checkAction == 'register'){
                 $mobileExist = User::where(['mobile' => $request->mobile])->first();
-            }else{                
+            }else{
                 $mobileExist = User::where(['mobile' => $request->mobile])->where('id', '!=' , $request->id)->first();
             }
             echo $mobileExist ? 'false' : 'true';
@@ -80,7 +89,8 @@ class FrontendController extends Controller
     * privacy Policy page Create
     */
     public function privacy(){
-        return view('privacy-policy');
+        $page_title = 'Privacy Policy';
+        return view('privacy-policy',compact('page_title'));
     }
 
     /**
@@ -88,8 +98,10 @@ class FrontendController extends Controller
     */
     public function editProfile(Request $request){
         if($request->isMethod('get')){
+           
             if (Auth::user()) {
-                $header = 'Update Profile';
+                $page_title = 'Update Profile';
+                
                 if(Auth::user()->user_role == 1){
                     $homeLink = route('admin-dashboard');
                 }elseif(Auth::user()->user_role == 2){
@@ -104,14 +116,14 @@ class FrontendController extends Controller
 
 
 
-                return view('edit-profile',compact('userData','header','homeLink','cardDetail'));
+                return view('edit-profile',compact('userData','page_title','homeLink','cardDetail'));
             }else{
                 return redirect()->route('login');
-            }    
+            }
         }
     }
 
-     
+
 
 
 
@@ -120,16 +132,16 @@ class FrontendController extends Controller
     */
     public function updateProfile(Request $request){
         $data = $request->except(['_token','avatar']);
-                 
+
         if($request->hasFile('avatar')) {
             $folderPath= "users-image/";
-            if ((file_exists(public_path('/users-image/'. Auth::user()->avatar)) && Auth::user()->avatar)) { 
+            if ((file_exists(public_path('/users-image/'. Auth::user()->avatar)) && Auth::user()->avatar)) {
                 unlink(public_path('/users-image/'. Auth::user()->avatar));
             }
-            $data['avatar'] = $this->imageUpload($request,$folderPath,'avatar');  
+            $data['avatar'] = $this->imageUpload($request,$folderPath,'avatar');
         }else{
             $data['avatar']= Auth::user()->avatar;
-        } 
+        }
 
         $user = User::where(['id' => Auth::user()->id])->update($data);
         if($user){
@@ -149,13 +161,13 @@ class FrontendController extends Controller
             $originName = $request->file($imageName)->getClientOriginalName();
             $fileName = pathinfo($originName, PATHINFO_FILENAME);
             $extension = $request->file($imageName)->getClientOriginalExtension();
-            $fileName = $fileName.'_'.time().'.'.$extension;            
+            $fileName = $fileName.'_'.time().'.'.$extension;
             if($request->file($imageName)->move(public_path($folderPath), $fileName)){
                 $fName = $fileName;
             }
             return $fName;
         }
-        return $fName;       
+        return $fName;
     }
 
 
@@ -177,11 +189,11 @@ class FrontendController extends Controller
             return view('changePassword',compact('header','homeLink'));
         }else{
             return redirect()->route('login');
-        }            
+        }
     }
-      
 
-     
+
+
 
     /**
     *   Change password functionality
@@ -202,12 +214,12 @@ class FrontendController extends Controller
             $user = Auth::user();
             $user->password = bcrypt($request->get('new_password'));
             $user->save();
-            return redirect()->back()->with(["alert-type"=>"success","message"=>"Password changed successfully."]);   
-        }        
-    } 
+            return redirect()->back()->with(["alert-type"=>"success","message"=>"Password changed successfully."]);
+        }
+    }
         //For fetching states
         public  function getStates($id)
-        { 
+        {
             $states = DB::table("states")->where("country_id",$id)->pluck("name","id");
             return response()->json($states);
         }

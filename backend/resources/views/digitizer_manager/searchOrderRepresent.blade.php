@@ -17,7 +17,7 @@
 						<label class="order-status-label">Status</label>
 						
 							@if ($order->status == '1')
-							<h3><span class="paid-tag">Awaiting Approval</span></h3>
+							<h3><span class="paid-tag">Waiting for Approval</span></h3>
 							@elseif ($order->status == '2')
 							<h3><span class="in-progress-tag">In progress</span></h3>
 							@elseif ($order->status == '3')

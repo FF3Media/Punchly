@@ -11,7 +11,7 @@
 					</div>
 					<div class="order-content">
 						<label class="order-date-label">Order date</label>
-						<h3><?php echo e(date('m-d-Y',strtotime($order->created_at))); ?></h3>
+						<h3><?php echo e(isset($order->payment_details->created_at) ? date('m-d-Y',strtotime($order->payment_details->created_at)): date('m-d-Y',strtotime($order->created_at))); ?></h3>
 					</div>
 					<div class="order-content">
 						<label class="order-status-label">Status</label>
@@ -154,7 +154,7 @@
                             <label>Are You Sure ?</label>                             
                         </div>
                     </div>  
-                    <input type="submit" value="Yes Sure" class="btn btn-success"> 
+                    <input type="submit" id="wrkcompleted" value="Yes Sure" class="btn btn-success"> 
             </form>
 
              </div>
@@ -182,7 +182,7 @@
                                 <textarea name="comment"  class="form-control"  rows="6" cols="50" placeholder="Leave a comment here"></textarea>
                             </div>
                         </div>                       
-                        <input type="submit" value="Reject Submitted By Digitizer" class="btn btn-success">                    
+                        <input type="submit" id="rejectSubmittedWork" value="Reject Submitted By Digitizer" class="btn btn-success">                    
                  </form>
              </div>
 

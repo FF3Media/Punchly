@@ -1,22 +1,11 @@
 <?php $__env->startSection('content'); ?>
 <div class="order-history-list-grid">
 <div class="container-fluid">
- <?php if(session()->has('success')): ?>
-                <div class="alert alert-success cus-msg-cls" style="text-align: left;">
-                    <?php echo e(session()->get('success')); ?>
-
-                </div>
-                <?php elseif(session()->has('failure')): ?>
-                <div class="alert alert-danger cus-msg-cls" style="text-align: left;">
-                    <?php echo e(session()->get('failure')); ?>
-
-                </div>
-                <?php endif; ?>
    
             <div class="row">
                 <div class="col-lg-12 my-3">
                   <div class="float-left">
-                  <h3>In-Progress Orders</h3>
+                  <h3>Orders List</h3>
                   </div>
                 <div class="float-right">
                     <div class="btn-group">
@@ -24,7 +13,7 @@
                       <button class="btn active" id="list">List View</button>
                       <button class="btn" id="grid">Grid View</button>
                       </div>
-                  <!--   <button class="filter-btn" data-toggle="modal" data-target="#filterModal">Filters <i class="fas fa-filter"></i> -->
+                    <button class="filter-btn" data-toggle="modal" data-target="#filterModal">Filters <i class="fas fa-filter"></i>
                     </div>
                   </div>
                 </div>
@@ -55,7 +44,7 @@
                     <div class="modal-body">
                       <div class="select-section">
                         <div class="select-box">
-                          <label>File type</label>
+                          <label>File Type</label>
                           <select class="form-control minimal-select" id="desired_output">
                             <option value="">Select</option>
                             <option value="for_embroidery_files">Embroidery files (DST, EMB)</option>
@@ -65,11 +54,9 @@
                           <label>Status</label>
                           <select class="form-control minimal-select" id="status">
                           <option value="">Select</option>
-                                  <option value="1">Awaiting Approval</option>
                                   <option value="2">In progress</option>
-                                  <option value="3">Rejected</option>
-                                  <!-- <option value="4">Completed</option> -->
-                                  <option value="9">Canceled</option>
+                                  <option value="13">Reworking</option>
+                                  <option value="10">For Review</option>
                          </select>
                       </div>
                       <div class="select-box">
@@ -84,6 +71,100 @@
               </div>
           </div>
       </div> 
+      <!---------------------Order Details Popup --------------------------------------->
+    <div class="modal fade download-modal" id="download-modal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      
+  <div class="modal-dialog" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </div>
+      <div class="modal-body">
+        <div class="title">
+          
+          <h3 id="order_image_name"> </h3>
+          <div class="date-status">
+            <span id="updated_date" class="date"></span> 
+             <span id="order_status" class="status completed-status"></span>  
+             <a href="javascript:void(0);" onclick="submittedWorkFiles();"  id="submitted_work" class="rejected-tag action_order float-right cancelBtn">Submit Work</a>               
+          </div>
+          <div style="display: none;" class="newWordSubmitted">
+        
+        <form id="submitted-work-form" action="<?php echo e(route('digitizer-manager-self-submitted-work')); ?>" enctype="multipart/form-data" method="post">
+                <?php echo csrf_field(); ?>              
+                    <h4 class="modal-title user-modal-title">Digitized files</h4>   
+                     <div id="loading-bar-spinner" class="spinner" style="display:none;">
+                      <div class="spinner-icon"></div>
+                    </div> 
+                    <input type="hidden" id="o_id" name="o_id"  value="">  
+                    <input type="hidden" id="order_status_submited" name="order_status"  value="">  
+                    <div class="form-group row">
+                      <div class="col-lg-12 my-error">
+                          <div class="input-field">
+                            <!--   <label class="active">Upload a sketch/wireframe</label> -->
+                              <div class="image-uploader-box"></div>
+                          </div>
+                      </div>
+                    </div>         
+                             
+                    <input type="submit" onclick="submitworkForm('submitted-work-form');" id="digi-submit-work" value="Submit Work" class="btn btn-success">
+               
+            </form>
+      </div>
+        </div>
+
+        <div class="modal-prod-details">
+          <div class="modal-prod-img"><img  id="order_image" src="" /> </div> 
+          <div class="modal-prod-text">
+            <p><span class="detail-type">File Type:</span> <span id="desired_output2" class="type-status"></span></p>
+            <p><span class="detail-type">Garment type:</span> <span id="garment_name" class="type-status"></span></p>
+            <p><span class="detail-type">Desired height:</span> <span id="desired_height" class="type-status">”</span></p>
+            <p><span class="detail-type">Desired width:</span> <span  id="desired_width" class="type-status"></span></p>
+            <p><span class="detail-type">Order ID:</span> <span id="order_unique_id" class="type-status"></span></p>            
+           <!--  <p  id="rejected-reason"><span class="detail-type">Rejection reason:</span> <span id="rejected-selected-reason" class="type-status"></span></p> -->
+                      
+            <!-- <p><span class="detail-type">Cost:</span> <span  id="order_amount" class="type-status"></span></p> -->
+          </div>   
+        </div> 
+      </div>
+      <div class="modal-footer">
+       <h5>Comment</h5>
+       <p id="order_message"></p>  
+       <div id="rejected-message">
+         
+        <div class="ftr-modal-box repeat-order-box">
+        <div class="ftr-dwnld">          
+          <h5><span class="reason-heading2">Rejection reason</span> </h5>        
+          <p style="margin: 10px 0px"><span id="rejected-selected-reason" class="type-status"></span></p>
+        </div>
+       
+      </div> 
+       <h5>Rejection Message:</h5>
+       <p id="rejected-text"></p>    
+       </div>   
+     
+     <div class="Orignal-image"> 
+         <h5>Orignal Image </h5> 
+      
+         <div class="ftr-modal-box">
+          <div class="ftr-dwnld-left">
+          <img id="order_image_download" src=" " />
+          <span id='ori-img'></span>
+        <!--  <h4 id="down_image_name"> <span class="file-size">12 MB</span></h4> -->
+        </div>
+        <div  class="ftr-dwnld-btn"> <a id="downloardBtn" href="" class="btn">Download</a></div>
+      </div>
+      </div>
+
+      <div class="submitted-work">
+            
+           </div> 
+      </div> 
+    </div>
+  </div>
+</div>
 <?php $__env->stopSection(); ?>
 
 <?php $__env->startSection('third_party_scripts'); ?>
@@ -122,10 +203,13 @@
     });
     $('.clearFilter').click(function(){       
       var elements = document.getElementsByTagName("select");
-       $('input[name="daterange"]').val('');
+          $('input[name="daterange"]').val('');
+          $("input[name=search]").val('');
           for (var ii=0; ii < elements.length; ii++) {             
-              elements[ii].value = "";           
+              elements[ii].value = "";  
+
           }
+
       var page = 1; 
       $('#filterModal').modal('toggle');
       filter_data(page);
@@ -138,7 +222,7 @@
           headers: {
                 'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
             },
-            url: HOST_URL+"/digitizer-manager/inprogress-orderRepresent/?page="+page,
+            url: HOST_URL+"/digitizer-manager/orderRepresentInProgress/?page="+page,
             method:"GET",
             data:{minimumDate:minimumDate, maximumDate:maximumDate , status:status, desired_output:desired_output},
             success:function(data){
@@ -176,33 +260,19 @@
 
   });
 
-function approveOrder(){
-	$('.approveForm').slideToggle();  
-	$('.rejectOrderForm').slideUp();
-   }
+  function submittedWorkFiles(){
+  	$('.newWordSubmitted').slideToggle();
+  }
 
-   function reAssignDigitizer(){
-   $('.reAssignForm').slideToggle();  
-  
-   }
-
-function rejectOrderForm (){
-	$('.rejectOrderForm').slideToggle();
-	$('.approveForm').slideUp(); 
-}
+ 
  function showOrderDetail(data){
-  $('.reAssignForm').hide();
   $('.rejectOrderForm').hide();
   $('.approveForm').hide();
-  $('#assign-digitizer').hide();
+  $('.newWordSubmitted').hide();
+  $('#submitted_work').hide();   
+  $('.submitted-work').hide();  
   $('#rejected-message').hide();
-  $('#rejected-reason').hide();
-  $('#payment_method').val(''); 
-  $('#pay_authorization_id').val(''); 
-  $('#order_amount').val(''); 
-  $('#desired_old_height_label').hide();
-  $('#desired_old_width_label').hide();
-  console.log(data);
+  $('#rejected-reason').hide();  
     //send order detail to Order detail poppup
     var status = '';
     var check = '';
@@ -213,25 +283,20 @@ function rejectOrderForm (){
     var year = updated_date.getUTCFullYear();
     $('#updated_date').text(day+' '+month+' '+year); 
 
-   if(data.desired_output == 'for_embroidery_files'){
-   	 $('#desired_output2').text('Embroidery files (DST, EMB)');
+     if(data.desired_output == 'for_embroidery_files'){
+     	 $('#desired_output2').text('Embroidery files (DST, EMB)');
      }       
      $('#garment_name').text(data.garment.name);
      $('#desired_height').text(data.desired_height);
      $('#desired_width').text(data.desired_width);
      $('#order_unique_id').text(data.order_unique_id);
-     $('#order_amount').text('$'+data.amount);
+     $('#order_amount').text('$'+data.total_amount);
      $('#order_message').text(data.order_message);
      $('#order_image_name').text(data.order_name);
-     if(data.desired_old_height > 0 && data.desired_old_width > 0 ) {
-      $('#desired_old_height').text(data.desired_old_height);
-      $('#desired_old_width').text(data.desired_old_width);
-      $('#desired_old_height_label').show();
-      $('#desired_old_width_label').show();
-     }
       if(data.status == 1){
       check = 'paid-tag';
-      status = 'Awaiting Approval';
+      status = 'Waiting for Approval';
+      $('#cancel_btn').show();
       }else if(data.status == 2){
       check = 'in-progress-tag';
       status = 'In progress';
@@ -244,9 +309,6 @@ function rejectOrderForm (){
       }else if(data.status == 7){
       check = 'rejected-tag';
       status = 'Refund pending';
-      }else if(data.status == 9){
-      check = 'rejected-tag';
-      status = 'Canceled';
       }else if(data.status == 8){
       check = 'rejected-tag';
       status = 'Refund failed';
@@ -267,21 +329,14 @@ function rejectOrderForm (){
       $('#order_status').removeClass(); 
       $('#order_status').addClass(check);
       $('#order_image').attr('src',HOST_URL+'/public/orders/'+data.feature_image);    
-      $('#down_image_name').text(data.order_name);  
+      $('#down_image_name').text(data.order_name); 
       $('#order_image_download').attr('src',HOST_URL+'/public/orders/'+data.feature_image);
-      var url = '<?php echo e(route("digitizer-manager-download-image", ":orderimage")); ?>';
+       $('#ori-img').text(data.feature_image);
+      var url = '<?php echo e(route("digitizer-download-image", ":orderimage")); ?>';
       url = url.replace(':orderimage', data.feature_image);
-       //Assign digitizer name  
-
-      if(data.status != 1 && data.order_digitizer_id != 0 ){  
-       if(data.digitizer){
-          $('#digitizer-name').text(data.digitizer.first_name);
-          $('#assign-digitizer').show();  
-        }  
-
-      }
+      
       //rejected message
-      if(data.status == 3 ){
+      if(data.status == 13 ){
         if(data.comment){
           $('#rejected-message').show();
           $('#rejected-text').text(data.comment);
@@ -291,241 +346,112 @@ function rejectOrderForm (){
           $('#rejected-selected-reason').text(data.rejection_reason.reason);
         }
        
-      }
-
-
-      //end details
-
-      //approve and Reject  order buttons hide and show for new listing.
-      if(data.status == 1){
-      if(data.payment_details != null ){
-        if(data.payment_details.st_payment_intent_id){
-          $('#payment_method').val(data.payment_details.st_payment_intent_id);  
-           $('#st_payment_intent_id').val(data.payment_details.st_payment_intent_id);  
-
-        }else if(data.payment_details.pay_authorization_id){
-
-          if(data.amount_after_coupon > 0){
-            $('#pay_order_amount').val(data.total_amount); 
-          }else{
-
-            $('#pay_order_amount').val(data.total_amount); 
-          }
-
-           
-          $('#pay_authorization_id').val(data.payment_details.pay_authorization_id);  
-        }
-       
-      
-      }
-       //send reject order id 
-      $('#reject_or_id').val(data.id);      
-      //send approve and asign digitizer  order id      
-
-
-      $('.btnhide').show();
-      //edit Button show
-      $('#edit-order-btn').show()
-      }else {
-        $('.btnhide').hide();
-        //edit Button hide
-        $('#edit-order-btn').hide()   
-
-         } 
-      //end button hiding
-
-      // Showing digiti
-      $('#downloardBtn').attr('href', url);       
-      //send assign digitizer order id 
-      $('#approve_or_id').val(data.id);
-      $('#approve_or_id2').val(data.id);      
-      //For edit form 
-      $('#edit_desired_height').val(data.desired_height);
-      $('#edit_desired_width').val(data.desired_width);
-      $('#o_id').val(data.id); 
-      $('#edit_order_message').val(data.order_message); 
-      $('#cost_calculate').val(data.amount);
-      $('#edit_order_image').val(data.feature_image);        
-      $('#showing_edit_order_image').text(data.feature_image);
-      if(data.desired_output == 'for_embroidery_files'){
-      selectFromDropdown('#edit_des_output', 'Embroidery files (DST, EMB)')
       } 
-      if(data.garment != null){
-      selectFromDropdown('#garment_id_edit', data.garment.name)
-      }else{
-      selectFromDropdown('#garment_id_edit', '')
-      }
-      
+      //end details 
+      // Showing digitizer
+      $('#downloardBtn').attr('href', url);  
+      $('#o_id').val(data.id); 
+      $('#order_status_submited').val(data.status); 
+      // $('#cost_calculate').val(data.amount); 
+      if(data.status == 2 || data.status == 13)  {
+         $('#submitted_work').show();
 
+      }   
+
+      $.ajax({
+          headers: {
+                'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+            },
+            url: "<?php echo e(route('digitizer-send-order-id')); ?>",
+            method:"GET",
+            data:{order_id:data.id},
+            success:function(data){               
+              if(data.isSucceeded){
+                  $('.submitted-work').html(data.data); 
+                  $('.submitted-work').show();             
+                  
+                }         
+            }
+        }); 
       //Show model 
       $('#download-modal').modal('toggle');
 
  }  
-function selectFromDropdown(selector, text) {
-  $(selector).find('option').each(function() {
-    if ($(this).text() == text) {
-      $(selector).val($(this).val());
-      return false;
-    }
-  })
-}
-
-  $('body').on('click','.action_order',function(){
-        if($(this).attr('act-name') == 'edit-order'){
-          $('#desired_height').attr('readonly','true');
-          $('#desired_width').attr('readonly','true');
-          $('#updateOrder').modal('toggle');
-         }  
-               
+ 
+   $('.image-uploader-box').imageUploader({
+        imagesInputName: 'order_image',
+        preloadedInputName: 'old',
+        maxFiles: 10,
     });
-   
-     function validateEditForm(data){
-        jQuery('.error2').remove();
-        var error=0;
-        var field_name= "";         
-      if(jQuery("select[name=garment_id]").val() == '') {    
-         jQuery("select[name=garment_id]").css('border','1px solid red');
-         jQuery("select[name=garment_id]").parent().append('<span class="error2" style="color:red">Please select garment type.</span>');    
-        if(field_name == "") {        
-            field_name = "select[name=garment_id]"; 
-        }   
-        error=1; 
 
-      }else{      
-        jQuery("select[name=garment_id]").css('border','1px solid #cacaca');
-       }
-        if(jQuery("select[name=measurement]").val() == '') {    
-         jQuery("select[name=measurement]").css('border','1px solid red');
-         jQuery("select[name=measurement]").parent().append('<span class="error2" style="color:red">Please select measurement.</span>');    
-        if(field_name == "") {        
-            field_name = "select[name=measurement]"; 
-        }   
-        error=1;  
-        }else{      
-        jQuery("textarea[name=order_message]").css('border','1px solid #cacaca');
-       }
-       if(jQuery("textarea[name=order_message]").val() == '') {    
-         jQuery("textarea[name=order_message]").css('border','1px solid red');
-         jQuery("textarea[name=order_message]").parent().append('<span class="error2" style="color:red">Please enter your desired message</span>');    
-        if(field_name == "") {        
-            field_name = "textarea[name=order_message]"; 
-        }   
-        error=1;  
-        }else{      
-        jQuery("textarea[name=order_message]").css('border','1px solid #cacaca');
-       }
-       // if(jQuery("input[name=feature_image]").val() == '') {    
-       //   jQuery("input[name=feature_image]").css('border','1px solid red');
-       //   jQuery("input[name=feature_image]").parent().append('<span class="error2" style="color:red">Please select image</span>');    
-       //  if(field_name == "") {        
-       //      field_name = "input[name=feature_image]"; 
-       //  }   
-       //  error=1;  
-       //  }else{      
-       //  jQuery("input[name=feature_image]").css('border','1px solid #cacaca');
-       // }
-
-         if(error==1){
-          if(field_name){
-              jQuery("html, body").animate({ scrollTop: jQuery(field_name).parent().find('div').top }, 900);
-              jQuery(field_name).focus(); 
-          }        
-            return false;
-         } 
-     }
+  //  $('#submitted-work-form').validate({
+  //         submitHandler: function(form,event) {
+  //           $('#loading-bar-spinner').show();
+  //           form.submit();
+  //         },
+  //         rules: {
+  //             "order_image[]": {
+  //                 required: true,
+  //                 extension: "jpg,jpeg,png",
+  //                 filesize: 30*1024*1024,
+  //             },
+  //         },
+  //         messages: {
+  //             "order_image[]": {
+  //                 required: "Please select at least one image",
+  //                 extension: "Please upload the file only have extension:jpg,jpeg,png",
+  //                 filesize: "File size must be less than 30MB",
+                  
+  //             },  
+  //         },
+  //         errorElement: 'span',           
+  //         errorPlacement: function (error, element) {
+  //           error.addClass('invalid-feedback');
+  //           element.closest('.my-error').append(error);
+  //         },
+  //         highlight: function (element, errorClass, validClass) {
+  //           $(element).addClass('is-invalid');
+  //         },
+  //         unhighlight: function (element, errorClass, validClass) {
+  //           $(element).removeClass('is-invalid');
+  //         }
+  //     }); 
   
   
- function rejectOrderValidation(data){
-        jQuery('.error2').remove();
-        var error=0;
-        var field_name= "";         
-       if(jQuery("select[name=reason_id]").val() == '') {    
-         jQuery("select[name=reason_id]").css('border','1px solid red');
-         jQuery("select[name=reason_id]").parent().append('<span class="error2" style="color:red">Please Select Reason For Rejection.</span>');    
-        if(field_name == "") {        
-            field_name = "select[name=reason_id]"; 
-        }   
-        error=1;
-      }else{      
-        jQuery("textarea[name=reason_id]").css('border','1px solid #cacaca');
-       }
-       if(jQuery("textarea[name=comment]").val() == '') {    
-         jQuery("textarea[name=comment]").css('border','1px solid red');
-         jQuery("textarea[name=comment]").parent().append('<span class="error2" style="color:red">Comment Cannot be blank.</span>');    
-        if(field_name == "") {        
-            field_name = "textarea[name=comment]"; 
-        }   
-        error=1;
-      }else{      
-        jQuery("textarea[name=comment]").css('border','1px solid #cacaca');
-       }
-        
-         if(error==1){
-          if(field_name){
-              jQuery("html, body").animate({ scrollTop: jQuery(field_name).parent().find('div').top }, 900);
-              jQuery(field_name).focus(); 
-          }        
-            return false;
-         } 
-}
- function assignDigitizerValidation(data){
-        jQuery('.error2').remove();
-        var error=0;
-        var field_name= "";   
-       if(jQuery("#order_digitizer_id2").val() == '') {   
-         jQuery("select[name=order_digitizer_id]").css('border','1px solid red');
-         jQuery("select[name=order_digitizer_id]").parent().append('<span class="error2" style="color:red">Please Select Digitizer.</span>');    
-        if(field_name == "") {        
-            field_name = "select[name=order_digitizer_id]"; 
-        }   
-        error=1;
-      }else{           
-        jQuery("select[name=order_digitizer_id]").css('border','1px solid #cacaca');
-       }
-        
-        
-         if(error==1){
-          if(field_name){
-              jQuery("html, body").animate({ scrollTop: jQuery(field_name).parent().find('div').top }, 900);
-              jQuery(field_name).focus(); 
-          }        
-            return false;
-         }
-          return true; 
-}
-function reassignDigitizerValidation(data){
-        jQuery('.error2').remove();
-        var error=0;
-        var field_name= "";         
-       if(jQuery("select[name=order_digitizer_id]").val() == '') {    
-         jQuery("select[name=order_digitizer_id]").css('border','1px solid red');
-         jQuery("select[name=order_digitizer_id]").parent().append('<span class="error2" style="color:red">Please Select Digitizer.</span>');    
-        if(field_name == "") {        
-            field_name = "select[name=order_digitizer_id]"; 
-        }   
-        error=1;
-      }else{      
-        jQuery("select[name=order_digitizer_id]").css('border','1px solid #cacaca');
-       } 
-         if(error==1){
-          if(field_name){
-              jQuery("html, body").animate({ scrollTop: jQuery(field_name).parent().find('div').top }, 900);
-              jQuery(field_name).focus(); 
-          }        
-            return false;
-         } 
-}
-  function munual_override(click){ 
-  
-   
-      if($(click).is(':checked')){         
-        $('#edit_desired_height').removeAttr('readonly');
-        $('#edit_desired_width').removeAttr('readonly');
-      }else{
-        $('#edit_desired_height').attr('readonly','true');
-        $('#edit_desired_width').attr('readonly','true');
-      }
+  const submitworkForm = (form_id) => {
+	  var form = $("#"+form_id);
+    form.validate({
+		rules: { 
+      "order_image[]": {
+                  required: true,
+                  extension: "jpg,jpeg,png",
+                  filesize: 30*1024*1024,
+              },
+        },
+		messages: {
+      "order_image[]": {
+                  required: "Please select at least one image",
+                  extension: "Please upload the file only have extension:jpg,jpeg,png",
+                  filesize: "File size must be less than 30MB",
+                  
+              },     
+        }, 
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
+            error.addClass('invalid-feedback');
+            element.closest('.my-error').append(error);
+          },
+          highlight: function (element, errorClass, validClass) {
+            $(element).addClass('is-invalid');
+          },
+          unhighlight: function (element, errorClass, validClass) {
+            $(element).removeClass('is-invalid');
+          }
+    },$("#digi-submit-work").attr('disabled','disabled'),
+      form.submit(), 
     
+    );
+       
 }
 </script>
 

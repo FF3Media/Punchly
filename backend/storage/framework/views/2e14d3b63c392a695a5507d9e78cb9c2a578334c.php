@@ -1,3 +1,5 @@
+
+
 <?php $__env->startSection('content'); ?>
 <div class="order-history-list-grid">
 <div class="container-fluid">
@@ -260,7 +262,7 @@
      $('#order_image_name').text(data.order_name);
         if(data.status == 1){
       check = 'paid-tag';
-      status = 'Awaiting Approval';
+      status = 'Waiting for Approval';
       $('#cancel_btn').show();
       }else if(data.status == 2){
       check = 'in-progress-tag';

@@ -1,3 +1,5 @@
+
+
 <?php $__env->startSection('content'); ?>
 <div class="order-history-list-grid">
 <div class="container-fluid">
@@ -103,13 +105,13 @@
                     <div class="form-group row">
                       <div class="col-lg-12 my-error">
                           <div class="input-field">
-                             <!--  <label class="active">Upload a sketch/wireframe</label> -->
+                            <!--   <label class="active">Upload a sketch/wireframe</label> -->
                               <div class="image-uploader-box"></div>
                           </div>
                       </div>
                     </div>         
                              
-                    <input type="submit" value="Submit Work" class="btn btn-success">
+                    <input type="submit" onclick="submitworkForm('submitted-work-form');" id="digi-submit-work" value="Submit Work" class="btn btn-success">
                
             </form>
       </div>
@@ -269,7 +271,7 @@
   $('.rejectOrderForm').hide();
   $('.approveForm').hide();
   $('.newWordSubmitted').hide();
-  // $('#submitted_work').hide();   
+  $('#submitted_work').hide();   
   $('.submitted-work').hide();  
   $('#rejected-message').hide();
   $('#rejected-reason').hide();  
@@ -290,12 +292,12 @@
      $('#desired_height').text(data.desired_height);
      $('#desired_width').text(data.desired_width);
      $('#order_unique_id').text(data.order_unique_id);
-     $('#order_amount').text('$'+data.amount);
+     $('#order_amount').text('$'+data.total_amount);
      $('#order_message').text(data.order_message);
      $('#order_image_name').text(data.order_name);
       if(data.status == 1){
       check = 'paid-tag';
-      status = 'Awaiting Approval';
+      status = 'Waiting for Approval';
       $('#cancel_btn').show();
       }else if(data.status == 2){
       check = 'in-progress-tag';
@@ -353,10 +355,10 @@
       $('#o_id').val(data.id); 
       $('#order_status_submited').val(data.status); 
       // $('#cost_calculate').val(data.amount); 
-      // if(data.status == 2 || data.status == 13)  {
-      //    $('#submitted_work').show();
+      if(data.status == 2 || data.status == 13 || data.status == 10)  {
+         $('#submitted_work').show();
 
-      // }   
+      }   
 
       $.ajax({
           headers: {
@@ -381,31 +383,68 @@
    $('.image-uploader-box').imageUploader({
         imagesInputName: 'order_image',
         preloadedInputName: 'old',
+       // extensions: ['.jpg','.jpeg','.png','.gif','.svg','.pdf','.PDF','.DST','.dst','.EMB','.emb','.bin'],
+      // mimes: ['image/jpeg','image/png','image/gif','/svg+xml','x-pdf','application/pdf','application/x-pdf','application/octet-stream','application/vnd.ms-office '],
         maxFiles: 10,
     });
+ 
 
-   $('#submitted-work-form').validate({
-          submitHandler: function(form,event) {
-            $('#loading-bar-spinner').show();
-            form.submit();
-          },
-          rules: {
-              "order_image[]": {
+  //  $('#submitted-work-form').validate({
+  //         submitHandler: function(form,event) {
+  //           $('#loading-bar-spinner').show();     
+  //           $("#digi-submit-work").attr('disabled','disabled');
+  //           form.submit();
+  //         },
+  //         rules: {
+  //             "order_image[]": {
+  //                 required: true,
+  //                 extension: "jpg,jpeg,png",
+  //                 filesize: 30*1024*1024,
+  //             },
+  //         },
+  //         messages: {
+  //             "order_image[]": {
+  //                 required: "Please select at least one image",
+  //                 extension: "Please upload the file only have extension:jpg,jpeg,png",
+  //                 filesize: "File size must be less than 30MB",
+                  
+  //             },  
+  //         },
+  //         errorElement: 'span',           
+  //         errorPlacement: function (error, element) {
+  //           error.addClass('invalid-feedback');
+  //           element.closest('.my-error').append(error);
+  //         },
+  //         highlight: function (element, errorClass, validClass) {
+  //           $(element).addClass('is-invalid');
+  //         },
+  //         unhighlight: function (element, errorClass, validClass) {
+  //           $(element).removeClass('is-invalid');
+  //         }
+  //     });   
+
+
+
+ const submitworkForm = (form_id) => {
+	  var form = $("#"+form_id);
+    form.validate({
+		rules: { 
+      "order_image[]": {
                   required: true,
                   extension: "jpg,jpeg,png",
                   filesize: 30*1024*1024,
               },
-          },
-          messages: {
-              "order_image[]": {
+        },
+		messages: {
+      "order_image[]": {
                   required: "Please select at least one image",
                   extension: "Please upload the file only have extension:jpg,jpeg,png",
                   filesize: "File size must be less than 30MB",
                   
-              },  
-          },
-          errorElement: 'span',           
-          errorPlacement: function (error, element) {
+              },     
+        }, 
+        errorElement: 'span',
+        errorPlacement: function (error, element) {
             error.addClass('invalid-feedback');
             element.closest('.my-error').append(error);
           },
@@ -415,7 +454,13 @@
           unhighlight: function (element, errorClass, validClass) {
             $(element).removeClass('is-invalid');
           }
-      });   
+    },$("#digi-submit-work").attr('disabled','disabled'),
+      form.submit(), 
+    
+    );
+       
+}
+
 </script>
 
  

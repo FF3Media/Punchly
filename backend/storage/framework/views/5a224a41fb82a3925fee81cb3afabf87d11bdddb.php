@@ -1,264 +1,218 @@
-<!doctype html>
-<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
-  <head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta http-equiv="content-type" content="text/html; charset=UTF-8">
-    <meta name="format-detection" content="telephone=no">
-    <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=no;">
-    <meta http-equiv="x-ua-compatible" content="IE=9; IE=8; IE=7; IE=EDGE">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta http-equiv="x-ua-compatible" content="ie-edge">
-    <meta name="x-apple-disable-message-reformatting">
-    <title>Email</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,500;0,700;1,400;1,500;1,700&display=swap" rel="stylesheet">
-    <style type="text/css">
-      #outlook a {
-      padding: 0;
-      }
-      body {
-      width: 100% !important;
-      size-adjust: 100%;
-      -ms-text-size-adjust: 100%;
-      margin: 0;
-      padding: 0;
-      font-family: 'Montserrat', sans-serif;
-      }
-      .ii a[href] {
-    color: #fff;
-    text-decoration: none;
-}
-      .fl {
-      width: 100%;
-      height: 40px;
-      border: 1px solid #fff;
-      margin-bottom: 20px;
-      background-color: transparent;
-      color: #fff;
-      }
-      ::placeholder {
-      color: #fff !important;
-      padding-left: 10px;
-      font-size: 16px;
-      font-weight: 300;
-      }
-      table td {
-      border-collapse: collapse;
-      }
-      #outlook a {
-      padding: 0;
-      }
-      body {
-      width: 100% !important;
-      size-adjust: 100%;
-      -ms-text-size-adjust: 100%;
-      margin: 0;
-      padding: 0;
-      -webkit-font-smoothing: antialiased;
-      }
-      table td {
-      border-collapse: collapse;
-      }
-      .ExternalClass * {
-      line-height: 115%;
-      }
-      @media  all and (min-width: 481px) and (max-width: 616px) {
-      body {
-      max-width: 96% !important;
-      width: 96% !important;
-      margin: 0 auto !important;
-      padding: 0 !important;
-      }
-      .wrapper {
-      width: 100% !important;
-      max-width: 100% !important;
-      text-align: center !important;
-      }
-      .full-width {
-      width: 100% !important;
-      max-width: 100% !important;
-      text-align: center !important;
-      display: inline-block !important;
-      margin-left: auto !important;
-      margin-right: auto !important;
-      }
-      .font_h1 {
-      font-size: 30px !important;
-      }
-      .m-120 {
-      height: 125px !important;
-      height: 125 !important;
-      }
-      }
-      @media  all and (max-width: 480px) {
-      body {
-      max-width: 96% !important;
-      width: 96% !important;
-      margin: 0 auto !important;
-      padding: 0 !important;
-      }
-      .wrapper {
-      width: 100% !important;
-      max-width: 100% !important;
-      text-align: center !important;
-      }
-      .Heading1 {
-      font-size: 28px !important;
-      }
-      .full-width {
-      width: 100% !important;
-      max-width: 100% !important;
-      text-align: center !important;
-      display: inline-block !important;
-      margin-left: auto !important;
-      margin-right: auto !important;
-      }
-      .m-center-image {
-      text-align: center !important;
-      }
-      .m-center-text {
-      text-align: center !important;
-      }
-      .PaddLR {
-      padding-left: 10px !important;
-      padding-right: 10px !important;
-      }
-      .m-none {
-      display: none !important;
-      height: 0px !important;
-      height: 0 !important;
-      }
-      .desktop {
-      display: none !important;
-      }
-      .mobile {
-      display: block !important;
-      }
-      .font_h1 {
-      font-size: 19px !important;
-      }
-      .m-120 {
-      height: 20px !important;
-      height: 20 !important;
-      }
-      .ii a[href] {
-    color: #fff;
-    text-decoration: none;
-}
-      }
-    </style>
-  </head>
-  <body bgcolor="#E9E9E9" style="padding:0; margin:0 auto; background:#E9E9E9;">
-    <table align="center" cellpadding="0" cellspacing="0" width="100%" bgcolor="#E9E9E9">
-    <tr>
-      <td align="center" width="100%" height="30" class=""></td>
-    </tr>
-    <tr>
-      <td align="center" valign="top" style="">
-              <table bgcolor="#fff  " align="center" border="0" cellpadding="0" cellspacing="0" width="600" class="wrapper" style="border-radius:10px;">
-                <tbody>
+<!DOCTYPE html>
+<html>
+   <head>
+      <meta charset="utf-8">
+      <meta http-equiv="x-ua-compatible" content="ie=edge">
+      <title>Email template</title>
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <style type="text/css">
+         @media  screen {
+         @font-face {
+         font-family: 'Source Sans Pro';
+         font-style: normal;
+         font-weight: 400;
+         src: local('Source Sans Pro Regular'), local('SourceSansPro-Regular'), url(https://fonts.gstatic.com/s/sourcesanspro/v10/ODelI1aHBYDBqgeIAH2zlBM0YzuT7MdOe03otPbuUS0.woff) format('woff');
+         }
+         @font-face {
+         font-family: 'Source Sans Pro';
+         font-style: normal;
+         font-weight: 700;
+         src: local('Source Sans Pro Bold'), local('SourceSansPro-Bold'), url(https://fonts.gstatic.com/s/sourcesanspro/v10/toadOcfmlt9b38dHJxOBGFkQc6VGVFSmCnC_l7QZG60.woff) format('woff');
+         }
+         }
+         body {
+         width: 100% !important;
+         height: 100% !important;
+         padding: 0 !important;
+         margin: 0 !important;
+         }
+         img {
+         height: auto;
+         line-height: 100%;
+         text-decoration: none;
+         border: 0;
+         outline: none;
+         }
+      </style>
+   </head>
+   <body style="background-color: #e9ecef;">
+      <!-- start body -->
+      <table border="0" cellpadding="0" cellspacing="0" width="100%">
+         <tr>
+            <td align="center" >
+               <table border="0" cellpadding="0" cellspacing="0" width="100%" style="background-color: #fff;max-width:900px";>
                   <tr>
-                    <td align="center" valign="top" style="padding:0px 0px 0px 0px;">
-                      <table bgcolor="#fff  " align="center" border="0" cellpadding="0" cellspacing="0" width="600" class="wrapper" style="border-radius: 10px 10px;">
-                        <tbody>
-                          <tr>
-                            <td align="center" valign="top">
-                              <table bgcolor="#fff  " align="center" border="0" cellpadding="0" cellspacing="0" width="600" class="wrapper" style="border-radius: 10px;">
-                                <tbody>
-                                  <tr>
-                                    <td align="center" width="100%" height="20" class=""></td>
-                                  </tr>
-                                  <tr>
-                                    <td bgcolor=""  align="center" valign="middle" style="text-align:center; padding:0px 20px;" class=""><a href="#"><img src="<?php echo e(asset('front_end/images/logo.png')); ?>" width="109" alt="Embroiderer Website"></a></td>
-                                  </tr>
-                                  <tr>
-                                    <td align="center" width="100%" height="10" class=""></td>
-                                  </tr>
-                                </tbody>
-                              </table>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td align="center" valign="top">
-                              <table bgcolor="" align="center" border="0" cellpadding="0" cellspacing="0" width="600" class="wrapper" style="">
-                                <tbody>
-                                  <tr>
-                                    <td bgcolor="" width="100%" align="center" valign="top" background="images/banner3.png" style="background-image:url(images/banner3.png) !important; background-size:cover; background-position:top !important; background-repeat:no-repeat;" class="paddLR20">
-                                      <table bgcolor="" align="center" border="0" cellpadding="0" cellspacing="0" width="100%" class="wrapper" style="">
-                                        <tbody>
-                                          <tr>
-                                            <td bgcolor=""  align="left" valign="top" style="text-align:left; padding:20px 20px 0px 20px; background-color: #ff4882;" class="">
-                                              <div style="color:#fff; padding: 0px; text-align:center;font-size:24px;font-family: 'Montserrat', sans-serif !important; font-weight:bold; vertical-align:top;" class=""><?php echo e($data['subject']); ?></div>
-                                            </td>
-                                          </tr>                                           
-                                          <tr>                  
-                                            <table bgcolor="#afc578" align="center" border="0" cellpadding="0" cellspacing="0" width="100%" class="wrapper" style="">
-                                              <tr>
-
-
-                                            <td width="50%" bgcolor=""  align="left" valign="top" style="text-align:center; padding:0px 20px 0px 20px;" class="">
-                                              <div style="color:#fff; padding: 15px 0px 0px 0px; text-align:left;font-size:14px;font-family: 'Montserrat', sans-serif !important; font-weight:medium; vertical-align:top;" class="">Name: <span><?php echo e(isset($data) ? $data['fullname']: ''); ?></span></div>
-                                            </td>
-                                            
-                                            
-                                          </tr> 
-                                          <tr>
-                                           
-                                            <td width="50%" bgcolor=""  align="left" valign="top" style="text-align:center; padding:0px 20px 0px 20px;" class="">
-                                              <div style="color:#fff; padding: 15px 0px 0px 0px; text-align:left;font-size:14px;font-family: 'Montserrat', sans-serif !important; font-weight:medium; vertical-align:top;" class="">Order Id: <span style="text-decoration: none;color: #fff;"><?php echo e(isset($data) ? $data['order_id'] : ''); ?></span></div>
-                                            </td>
-                                          </tr>   
-                                           <tr>
-                                            
-                                            <td width="50%" bgcolor=""  align="left" valign="top" style="text-align:center; padding:0px 20px 0px 20px;" class="">
-                                              <div style="color:#fff; padding: 15px 0px 0px 0px; text-align:left;font-size:14px;font-family: 'Montserrat', sans-serif !important; font-weight:medium; vertical-align:top;" class="">Amount($): <span style="text-decoration: none;color: #fff;"><?php echo e(isset($data) ? $data['amount'] : ''); ?></span></div>
-                                            </td>
-                                          </tr>                                        
-                                          </table>
-                                          </tr>                                          
-                                          
-                                          
-                                        </tbody>
-                                      </table>
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td bgcolor="#afc578"  align="center" valign="middle" style="" class="">
-                              <table bgcolor="" align="center" width="100%" border="0" cellspacing="0" cellpadding="0">
-                                <tr>
-                                  <td align="center" width="100%" style="" class="full-width">
-                                    <table bgcolor="" align="center" width="100%" border="0" cellspacing="0" cellpadding="0">
-                                      <tr>
-                                        <td bgcolor=""  align="center" valign="middle" style="color:#000000;padding:0px 20px 0px 20px; text-align:left;font-size: 15.2px; line-height:120%;font-family:Arial, Helvetica, sans-serif !important; font-weight:400;" class="">
-                                        </td>
-                                      </tr>
-                                      <tr>
-                                        <td align="center" width="100%" height="10" class="" bgcolor="#afc578"></td>
-                                      </tr>
-                                    </table>
-                                  </td>
-                                </tr>
-                              </table>
-                            </td>
-                          </tr>
-                          <tr>
-                            <td align="center" width="100%" height="20" class="" style="border-radius: 0px 0px 10px 10px; background-color: #afc578"></td>
-                          </tr>
-                        </tbody>
-                      </table>
-                    </td>
+                     <td align="left" bgcolor="#e9ecef" style="height:20px;"> </td>
                   </tr>
-              </table>
+                  <!-- start logo -->
+                  <tr>
+                     <td align="center">
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                           <tr>
+                              <td align="left" valign="top" style="background-color:#f6f6f6;padding: 20px 24px;border-bottom: 1px solid #d4dadf;">
+                                 <a href="#" target="_blank" style="display: inline-block;">
+                                 <img src="<?php echo e(asset('front_end/images/logo.png')); ?>"   border="0" style="display: block;">
+                                 </a>
+                              </td>
+                           </tr>
+                        </table>
+                        <table border="0" cellpadding="0" cellspacing="0" width="100%">
+                           <tr>
+                              <!-- <td valign="top" align="left" style="padding: 10px 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif;"> -->
+                                 <!-- <h4 style="font-weight:500;margin-top:5px;"><strong>Invoice Number: </strong> <span>#12345678</span> </h4> -->
+                              <!-- </td> -->
+                              <td valign="top" align="right" style="padding:10px 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif;">
+                                 <h4 style="margin: 0;font-weight: 600;line-height: 24px;">Address</h4>
+                                 <p style="font-size:15px;margin: 0;"><?php echo e(isset($data) ? $data['userAdress'] : ''); ?>
+
+                                 </p>
+                                 <h4 style="font-weight:500;margin-top:10px;"><strong>Order Date: </strong> <span><?php echo e(isset($data) ? $data['orderdate'] : ''); ?></span> </h4>
+                              </td>
+                           </tr>
+                           <tr>
+                              <td colspan="2" align="center" style="padding: 10px 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; border-top:1px solid #d4dadf;">
+                                 <h1 style="margin: 0; font-size: 25px; font-weight: 700; letter-spacing: -1px; line-height: 48px;">Order Details</h1>
+                              </td>
+                           </tr>
+                           <tr>
+                              <td colspan="2" align="left" bgcolor="#ffffff" style="padding:24px; padding-top:0;font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
+                                 <h4 style="font-weight:600;margin:0;">Embriodery </h4>
+                              </td>
+                           </tr>
+                        </table>
+                     </td>
+                  </tr>
+                  <!-- end logo -->
+                  <!-- start block -->
+				  <?php if(!empty($data['cartOrdres'])): ?>
+				  <?php
+				  $total =0;
+              $amt=0;
+				  ?>
+				  <?php $__currentLoopData = $data['cartOrdres']; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $cartOrder): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                  <tr>
+                     <td align="center" style="padding:0 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif;">
+                        <table border="0" cellspacing="0" cellpadding="15" width="100%">
+                           <thead style="background-color:#f7f7f7;">
+                              <tr>
+                                 <th align="left">Order Name</th>
+                                 <th align="left">Desired Height</th>
+                                 <th align="left">Desired Width</th>                                 
+                                 <th align="left">Desired Output</th>								
+                                 <th align="left">Discount</th>
+                                 <th align="left">Amount</th>
+                              </tr>
+                           </thead>
+                           <tbody>
+                              <tr>
+                                 <td><?php echo e(isset($data) ? $cartOrder->order_name : ''); ?></td>
+                                 <td><?php echo e(isset($data) ? $cartOrder->desired_height : ''); ?></td>
+                                 <td><?php echo e(isset($data) ? $cartOrder->desired_width : ''); ?></td>                               
+                                 <td><?php echo e(isset($data) ? $cartOrder->desired_output : ''); ?></td>
+                                 <td><?php if($data['ccheck'] == 1): ?>
+                                    <?php echo e(isset($data['amountDiscount']) ? '$'.$data['amountDiscount'] :  $data['discountPercentage'] .'%'); ?>
+
+                                    <?php else: ?>
+                                    0
+                                     <?php endif; ?>
+                                 </td>
+                                 <?php if($data['ccheck'] == 1): ?>
+                                    <?php if(isset($data['amountDiscount'])): ?>
+                                       <?php 
+                                             $amt = $cartOrder->amount -  $data['amountDiscount'];  
+                                       ?>
+                                      <td><?php echo e($amt); ?></td>
+                                      <?php else: ?>
+                                         <?php if(isset($data['discountPercentage']) ): ?>
+                                          <?php 
+                                             $final_amount = ($data['discountPercentage'] / 100) * $cartOrder->amount;
+                                             $amt = $cartOrder->amount - $final_amount; 
+                                          ?> 
+                                          <td><?php echo e($amt); ?></td>
+                                           
+                                          <?php endif; ?>
+                                     <?php endif; ?>
+                                      <?php else: ?>
+                                      <td><?php echo e(isset($data) ? $cartOrder->amount : ''); ?></td>
+                                 <?php endif; ?>
+                               
+                              </tr>
+                           </tbody>
+                        </table>
+                     </td>
+                  </tr>
+				  <?php
+
+				  $total += $amt;
+				  
+				  ?>
+              
+				  <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+				  <?php endif; ?>
+                  <!-- end block -->
+                  <!-- start block -->
+                  <tr>
+                     <td align="right" text-align="right" style="border-top:1px solid #ccc;padding:0 24px; padding-top:20px;font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif;">
+                        <table border="0" cellspacing="0" cellpadding="5" width="100%" style="max-width:350px;">
+                           <!-- <tr> -->
+                              <!-- <th align="left">Sub total</th> -->
+                              <!-- <td>$60.00</td> -->
+                           <!-- </tr> -->
+                           <!-- <tr> -->
+                              <!-- <th align="left">QST 9.97%</th> -->
+                              <!-- <td>$90</td> -->
+                           <!-- </tr> -->
+                           <!-- <tr> -->
+                              <!-- <th align="left">Canadian GST 9.97%</th> -->
+                              <!-- <td>$1</td> -->
+                           <!-- </tr> -->
+                           <!-- <tr> -->
+                              <!-- <th align="left">Shipping Canada - Standard Shipping</th> -->
+                              <!-- <td>$10.00</td> -->
+                           <!-- </tr> -->
+                           <tr>
+                              <th align="left">Total</th>
+                              <?php if($data['ccheck'] == 1): ?>
+                                    <?php if(isset($data['amountDiscount'])): ?>
+                                       <?php 
+                                             $amt = $total -  $data['amountDiscount'];  
+                                       ?>
+                                          <td><?php echo e('$'.$amt); ?></td>
+                                      <?php else: ?>
+                                         <?php if(isset($data['discountPercentage']) ): ?>
+                                          <?php 
+                                             $final_amount = ($data['discountPercentage'] / 100) * $cartOrder->amount;
+                                             $amt = $total - $final_amount; 
+                                          ?> 
+                                          <td><?php echo e('$'.$amt); ?></td> 
+                                          <?php endif; ?>
+                                     <?php endif; ?>
+                                      <?php else: ?>
+                                      <td><?php echo e(isset($data) ? '$'.$total : ''); ?></td>
+                                 <?php endif; ?>
+                              <td></td>
+                           </tr>
+                        </table>
+                     </td>
+                  </tr>
+                  <!-- end block -->
+                  <tr>
+                     <td colspan="2" align="left" bgcolor="#ffffff" style="padding-top:0;padding: 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif; font-size: 16px; line-height: 24px;">
+                        <h4 style="font-weight:500;margin-top:10px;margin-bottom:10px;"><strong>Payment Method: </strong> <span>Paypal</span> </h4>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td colspan="2" align="center" style="padding: 10px 24px; font-family: 'Source Sans Pro', Helvetica, Arial, sans-serif;">
+                        <h1 style="margin: 0; font-size: 20px; padding: 10px 24px; background-color:#743387;color:#fff;font-weight: 600; line-height: 48px;">Thanks For your Order</h1>
+                     </td>
+                  </tr>
+                  <tr>
+                     <td align="left" bgcolor="#e9ecef" style="height:20px;"> </td>
+                  </tr>
+               </table>
             </td>
-          </tr>
-          <tr>
-            <td align="center" width="100%" height="30" class=""></td>
-          </tr>
-        </table>
-  </body>
+         </tr>
+      </table>
+      <!-- end body -->
+   </body>
 </html><?php /**PATH /var/www/punchly/backend/resources/views/mail/newOrderPlaced.blade.php ENDPATH**/ ?>

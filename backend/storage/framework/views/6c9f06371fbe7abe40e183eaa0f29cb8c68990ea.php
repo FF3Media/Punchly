@@ -1,3 +1,5 @@
+
+
 <?php $__env->startSection('content'); ?>
     <div class="container">
         <div class="row justify-content-center">
@@ -11,9 +13,9 @@
                                 your email address
                             </div>
                         <?php endif; ?>
-                        <p>Before proceeding, please check your email for a verification link.If you did not receive
-                            the email,</p>
-                        <a onclick="event.preventDefault(); document.getElementById('email-form').submit();" href="#">click here to request another'</a>.
+                        <p>Before proceeding, please check your email for a verification link. If you did not receive
+                            the email, <a onclick="event.preventDefault(); document.getElementById('email-form').submit();" href="#">click here to request another</a>.</p>
+                        
 
  
                     </div>

@@ -30,7 +30,8 @@ class DigitizerController extends Controller
      */
     public function dashboard(Request $request)
     {
-        return view('digitizer.dashboard');
+        $page_title = "Dashboard";  
+        return view('digitizer.dashboard',compact('page_title'));
     }
     /**
     * Order List Management
@@ -39,12 +40,13 @@ class DigitizerController extends Controller
         if($request->isMethod('get')){
             $priceCalculator = PriceCalculator::all();
             $inch = 0 ; $centimeter = 0;
+            $page_title = "Orders Management";
             if(count($priceCalculator)){        
                 $priceCalculator = $priceCalculator->toArray();
                 $inch = $priceCalculator[0]['desired_price']; 
                 $centimeter = $priceCalculator[1]['desired_price'];
             }  
-            return view('digitizer.ordersManagement',compact('inch','centimeter'));      
+            return view('digitizer.ordersManagement',compact('page_title','inch','centimeter'));      
         }
     }
 
@@ -99,18 +101,9 @@ class DigitizerController extends Controller
                 ]);
             }else{
                 if($filterData == true){
-                    $html = '<div class="col-lg-12">
-                     <div class="exp-box" style="text-align: center;font-weight: 500;">
-                        There is no data related to this filter.
-                    </div>
-                    </div>';
+                    $html = '<div class="col-lg-12"><div class="exp-box" style="text-align: center;font-weight: 500;">There is no data related to this filter.</div></div>';
                     }else{
-                       $html = '<div class="col-lg-12">
-                    <div class="orders_empty" style="text-align: center;font-weight: 500;">
-                        <h3> Your new order list is empty Yet.</h3>
-                        <p style="color: #708da8;"></p>
-                    </div>
-                   </div>';
+                       $html = '<div class="col-lg-12"><div class="orders_empty" style="text-align: center;font-weight: 500;"><h3> Your new order list is empty Yet.</h3><p style="color: #708da8;"></p></div></div>';
                 }
                 return response()->json([
                     "message"       => 'There is no order found.',
@@ -127,13 +120,14 @@ class DigitizerController extends Controller
     public function searchOrder(Request $request){
         if($request->isMethod('get')){
             $priceCalculator = PriceCalculator::all();
+            $page_title = "Search Order";
             $inch = 0 ; $centimeter = 0;
             if(count($priceCalculator)){         
                 $priceCalculator = $priceCalculator->toArray();
                 $inch = $priceCalculator[0]['desired_price']; 
                 $centimeter = $priceCalculator[1]['desired_price'];
             }  
-            return view('digitizer.searchOrder',compact('inch','centimeter'));      
+            return view('digitizer.searchOrder',compact('page_title','inch','centimeter'));      
         }
     }
 
@@ -187,11 +181,7 @@ class DigitizerController extends Controller
                     "data"          => $html,
                 ]);
             }else{
-                $html = '<div class="col-lg-12">
-                    <div class="exp-box" style="text-align: center;font-weight: 500;">
-                        There is no data related to this filter.
-                    </div>
-                </div>';
+                $html = '<div class="col-lg-12"><div class="exp-box" style="text-align: center;font-weight: 500;">There is no data related to this filter.</div></div>';
                 return response()->json([
                     "message"       => 'There is no order found.',
                     "isSucceeded"   => FALSE,
@@ -206,6 +196,7 @@ class DigitizerController extends Controller
     */
     public function orderHistory(Request $request){              
          $user = Auth::user();
+         $page_title = "Orders History";
          if($request->ajax()){     
            $filterData = false;  
            $conditions[]=['order_digitizer_id','=', Auth::user()->id];   
@@ -243,11 +234,7 @@ class DigitizerController extends Controller
                 ]);
             }else{               
                 if($filterData == true){
-                $html = '<div class="col-lg-12">
-                          <div class="exp-box" style="text-align: center;font-weight: 500;">
-                          There is no data related to this filter.
-                          </div>
-                        </div>';
+                $html = '<div class="col-lg-12"><div class="exp-box" style="text-align: center;font-weight: 500;">There is no data related to this filter.</div></div>';
                     }else{
                        $html = '<div class="col-lg-12">
                         <div class="orders_empty" style="text-align: center;font-weight: 500;">
@@ -265,7 +252,7 @@ class DigitizerController extends Controller
         }
           
     
-         return view('digitizer.ordersHistory');
+         return view('digitizer.ordersHistory',compact('page_title'));
     }
 
     /**
@@ -292,6 +279,7 @@ class DigitizerController extends Controller
         if($request->isMethod('get')){
             $allOrder = '';
             $orderImages = '';
+            $html = '';
             if($request->order_id){
               $allOrder = Order::with(['user','digitizer','rejection_reason','payment_details','order_images'])
                                 ->where(['id' => $request->order_id])->first(); 
@@ -301,13 +289,32 @@ class DigitizerController extends Controller
                          
                      
                         $html = '<h5 class="completed_files">Submitted Files<div class="order_btns"></h5>'; 
-                    foreach ($orderImages as $allImages) {
-                        $html .= '<div class="ftr-modal-box">';
-                         $html .= '<div class="ftr-dwnld-left"> 
-                           <img class="img-submitted" src="'.url('/public/orders').'/'.$allImages->order_image.'" height="85px" width="100px" /><span id="sub-img">'.$allImages->order_image.'</span></div>
-                            <div class="ftr-dwnld-btn">
-                            <a class="btn downloardButton" href="'.route("digitizer-download-image", $allImages->order_image).'">Download</a> 
-                            </div>';  
+                    foreach ($orderImages as $allImages) { 
+                        
+                        $temp= explode('.',$allImages->order_image);
+                        $extension = end($temp);
+                       
+                        if($extension == 'pdf' || $extension == 'EMB' || $extension == 'DST' || $extension == 'dst' || $extension == 'emb' ){
+
+                            if($extension == 'DST' || $extension == 'dst'){
+                                $ImageName = 'dst.png';
+                            }elseif($extension == 'EMB' || $extension == 'emb'){
+
+                                $ImageName = 'emb.png';
+                            }else{
+
+                                $ImageName = 'pdf.png';
+                            }
+
+                               
+                        }else{
+                            $ImageName = $allImages->order_image;
+
+                        }
+                        
+                         $html .= '<div class="ftr-modal-box">';
+                         $html .= '<div class="ftr-dwnld-left"> <img class="img-submitted" src="'.url('/public/orders').'/'.$ImageName.'" height="85px" width="100px" /><span id="sub-img">'.$allImages->order_image.'</span></div>
+                            <div class="ftr-dwnld-btn"><a class="btn downloardButton" href="'.route("digitizer-download-image", $allImages->order_image).'">Download</a></div>';  
                             $html .= '</div>';                        
                     }   
                 }
@@ -337,14 +344,43 @@ class DigitizerController extends Controller
     public function submittedWork(Request $request){
         if($request->isMethod('post')){
             $imageName = '';
-            $originalImage = $request->file('order_image');  
+            $pdfMove = '';
+            $originalImage = $request->file('order_image');
+          
+
+            // dd($ext);
+            // $filename = time() . '.' . $request->file('order_image')->extension();
+           // dd($originalImage);
+
             foreach ($originalImage as $key => $value) {
-                $folderPath = public_path().'/orders/';
-                $thumbnailImage = Image::make($value);
-                $imgName = time().$value->getClientOriginalName();         
-                $imageName = $thumbnailImage->save($folderPath.$imgName);
-                $uploadedImages[] = ['order_id'  => $request->o_id ,'image_format'  => $value->extension(),'order_image'  => $imgName];
+                  $folderPath = public_path().'/orders/'; 
+              
+                if($value->extension() == "pdf"){
+                   
+                    $pdfName = time().$value->getClientOriginalName();    
+                    $pdfMove =  $value->move($folderPath, $pdfName); 
+                    
+                    $uploadedImages[] = ['order_id'  => $request->o_id ,'image_format'  => 'pdf','order_image'  => $pdfName];
+               
+                }elseif($value->extension() == "bin" || $value->getClientOriginalExtension() == "EMB" || $value->getClientOriginalExtension() == "emb"){
+
+                     $imgName = time().$value->getClientOriginalName(); 
+                     $fileMove = $value->move($folderPath, $imgName);
+                     $uploadedImages[] = ['order_id'  => $request->o_id ,'image_format'  => $value->getClientOriginalExtension(),'order_image'  => $imgName];
+                      
+                }
+                else{
+                    $thumbnailImage = Image::make($value);
+                    $imgName = time().$value->getClientOriginalName();         
+                    $imageName = $thumbnailImage->save($folderPath.$imgName);
+                    $uploadedImages[] = ['order_id'  => $request->o_id ,'image_format'  => $value->extension(),'order_image'  => $imgName];
+
+                }
+                
+                
             } 
+
+            
             if(!empty($imageName)){
                 if ($request->order_status == 13) {
                     OrderImage::where('order_id', $request->o_id)->delete();                         
@@ -358,6 +394,38 @@ class DigitizerController extends Controller
                     $message = 'Image does not uploaded';
                     $isSucceeded = 'error';
                 }          
+            }elseif(!empty($pdfMove)){
+
+                if ($request->order_status == 13) {
+                    OrderImage::where('order_id', $request->o_id)->delete();                         
+                }
+                $updateOrderStatus = Order::where(['id' => $request->o_id])->update(['status' => '10']);
+                $saveUplordedImage = OrderImage::insert($uploadedImages);                 
+                if($saveUplordedImage && $updateOrderStatus){
+                    $message = 'Work Submitted Uploaded Successfully.';
+                    $isSucceeded = 'success';
+                }else{
+                    $message = 'Image does not uploaded';
+                    $isSucceeded = 'error';
+                }          
+
+
+            }elseif(!empty($fileMove)){
+
+                if ($request->order_status == 13) {
+                    OrderImage::where('order_id', $request->o_id)->delete();                         
+                }
+                $updateOrderStatus = Order::where(['id' => $request->o_id])->update(['status' => '10']);
+                $saveUplordedImage = OrderImage::insert($uploadedImages);                 
+                if($saveUplordedImage && $updateOrderStatus){
+                    $message = 'Work Submitted Uploaded Successfully.';
+                    $isSucceeded = 'success';
+                }else{
+                    $message = 'Image does not uploaded';
+                    $isSucceeded = 'error';
+                }          
+
+
             }else{
                 $message = 'Image does not uploaded';
                 $isSucceeded = 'error';
@@ -365,4 +433,7 @@ class DigitizerController extends Controller
             return redirect()->back()->with(['alert-type' => $isSucceeded , 'message' => $message]);
         }
     }
+
+
+    
 }

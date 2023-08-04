@@ -35,7 +35,7 @@
                     <p><span class="order_index">Width:</span><span class="order_value">{{ $order->desired_width }}</span></p>
                     <p><span class="order_index">Height:</span><span class="order_value">{{ $order->desired_height }}</span></p>
                     <p><span class="order_index">Status:</span>@if($order->status == 1)
-                      <span class="badge badge-warning order_value">Awaiting Approval</span>
+                      <span class="badge badge-warning order_value">Waiting for Approval</span>
                       @endif
                       @if($order->status == 2)
                       <span class="badge badge-info order_value">In progress</span>

@@ -170,7 +170,7 @@
                                     <td align="center" width="100%" height="20" class=""></td>
                                   </tr>
                                   <tr>
-                                    <td bgcolor=""  align="center" valign="middle" style="text-align:center; padding:0px 20px;" class=""><a href="#"><img src="{{ asset('front_end/images/logo.png') }}" width="109" alt="Embroiderer Website"></a></td>
+                                    <td bgcolor=""  align="center" valign="middle" style="text-align:center; padding:0px 20px;" class=""><a href="#"><img src="{{ asset('front_end/images/logo.png') }}" width="109" alt=""></a></td>
                                   </tr>
                                   <tr>
                                     <td align="center" width="100%" height="10" class=""></td>

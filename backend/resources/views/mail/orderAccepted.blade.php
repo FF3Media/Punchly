@@ -170,7 +170,7 @@
                                     <td align="center" width="100%" height="20" class=""></td>
                                   </tr>
                                   <tr>
-                                    <td bgcolor=""  align="center" valign="middle" style="text-align:center; padding:0px 20px;" class=""><a href="#"><img src="{{asset('front_end/images/logo.png')}}" width="109" alt="Embroiderer Website"></a></td>
+                                    <td bgcolor=""  align="center" valign="middle" style="text-align:center; padding:0px 20px;" class=""><a href="#"><img src="{{asset('front_end/images/logo.png')}}" width="109" alt=""></a></td>
                                   </tr>
                                   <tr>
                                     <td align="center" width="100%" height="10" class=""></td>
@@ -198,7 +198,7 @@
                                             <td width="100%" bgcolor=""  align="left" valign="top" style="text-align:center; padding:0px 20px 0px 20px;" class="">
                                               <div style="color:#333; padding: 15px 0px 0px 0px; text-align:left;font-size:16px;font-family: 'Montserrat', sans-serif !important; font-weight:medium; vertical-align:top;" class="">From: <span><a style="color: #B53DD7; text-decoration: none;" href="mailto:orders@punchly.io">orders@punchly.io</a></span></div>
                                                <div style="color:#333; padding: 15px 0px 0px 0px; text-align:left;font-size:16px;font-family: 'Montserrat', sans-serif !important; font-weight:medium; vertical-align:top;" class="">Subject: <span style="text-transform: capitalize;">{{$data['subject']}}</span></div>
-                                               <div style="color:#333; padding: 15px 0px 0px 0px; text-align:left;font-size:14px;font-family: 'Montserrat', sans-serif !important; font-weight:medium; vertical-align:top;" class=""><b>Hi [{{ isset($data) ? $data['user_name'] : '' }}],</b></span></div>
+                                               
                                             </td>
                                        
                                             
@@ -209,7 +209,7 @@
                                             <td width="100%" bgcolor=""  align="left" valign="top" style="text-align:center; padding:0px 20px 0px 20px;" class="">
                                               <div style="color:#333; padding: 15px 0px 0px 0px; text-align:left;font-size:14px;font-family: 'Montserrat', sans-serif !important; font-weight:medium; vertical-align:top;" class=""><b>Order Id: </b> <span> {{ isset($data) ? $data['order_unique_id'] : '' }}</span></span></div>
                                               <div style="color:#333; padding: 0px 0px 0px 0px; text-align:left;font-size:14px;font-family: 'Montserrat', sans-serif !important; font-weight:medium; vertical-align:top;" class="">
-                                                <p style="margin-top: 10px; margin-bottom: 0px; color: #666;">we have started work on your order. Sit tight, it should be done within the next business day. You will receive another message once the order has been completed.</p>
+                                                <p style="margin-top: 10px; margin-bottom: 0px; color: #666;">Hi [{{ isset($data) ? $data['user_name'] : '' }}], we have started work on your order. Sit tight, it should be done within the next business day. You will receive another message once the order has been completed.</p>
                                               </div>
                                             </td>
                                           </tr>

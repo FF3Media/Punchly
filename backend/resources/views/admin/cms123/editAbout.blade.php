@@ -113,17 +113,7 @@ $i=1;
                                                   </div>
                                               </div>
                                             </div>                                            
-                                        </div> 
-
-  <div class="form-group row">
-    <div class="col-lg-6 my-error"> 
-    <label>Banner Image Alt Tag Text:</label>
-    <input type="text" class="form-control"
-     value="{{isset($banner['alt_banner_tag']) ? $banner['alt_banner_tag'] : '' }}"
-     id="alt_banner_tag" name="alt_banner_tag[{{ $i }}]" class="form-control" 
-     placeholder="Banner Image Alt Tag Text">
- </div>
-</div>         
+                                        </div>          
                                     </div>
                                      <div class="form-group row">
                                       <div class="col-lg-6 my-error">                                               
@@ -156,14 +146,6 @@ $i=1;
                                             </div>
                                           
                                          
-    <div class="col-lg-6 my-error"> 
-    <label> Right Image Alt Tag Text:</label>
-    <input type="text" class="form-control"
-   value="{{isset($banner['Alt_right_image_tag']) ? $banner['Alt_right_image_tag'] : '' }}"
-   id="Alt_right_image_tag" name="Alt_right_image_tag[{{ $i }}]" class="form-control" 
-   placeholder="Right Image Alt Tag Text">
- </div>
- 
                                     </div>
                                   </div>
                                   @php

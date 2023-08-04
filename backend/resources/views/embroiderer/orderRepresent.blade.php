@@ -11,13 +11,13 @@
 					</div>
 					<div class="order-content">
 						<label class="order-date-label">Order date</label>
-						<h3>{{ date('m-d-Y',strtotime($order->created_at)) }}</h3>
+						<h3>{{ isset($order->payment_details->created_at) ? date('m-d-Y',strtotime($order->payment_details->created_at)): date('m-d-Y',strtotime($order->created_at)) }}</h3>
 					</div>
 					<div class="order-content">
 						<label class="order-status-label">Status</label>
 						
 					  	@if ($order->status == '1')
-						    <h3><span class="paid-tag">Awaiting Approval</span></h3>
+						    <h3><span class="paid-tag">Waiting for Approval</span></h3>
 					   	@elseif ($order->status == '3')
 						    <h3><span class="rejected-tag">Rejected</span>
                   <span>
@@ -48,12 +48,14 @@
 					</div>
 					<div class="order-content">
 						<label class="order-cost-label">Cost</label>
+						{{--@if($order->coupon_id != null || !empty($order->coupon_id))
+						 <h3>{{'$'.$order->amount_after_coupon}}</h3>
+						 @else
+						 <h3>{{'$'.$order->amount}}</h3>
+						@endif
+						--}}
 						<h3>{{'$'.$order->amount}}</h3>
 					</div>
-          <div class="order-content">
-            <label class="order-cost-label">Paid</label>
-            <h3>{{'$'.$order->total_amount}}</h3>
-          </div>
 					<div class="order-content">
 						<label class="order-cost-label"></label>
 					    <button class="download-btn btn btn-success" onclick="showOrderDetail(<?php echo htmlspecialchars(json_encode($order)); ?>);" >View Details</button>
@@ -151,8 +153,7 @@
        <p id="rejected-text"></p>    
        </div>	   
 	   <div class="Orignal-image"> 
-	   	<h5>Orignal Image  
-	   	</h5>       
+	   	<h5>Orignal Image </h5>       
 	   <div class="ftr-modal-box">
       	<div class="ftr-dwnld-left">
       		<img id="order_image_download" src=" " />

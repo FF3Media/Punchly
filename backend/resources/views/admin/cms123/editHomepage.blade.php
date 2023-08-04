@@ -157,15 +157,6 @@ $i=1;
                                                   </div>
                                               </div>
                                             </div>
- <div class="col-lg-6 my-error"> 
- <label>Banner Image Alt Tag Text:</label>
- <input type="text" class="form-control"
-  value="{{ isset($banner['alt_banner_tag']) ? $banner['alt_banner_tag'] : '' }}"
-  id="alt_banner_tag" 
-  name="alt_banner_tag[{{ $i }}]"
-  class="form-control" 
-  placeholder="Banner Image Alt Tag Text">
-</div>
                                             <div class="col-lg-6 my-error" style="display:none">
                                               <label>Front Image:</label>
                                               <div class="input-group">
@@ -241,7 +232,7 @@ $i=1;
                                     <div class="banner_content">
                                         <div class="add_banner_html">
                                         <div class="form-group row">
-                                            <div class="col-lg-6 my-error">                  
+                                            <div class="col-lg-6 my-error">                                                
                                                 <label>Description:</label>
                                                 <textarea class="form-control editor" name="section_three_left_description"     id="section_three_description">{{ isset($banner['section_three_left_description']) ? $banner['section_three_left_description'] : '' }}</textarea>
                                             </div>
@@ -255,25 +246,13 @@ $i=1;
                                                           accept="image/*"
                                                           {{ isset($banner['section_three_right_image']) ? ' ' : 'required' }} />
                                                           
-                                                  <input type="hidden" name="old_section_three_right_image[{{ $i }}]"
-                                                          value="{{ isset($banner['section_three_right_image']) ? $banner['section_three_right_image'] : '' }}"/>
-
-                                                  <label class="custom-file-label" for="section_three_right_image">
-                                                        {{ isset($banner['section_three_right_image']) ? $banner['section_three_right_image'] : '' }}
-                                                  </label>
-
+                                                      <input type="hidden" name="old_section_three_right_image[{{ $i }}]"
+                                                          value="{{ isset($banner['section_three_right_image']) ? $banner['section_three_right_image'] : '' }}" />
+                                                      <label class="custom-file-label"
+                                                          for="section_three_right_image">{{ isset($banner['section_three_right_image']) ? $banner['section_three_right_image'] : '' }}</label>
                                                   </div>
                                             </div>
                                         </div> 
- <div class="form-group row">
- <div class="col-lg-6 my-error"> 
-   <label>Step 1 Image Alt Tag Text:</label>
-   <input type="text" class="form-control"
-    value="{{isset($banner['alt_step_1_tag']) ? $banner['alt_step_1_tag'] : '' }}"
-    id="alt_step_1_tag" name="alt_step_1_tag[{{ $i }}]" class="form-control" 
-    placeholder="Step 1 Image Alt Tag Text">
-</div>
-</div>
                                     </div>
 
                                     </div>
@@ -312,15 +291,6 @@ $i=1;
                                                   </div>
                                             </div>
                                         </div> 
-<div class="form-group row">
- <div class="col-lg-6 my-error"> 
-  <label>Step 2 Image Alt Tag Text:</label>
-   <input type="text" class="form-control"
-   value="{{isset($banner['alt_step_2_tag']) ? $banner['alt_step_2_tag'] : '' }}"
-   id="alt_step_2_tag" name="alt_step_2_tag[{{ $i }}]" class="form-control" 
-   placeholder="Step 2 Image Alt Tag Text">
- </div>
-</div>
                                     </div>
 
                                     </div>
@@ -359,15 +329,6 @@ $i=1;
                                                   </div>
                                             </div>
                                         </div> 
-  <div class="form-group row">
- <div class="col-lg-6 my-error"> 
-  <label>Step 3 Image Alt Tag Text:</label>
-   <input type="text" class="form-control"
-   value="{{isset($banner['alt_step_3_tag']) ? $banner['alt_step_3_tag'] : '' }}"
-   id="alt_step_3_tag" name="alt_step_3_tag[{{ $i }}]" class="form-control" 
-   placeholder="Step 3 Image Alt Tag Text">
- </div>
-</div>
                                     </div>
 
                                     </div>
@@ -406,16 +367,6 @@ $i=1;
                                                   </div>
                                             </div>
                                         </div> 
-
- <div class="form-group row">
- <div class="col-lg-6 my-error"> 
-  <label>Step 4 Image Alt Tag Text:</label>
-   <input type="text" class="form-control"
-   value="{{isset($banner['alt_step_4_tag']) ? $banner['alt_step_4_tag'] : '' }}"
-   id="alt_step_4_tag" name="alt_step_4_tag[{{ $i }}]" class="form-control" 
-   placeholder="Step 4 Image Alt Tag Text">
- </div>
-</div>
                                     </div>
 
                                     </div>
@@ -454,16 +405,6 @@ $i=1;
                                                   </div>
                                             </div>
                                         </div> 
-<div class="form-group row">
- <div class="col-lg-6 my-error"> 
-  <label>Step 5 Image Alt Tag Text:</label>
-   <input type="text" class="form-control"
-   value="{{isset($banner['alt_step_5_tag']) ? $banner['alt_step_5_tag'] : '' }}"
-   id="alt_step_5_tag" name="alt_step_5_tag[{{ $i }}]" class="form-control" 
-   placeholder="Step 5 Image Alt Tag Text">
- </div>
-</div>
-
                                     </div>
 
                                     </div>
@@ -502,16 +443,6 @@ $i=1;
                                                   </div>
                                             </div>
                                         </div> 
-<div class="form-group row">
- <div class="col-lg-6 my-error"> 
-  <label>Step 6 Image Alt Tag Text:</label>
-   <input type="text" class="form-control"
-   value="{{isset($banner['alt_step_6_tag']) ? $banner['alt_step_6_tag'] : '' }}"
-   id="alt_step_6_tag" name="alt_step_6_tag[{{ $i }}]" class="form-control" 
-   placeholder="Step 6 Image Alt Tag Text">
- </div>
-</div>
-
                                     </div>
 
                                     </div>
@@ -550,17 +481,6 @@ $i=1;
                                                   </div>
                                             </div>
                                         </div> 
-<div class="form-group row">
- <div class="col-lg-6 my-error"> 
-  <label>Step 7 Image Alt Tag Text:</label>
-   <input type="text" class="form-control"
-   value="{{isset($banner['alt_step_7_tag']) ? $banner['alt_step_7_tag'] : '' }}"
-   id="alt_step_7_tag" name="alt_step_7_tag[{{ $i }}]" class="form-control" 
-   placeholder="Step 7 Image Alt Tag Text">
- </div>
-</div>
-
-
                                     </div>
 
                                     </div>
@@ -599,15 +519,6 @@ $i=1;
                                                   </div>
                                             </div>
                                         </div> 
-  <div class="form-group row">
-    <div class="col-lg-6 my-error"> 
-    <label>Step 8 Image Alt Tag Text:</label>
-    <input type="text" class="form-control"
-   value="{{isset($banner['alt_step_8_tag']) ? $banner['alt_step_8_tag'] : '' }}"
-   id="alt_step_8_tag" name="alt_step_8_tag[{{ $i }}]" class="form-control" 
-   placeholder="Step 8 Image Alt Tag Text">
- </div>
-</div>
                                     </div>
 
                                     </div>
@@ -646,15 +557,6 @@ $i=1;
                                                   </div>
                                             </div>
                                         </div> 
- <div class="form-group row">
-    <div class="col-lg-6 my-error"> 
-    <label>Step 9 Image Alt Tag Text:</label>
-    <input type="text" class="form-control"
-   value="{{isset($banner['alt_step_9_tag']) ? $banner['alt_step_9_tag'] : '' }}"
-   id="alt_step_9_tag" name="alt_step_9_tag[{{ $i }}]" class="form-control" 
-   placeholder="Step 9 Image Alt Tag Text">
- </div>
-</div>
                                     </div>
 
                                     </div>
@@ -693,15 +595,6 @@ $i=1;
                                                   </div>
                                             </div>
                                         </div> 
-    <div class="form-group row">
-    <div class="col-lg-6 my-error"> 
-    <label>Step 10 Image Alt Tag Text:</label>
-    <input type="text" class="form-control"
-   value="{{isset($banner['alt_step_10_tag']) ? $banner['alt_step_10_tag'] : '' }}"
-   id="alt_step_10_tag" name="alt_step_10_tag[{{ $i }}]" class="form-control" 
-   placeholder="Step 10 Image Alt Tag Text">
- </div>
-</div>
                                     </div>
 
                                     </div>
@@ -739,16 +632,6 @@ $i=1;
                                                   </div>
                                             </div>
                                         </div> 
-
-    <div class="form-group row">
-    <div class="col-lg-6 my-error"> 
-    <label>Newsletter Image Alt Tag Text:</label>
-    <input type="text" class="form-control"
-   value="{{isset($banner['alt_step_11_tag']) ? $banner['alt_step_11_tag'] : '' }}"
-   id="alt_step_11_tag" name="alt_step_11_tag[{{ $i }}]" class="form-control" 
-   placeholder="Newsletter Image Alt Text">
- </div>
-</div>
                                     </div>
 
                                     </div>
@@ -785,15 +668,7 @@ $i=1;
                                                           for="section_seven_image">{{ isset($banner['section_eight_image']) ? $banner['section_eight_image'] : '' }}</label>
                                                   </div>
                                             </div>
-<div class="col-lg-6 my-error"> 
- <label>Seo Image Alt Tag Text:</label>
- <input type="text" class="form-control"
- value="{{ isset($banner['alt_img_tag']) ? $banner['alt_img_tag'] : '' }}"
- id="alt_img_tag" name="alt_img_tag[{{ $i }}]"
- class="form-control" placeholder="Seo Image Alt Tag Text">
-</div>
-
-
+ 
                                         </div> 
                                     </div>
 

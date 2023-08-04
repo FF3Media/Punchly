@@ -17,7 +17,7 @@
 						<label class="order-status-label">Status</label>
 						
 						@if ($order->status == '1')
-						    <h3><span class="green-tag tag">Awaiting Approval</span></h3>
+						    <h3><span class="green-tag tag">Waiting for Approval</span></h3>
 						@elseif ($order->status == '3')
 						    <h3><span class="green-tag tag">Rejected</span></h3>
 					    @elseif ($order->status == '4')
@@ -43,10 +43,6 @@
 						<label class="order-cost-label">Cost</label>
 						<h3>{{'$'.$order->amount}}</h3>
 					</div>
-					 <div class="order-content">
-			            <label class="order-cost-label">Paid</label>
-			            <h3>{{'$'.$order->total_amount}}</h3>
-			          </div>
 					<div class="order-content">
 						<label class="order-cost-label"></label>
 						<button class="download-btn btn btn-success" onclick="showOrderDetail(<?php echo htmlspecialchars(json_encode($order)); ?>);" >View Details</button>

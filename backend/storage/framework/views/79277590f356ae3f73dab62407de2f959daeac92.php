@@ -11,11 +11,11 @@
 					</div>
 					<div class="order-content">
 						<label class="order-date-label">Order date</label>
-						<h3><?php echo e(date('m-d-Y',strtotime($order->created_at))); ?></h3>
+						<h3><?php echo e(isset($order->payment_details->created_at) ? date('m-d-Y',strtotime($order->payment_details->created_at)): date('m-d-Y',strtotime($order->created_at))); ?></h3>
 					</div>
 					<div class="order-content">
-						<label class="order-status-label">Status</label>
-					  <?php if($order->status == '1'): ?>
+			    <label class="order-status-label">Status</label>
+			<?php if($order->status == '1'): ?>
                 <h3><span class="paid-tag">Awaiting Approval</span></h3>
             <?php elseif($order->status == '2'): ?>
                 <h3><span class="in-progress-tag">In progress</span></h3>
@@ -25,14 +25,14 @@
                 <h3><span class="completed-tag">Completed</span></h3>
             <?php elseif($order->status == '9'): ?>
                 <h3><span class="rejected-tag">Canceled</span></h3> 
-					  <?php elseif($order->status == '10'): ?>
+			<?php elseif($order->status == '10'): ?>
                 <h3><span class="paid-tag">For Review</span></h3>          
             <?php elseif($order->status == '11'): ?>
                 <h3><span class="completed-tag">Completed</span></h3>
              
             <?php elseif($order->status == '13'): ?>
                 <h3><span class="paid-tag">Reworking</span></h3>
-						<?php endif; ?>
+			<?php endif; ?>
 					</div>
 					<div class="order-content">
 						<label class="order-output-label">File Type</label>
@@ -160,7 +160,7 @@
                             </select>
                         </div>
                     </div>  
-                   <input type="submit" value="Approve Order" class="btn btn-success">
+                   <input type="submit" id="aprvbtn" value="Approve Order" class="btn btn-success">
              
        </form>  
        </div>
@@ -189,7 +189,7 @@
                         <textarea name="comment"  class="form-control"  rows="6" cols="50" placeholder="Leave a comment here"></textarea>
                       </div>
                     </div>                         
-                    <input type="submit" value="Reject Order" class="btn btn-success">                   
+                    <input type="submit" id="rejectBtn" value="Reject Order" class="btn btn-success">                   
             </form>
        </div>
 	   <div class="ftr-modal-box">

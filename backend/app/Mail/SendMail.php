@@ -31,6 +31,6 @@ class SendMail extends Mailable
      */
     public function build()
     {
-        return $this->from('admin@punchly.io')->subject($this->data['subject'])->view('mail.'.$this->templateName)->with('data', $this->data);
+        return $this->from('noreply@upchat.io')->subject($this->data['subject'])->view('mail.'.$this->templateName)->with('data', $this->data);
     }
 }

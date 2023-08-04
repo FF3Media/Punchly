@@ -1,14 +1,20 @@
-<aside class="main-sidebar sidebar-dark-primary elevation-4 <?php echo e(Auth::user()->user_role == 4 ? 'embroiderer-cls' : ''); ?>">
-    <?php $userImage = asset('users-image/user.png');
-    if (strpos(Auth::user()->avatar, 'http') !== false) {
-        $userImage = Auth::user()->avatar;
-    }else{                            
-        if(!empty(Auth::user()->avatar)){
-            $userImage = asset('users-image/'.Auth::user()->avatar);    
-        }                            
-    } ?>
+<?php
+use Illuminate\Support\Facades\Auth;
+$user = Auth::user();
+$user_role = isset($user['user_role']) ? $user['user_role'] : 4;
+$user_avatar = isset($user['avatar']) ? $user['avatar'] : '';
+
+$userImage = asset('users-image/user.png');
+if (strpos($user_avatar, 'http') !== false) {
+    $userImage = $user_avatar;
+} else {
+    if (!empty($user_avatar)) {
+        $userImage = asset('users-image/' . $user_avatar);
+    }
+} ?>
+<aside class="main-sidebar sidebar-dark-primary elevation-4 <?php echo e($user_role == 4 ? 'embroiderer-cls' : ''); ?>">
     <a href="<?php echo e(url('../')); ?>" class="brand-link">
-       <img src="<?php echo e(asset('backend-images/sidebar-logo.png')); ?>" />
+        <img src="<?php echo e(asset('backend-images/sidebar-logo.png')); ?>" />
     </a>
 
     <div class="sidebar">
@@ -18,13 +24,12 @@
             </ul>
         </nav>
     </div>
-	
-	<div class="copyright-box">
-	<a href="/terms-of-sale/">Terms & Conditions</a>
-	<a href="/return-policy/">Return Policy</a>
-	<p>© Punchly 2021.<br>
-All rights reserved.</p>
-	</div>
 
-</aside>
-<?php /**PATH /var/www/punchly/backend/resources/views/layouts/sidebar.blade.php ENDPATH**/ ?>
+    <div class="copyright-box">
+        <a href="/terms-of-sale/">Terms & Conditions</a>
+        <a href="/return-policy/">Return Policy</a>
+        <p>© Punchly 2022.<br>
+            All rights reserved.</p>
+    </div>
+
+</aside><?php /**PATH /var/www/punchly/backend/resources/views/layouts/sidebar.blade.php ENDPATH**/ ?>

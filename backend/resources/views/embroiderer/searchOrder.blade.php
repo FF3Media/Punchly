@@ -21,10 +21,10 @@
             </div>
 
            <div id="products" class="view-group row list-group-item">
-            <div class="div-responsive">           
+            <div class="div-responsive">
             <div class="page_loader roleMe" style="display: none;">
               <div class="spinner-border text-primary" role="status">
-              <span class="sr-only">Loading...</span> 
+              <span class="sr-only">Loading...</span>
               </div>
             </div>
           <div class="renderOrder row">
@@ -56,7 +56,7 @@
                   <label>Status</label>
                   <select class="form-control minimal-select" id="status">
                   <option value="">Select</option>
-                          <option value="1">Awaiting Approval</option>
+                          <option value="1">Waiting for approval</option>
                           <option value="2">In progress</option>
                           <option value="3">Rejected</option>
                           <option value="4">Completed</option>
@@ -74,7 +74,7 @@
         </div>
       </div>
   </div>
- 
+
 @endsection
 
 @section('third_party_scripts')
@@ -87,7 +87,7 @@
     var start = moment().format('L');
     filter_data(1);
     var minimumDate= 0 , maximumDate = 0 , status = 0 , desired_output='';
-    
+
     $('input[name="daterange"]').daterangepicker({
       autoUpdateInput: false,
       locale: {
@@ -102,34 +102,34 @@
     $('input[name="daterange"]').on('cancel.daterangepicker', function(ev, picker) {
       $(this).val('');
     });
-    
+
     $('.applyFilter').click(function(){
       var result = $('#daterangepicker').val().split('-');
       minimumDate = result[0];
       maximumDate = result[1];
-      var page = 1; 
+      var page = 1;
       $('#filterModal').modal('toggle');
       filter_data(page);
 
     });
 
-    $('.clearFilter').click(function(){  
-      searchParam=""; 
-      //remove url string   
+    $('.clearFilter').click(function(){
+      searchParam="";
+      //remove url string
       var uri = window.location.toString();
       if (uri.indexOf("?") > 0) {
           var clean_uri = uri.substring(0, uri.indexOf("?"));
           window.history.replaceState({}, document.title, clean_uri);
       }
       var elements = document.getElementsByTagName("select");
-      for (var ii=0; ii < elements.length; ii++) {             
-          elements[ii].value = "";           
+      for (var ii=0; ii < elements.length; ii++) {
+          elements[ii].value = "";
       }
-      var page = 1; 
+      var page = 1;
       $('#filterModal').modal('toggle');
       filter_data(page);
     });
-    
+
     function filter_data(page){
       status = $('#status').val();
       desired_output = $('#desired_output').val();
@@ -174,40 +174,40 @@
       $(this).addClass("active");
     });
 
-  }); 
-  $('.pri-cal').bind('keyup mouseup onchange', function(e) {      
+  });
+  $('.pri-cal').bind('keyup mouseup onchange', function(e) {
       var height , width , valActual = 0;
-      var measurement_inch_and_width = '1'; 
-      var priceInch = "<?php echo $inch;?>"; 
+      var measurement_inch_and_width = '1';
+      var priceInch = "<?php echo $inch;?>";
       var priceCentimeter ="<?php echo $centimeter;?>";
       height = $('#desired_height').val();
       width = $('#desired_width').val();
       inch = $("input[name=height_in]:checked").val();
       cm = $("input[name=width_cm]:checked").val();
-       if(inch == 1){ 
+       if(inch == 1){
         measurement_inch_and_width = 1 ;
        }
-       if(cm == 2){ 
-         measurement_inch_and_width = 2 ;         
-       }           
+       if(cm == 2){
+         measurement_inch_and_width = 2 ;
+       }
       if(height && width && measurement_inch_and_width){
           if(measurement_inch_and_width == '1'){
               valActual = height*width*priceInch;
               valActual =  valActual.toFixed(2);
-              $('#cost_calculate').val(valActual);    
+              $('#cost_calculate').val(valActual);
           }else if(measurement_inch_and_width == '2'){
               valActual = height*width*priceCentimeter;
               valActual =  valActual.toFixed(2);
-              $('#cost_calculate').val(valActual);    
-          }            
+              $('#cost_calculate').val(valActual);
+          }
       }
   });
   function showOrderDetail(data){
-   
+
   $('#rejected-message').hide();
   $('.cancelForm').hide();
   $('#rejected-reason').hide();
-  $('.submitted-work').html(''); 
+  $('.submitted-work').html('');
   $('#cancel_btn').hide();
   $('#cancel_order_id').val('');
   $('#st_charge_id').val('');
@@ -228,7 +228,7 @@
      $('#desired_output2').text('For print');
    }else{
      $('#desired_output2').text('For embroyer');
-    }      
+    }
      $('#garment_name').text(data.garment.name);
      $('#desired_height_detail').text(data.desired_height);
      $('#desired_width_detail').text(data.desired_width);
@@ -244,7 +244,7 @@
      }
       if(data.status == 1){
       check = 'paid-tag';
-      status = 'Awaiting Approval';
+      status = 'Waiting for Approval';
       $('#cancel_btn').show();
       }else if(data.status == 2){
       check = 'in-progress-tag';
@@ -270,16 +270,16 @@
       }else if(data.status == 11){
       check = 'completed-tag';
       status = 'Completed';
-      } 
-      $('#order_status').text(status); 
-      $('#order_status').removeClass(); 
+      }
+      $('#order_status').text(status);
+      $('#order_status').removeClass();
       $('#order_status').addClass(check);
-      $('#order_image').attr('src',HOST_URL+'/public/orders/'+data.feature_image);    
-      $('#down_image_name').text(data.order_name); 
+      $('#order_image').attr('src',HOST_URL+'/public/orders/'+data.feature_image);
+      $('#down_image_name').text(data.order_name);
       $('#order_image_download').attr('src',HOST_URL+'/public/orders/'+data.feature_image);
       var url = '{{ route("embroiderer-download-image", ":orderimage") }}';
-      url = url.replace(':orderimage', data.feature_image); 
-      $('#downloardBtn').attr('href', url);       
+      url = url.replace(':orderimage', data.feature_image);
+      $('#downloardBtn').attr('href', url);
       //rejected message
       if(data.status == 3){
         if(data.comment){
@@ -289,14 +289,14 @@
         if(data.rejection_reason){
           $('#rejected-reason').show();
           $('#rejected-selected-reason').text(data.rejection_reason.reason);
-        }       
+        }
       }
 
       //invoice Button
        if(data.status == 4){
          $('#invoicedPdf').show();
         }
-      //end details  
+      //end details
 
       //Cancel Order Form
       $('#cancel_order_id').val(data.id);
@@ -309,7 +309,7 @@
       }else{
          $('#order_amount_cancel').val(data.amount);
       }
-     
+
 
       $.ajax({
           headers: {
@@ -318,17 +318,17 @@
             url: "{{ route('embroiderer-send-order-id')}}",
             method:"GET",
             data:{order_id:data.id},
-            success:function(data){               
+            success:function(data){
               if(data.isSucceeded){
-                  $('.submitted-work').html(data.data);            
-                  
-                }         
+                  $('.submitted-work').html(data.data);
+
+                }
             }
-        });     
-       
-      //Show model 
+        });
+
+      //Show model
       $('#download-modal').modal('toggle');
 
- }  
+ }
 </script>
 @endsection

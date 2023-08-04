@@ -5,6 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="csrf-token" content="{{ csrf_token() }}">
         <title>{{ config('app.name') }} | Registration Page</title>
+        <link rel="icon" type="image/x-icon" href="{{ asset('/images/favicon.png') }}">  
         <!-- Tell the browser to be responsive to screen width -->
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
@@ -102,12 +103,11 @@
 						
                         <div class="input-group mb-3 my-error">
 						<label for="mobile">Mobile number</label>
-                            <input type="text"  name="mobile" class="form-control @error('mobile') is-invalid @enderror"   value="{{ old('mobile') }}"  placeholder="Mobile">
-                            
+                            <input type="text"  name="mobile" class="form-control @error('mobile') is-invalid @enderror"   value="{{ old('mobile') }}"  placeholder="Mobile"> 
                             @error('mobile')
-                            <span class="invalid-feedback" role="alert">
-                            <strong>{{ $message }}</strong>
-                            </span>
+                              <span class="invalid-feedback" role="alert">
+                                <strong>{{ $message }}</strong>
+                               </span>
                             @enderror
                         </div>
                         <div class="input-group mb-3 my-error">
@@ -122,7 +122,7 @@
                         </div>
 
                          <div class="input-group mb-3 my-error">
-                           <label for="first-name">Countries</label>
+                           <label for="first-name">Country</label>
                            @php
                             $countries = getCounties();
                            @endphp
@@ -165,7 +165,7 @@
                         </div>
                         <div class="input-group mb-3 my-error">
                            <label for="first-name">Postcode</label>
-                            <input type="number"  class="form-control" name="postcode" id="postcode"/> 
+                            <input type="text"  class="form-control"  name="postcode" id="postcode"/> 
                             
                             @error('postcode')
                             <span class="invalid-feedback" role="alert">
@@ -297,8 +297,8 @@
                         mobile:{
                             required: true,
                             digits: true,
-                            minlength: 10,
-                            maxlength: 10,
+                           // minlength: 10,
+                           // maxlength: 10,
                             remote: {
                                 url: `{{ route('check-mobile-exist') }}`,
                                 type: "post",
@@ -333,7 +333,7 @@
                             required : "Please enter your last name",
                         },
                         mobile: {
-                            required : "Please enter your mobile number",
+                          //  required : "Please enter your mobile number",
                             remote: "This mobile number already exists"
                         },
                         email: {

@@ -3,14 +3,6 @@
 
 {{-- Content --}}
 @section('content')
-<div class="row mb-2">
-          <div class="col-sm-6">
-            <h3 class="card-label">{{ isset($resData) ? $resData->service_title : '' }}</h3>
-          </div>
-          <div class="col-sm-6">
-         
-          </div>
-        </div>
 <div class="row">
     <div class="col-lg-12">
         <div class="card card-custom custom-shadow">
@@ -20,14 +12,6 @@
 
 					<input type="hidden" name="service_id" value="{{ isset($resData) ? $resData->id : 0 }}">
 					<div class="form-group row">
-						<div class="col-lg-6 my-error">
-							<label>Title :</label>
-							<input type="text" class="form-control" value="{{ isset($resData) ? $resData->service_title : '' }}" name="service_title" id="service_title" placeholder="Enter Service title">
-						</div>
-						<div class="col-lg-6 my-error">
-							<label>Meta Title :</label>
-							<input type="text" class="form-control" value="{{ isset($resData) ? $resData->meta_title : '' }}" name="meta_title" id="meta_title" placeholder="Enter meta title">
-						</div> 
 						<div class="col-lg-6 my-error">
 							<label>Meta Tag</label>
 							<input type="text" class="form-control" value="{{ isset($resData) ? $resData->meta_tag : '' }}" name="meta_tag" id="meta_tag" placeholder="Meta tag">
@@ -41,17 +25,12 @@
 					<div class="form-group row">
 						<div class="col-lg-6 my-error">
 							<label>Services Slug:</label>
-							<input type="text" class="form-control" value="{{ isset($resData) ? $resData->service_slug : '' }}" name="service_slug" id="service_slug" placeholder="Enter Service Slug">
+							<input type="text" class="form-control" value="{{ isset($resData) ? $resData->service_title : '' }}" name="service_title" id="service_title" placeholder="Enter Service title">
 						</div>
 						<div class="col-lg-6 my-error">
 						<label>Services Feature Image:</label>
-						 <div class="custom-file">
-                          <input type="file" name="feature_image"  value="" id="feature_image" class="form-control   custom-file-input" placeholder="{{ (isset($resData) && $resData->feature_image!=null) ? $resData->feature_image : 'Browse Image' }}">         
-                             <label class="custom-file-label" for="avatar_image">{{ (isset($resData) && $resData->feature_image!=null) ? $resData->feature_image : 'Browse Image' }}</label>
-                             <input type="hidden" id="old_img" value="{{ (isset($resData) && $resData->feature_image!=null) ? $resData->feature_image : '' }}">
-                          </div> 
-						
-						
+						<input type="file" name="feature_image"  value="" id="feature_image" class="form-control" placeholder="Browse Image">
+						<input type="hidden" id="old_img" value="{{ (isset($resData) && $resData->feature_image!=null) ? $resData->feature_image : '' }}">
 						</div>			
 					</div> 
 					<div class="form-group row">

@@ -1,6 +1,7 @@
 @extends('layouts.app')
 
 @section('content')
+ 
  <div class="order-history-list-grid">
 <div class="container-fluid embroidererSection">
   <div class="row">
@@ -274,13 +275,16 @@
       acceptedFiles: ".jpeg,.jpg,.png,.psd",
       accept: function(file) {       
       let fileReader = new FileReader();
+      fileReader.onload = (event) => { 
+        $('#dz-preview').html('<img src="' + event.target.result + '"   alt="">');
+      }
       this.on("addedfile", function(event) {
       while (this.files.length > this.options.maxFiles) {
           this.removeFile(this.files[0]);
       }
       });
       this.on("thumbnail", function(file, dataUrl) {
-              $('#dz-preview').html('<img src="'+dataUrl+'"  alt="">');
+              //$('#dz-preview').html('<img src="'+dataUrl+'"  alt="">');
               $('.file-name').text(file.name);
               $('#order_name').val(file.name);   
           });

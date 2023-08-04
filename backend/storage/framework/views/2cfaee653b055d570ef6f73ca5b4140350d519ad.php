@@ -4,25 +4,32 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title><?php echo e(config('app.name')); ?></title>
-
+    <link rel="icon" type="image/x-icon" href="<?php echo e(asset('/images/favicon.png')); ?>">  
     <!-- Tell the browser to be responsive to screen width -->
-    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport"> 
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
           integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog=="
-          crossorigin="anonymous"/> 
+          crossorigin="anonymous"/>
+
     <link href="<?php echo e(asset('css/app.css')); ?>" rel="stylesheet">
     <link href="<?php echo e(asset('css/custom.css')); ?>" rel="stylesheet">
-    <link rel="icon" href="<?php echo e(asset('images/favicon.png')); ?>"/>
 
 </head>
-<body class="hold-transition login-page"> 
+<body class="hold-transition login-page">
+
 <section class="login-register-section">
 <div class="container-fluid p-0">
-    <div class="row no-gutters"> 
-    <div class="col-lg-6 col-md-12	 col-sm-12 col-12"> 
-    <div class="login-register-text"> 
-        <a class="logo-a"  href="<?php echo e(url('../')); ?>"><img src="<?php echo e(asset('backend-images/logo.svg')); ?>" /></a> 
-        <div class="left-login-regietr-text"> 
+    <div class="row no-gutters">
+
+    <div class="col-lg-6 col-md-12	 col-sm-12 col-12">
+    
+    <div class="login-register-text">
+        
+        <a class="logo-a"  href="<?php echo e(url('../')); ?>"><img src="<?php echo e(asset('backend-images/logo.svg')); ?>" /></a>
+
+        <div class="left-login-regietr-text">
+            
             <h2>Welcome to the best solution for embroiders!</h2>
             <p>Register for free and start using right now! Our product will greatly help you and increase your efficiency.</p>
 
@@ -123,7 +130,7 @@ unset($__errorArgs, $__bag); ?>
 
                 </div>
 
-                 <p class="forgot-password"><a href="<?php echo e(route('password.request')); ?>">Forgot your password?</a></p>
+                 <p class="forgot-password"><a href="<?php echo e(route('password.request')); ?>">Forgot your password</a> </p>
 
                 <div class="row">
                     <div class="col-12">

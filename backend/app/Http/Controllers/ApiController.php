@@ -202,10 +202,11 @@ class ApiController extends Controller
 	public function serviceCateSlug(Request $request){
 		if($request->isMethod('get')){               
                try{
-				  $cmsServices = Cms_services::orderBy('id', 'ASC')->get(); 
+				  $cmsServices = Cms_services::orderBy('id', 'ASC')->get();
 				  $data = [];
 				  if($cmsServices){
-				   foreach ($cmsServices as $key => $Services) { 	                                         
+				   foreach ($cmsServices as $key => $Services) { 
+				                                         
 					   $service_slug = $Services->service_slug; 
 					   $service_title = $Services->service_title; 
 					   $service_description = $Services->service_description; 

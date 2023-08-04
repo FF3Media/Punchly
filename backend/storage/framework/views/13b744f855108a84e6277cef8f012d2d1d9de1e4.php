@@ -16,7 +16,7 @@
 					<div class="order-content">
 						<label class="order-status-label">Status</label>
 						<?php if($order->status == '1'): ?>
-						    <h3><span class="in-progress-tag">Awaiting Approval</span></h3>
+						    <h3><span class="in-progress-tag">Waiting for Approval</span></h3>
 						<?php elseif($order->status == '2'): ?>
 						    <h3><span class="completed-tag">In progress</span></h3>
 						<?php elseif($order->status == '3'): ?>
@@ -164,7 +164,7 @@
                             <label>Are You Sure ?</label>                             
                         </div>
                     </div>  
-                    <input type="submit" value="Yes Sure" class="btn btn-success"> 
+                    <input type="submit" id="wrkcompleted" value="Yes Sure" class="btn btn-success"> 
             </form>
 
              </div>
@@ -192,7 +192,7 @@
                                 <textarea name="comment"  class="form-control"  rows="6" cols="50" placeholder="EX: Remove the white background"></textarea>
                             </div>
                         </div>                       
-                        <input type="submit" value="Reject Submitted work" class="btn btn-success">                    
+                        <input type="submit" id="rejectSubmittedWork" value="Reject Submitted work" class="btn btn-success">                    
                  </form>
              </div>
             

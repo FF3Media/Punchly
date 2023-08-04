@@ -38,14 +38,17 @@ class DigitizerManagerController extends Controller
      */
     public function dashboard(Request $request)
     {
-        return view('digitizer_manager.dashboard');
+        $page_title = "Dashboard";  
+        return view('digitizer_manager.dashboard',compact('page_title'));
     }
 
     /**
     *	Change Password Form
     */
     public function changePasswordForm(Request $request){
-        return view('digitizer_manager.changePassword');
+        $page_title = "Change Password";  
+        
+        return view('digitizer_manager.changePassword',compact('page_title'));
     }
  
     /**
@@ -53,6 +56,8 @@ class DigitizerManagerController extends Controller
     */
     public function orderManagement(Request $request){
         if($request->isMethod('get')){
+            $page_title = "Orders Management"; 
+            $status = 1; 
             $priceCalculator = PriceCalculator::all();
             $inch = 0 ; $centimeter = 0;
             if(count($priceCalculator)){        
@@ -60,7 +65,8 @@ class DigitizerManagerController extends Controller
                 $inch = $priceCalculator[0]['desired_price']; 
                 $centimeter = $priceCalculator[1]['desired_price'];
             }  
-            return view('digitizer_manager.ordersManagement',compact('inch','centimeter'));      
+            
+            return view('digitizer_manager.ordersManagement',compact('page_title','status','inch','centimeter'));      
         }
     }
 
@@ -88,6 +94,7 @@ class DigitizerManagerController extends Controller
             }else{
                $orderList = Order::with(['garment','payment_details','digitizer','rejection_reason'])->where($conditions)->whereIn('status',[1])->orderBy('id', 'DESC');
             }
+          
             if(!empty($request->maximumDate) && !empty($request->minimumDate) || !empty($request->desired_output) || !empty($request->status)){
 
                  $filterData = true;
@@ -138,6 +145,7 @@ class DigitizerManagerController extends Controller
     */
     public function InProgressOrderManagement(Request $request){
         if($request->isMethod('get')){
+            $page_title = "In Progress Management";  
             $priceCalculator = PriceCalculator::all();
             $inch = 0 ; $centimeter = 0;
             if(count($priceCalculator)){        
@@ -145,7 +153,7 @@ class DigitizerManagerController extends Controller
                 $inch = $priceCalculator[0]['desired_price']; 
                 $centimeter = $priceCalculator[1]['desired_price'];
             }  
-            return view('digitizer_manager.inProgressManagement',compact('inch','centimeter'));      
+            return view('digitizer_manager.inProgressManagement',compact('page_title','inch','centimeter'));      
         }
     }
 
@@ -226,13 +234,14 @@ class DigitizerManagerController extends Controller
     public function rejectedOrderManagement(Request $request){
         if($request->isMethod('get')){
             $priceCalculator = PriceCalculator::all();
+            $page_title = "Rejected Management"; 
             $inch = 0 ; $centimeter = 0;
             if(count($priceCalculator)){        
                 $priceCalculator = $priceCalculator->toArray();
                 $inch = $priceCalculator[0]['desired_price']; 
                 $centimeter = $priceCalculator[1]['desired_price'];
             }  
-            return view('digitizer_manager.rejectedManagement',compact('inch','centimeter'));      
+            return view('digitizer_manager.rejectedManagement',compact('page_title','inch','centimeter'));      
         }
     }
 
@@ -312,13 +321,14 @@ class DigitizerManagerController extends Controller
     public function canceledOrderManagement(Request $request){
         if($request->isMethod('get')){
             $priceCalculator = PriceCalculator::all();
+            $page_title = "Canceled Management"; 
             $inch = 0 ; $centimeter = 0;
             if(count($priceCalculator)){        
                 $priceCalculator = $priceCalculator->toArray();
                 $inch = $priceCalculator[0]['desired_price']; 
                 $centimeter = $priceCalculator[1]['desired_price'];
             }  
-            return view('digitizer_manager.canceledManagement',compact('inch','centimeter'));      
+            return view('digitizer_manager.canceledManagement',compact('page_title','inch','centimeter'));      
         }
     }
 
@@ -399,13 +409,14 @@ class DigitizerManagerController extends Controller
     public function reworkingOrderManagement(Request $request){
         if($request->isMethod('get')){
             $priceCalculator = PriceCalculator::all();
+            $page_title = "Reworking Management";
             $inch = 0 ; $centimeter = 0;
             if(count($priceCalculator)){        
                 $priceCalculator = $priceCalculator->toArray();
                 $inch = $priceCalculator[0]['desired_price']; 
                 $centimeter = $priceCalculator[1]['desired_price'];
             }  
-            return view('digitizer_manager.reworkingManagement',compact('inch','centimeter'));      
+            return view('digitizer_manager.reworkingManagement',compact('page_title','inch','centimeter'));      
         }
     }
 
@@ -486,12 +497,13 @@ class DigitizerManagerController extends Controller
         if($request->isMethod('get')){
             $priceCalculator = PriceCalculator::all();
             $inch = 0 ; $centimeter = 0;
+            $page_title = "Search Order";
             if(count($priceCalculator)){         
                 $priceCalculator = $priceCalculator->toArray();
                 $inch = $priceCalculator[0]['desired_price']; 
                 $centimeter = $priceCalculator[1]['desired_price'];
             }  
-            return view('digitizer_manager.searchOrder',compact('inch','centimeter'));      
+            return view('digitizer_manager.searchOrder',compact('page_title','inch','centimeter'));      
         }
     }
 
@@ -630,6 +642,7 @@ class DigitizerManagerController extends Controller
     public function submittedOrderDetail(Request $request){
         if($request->isMethod('get')){
             $allOrder = '';
+            $page_title = "Submitted Work Management";
             $orderImages = '';
             if($request->order_id){
               $allOrder = Order::with(['user','digitizer','rejection_reason','payment_details','order_images'])
@@ -637,17 +650,90 @@ class DigitizerManagerController extends Controller
 
                $orderImages = OrderImage::where(['order_id' => $request->order_id])->get();
                 if($allOrder->status == 10 || $allOrder->status == 13 || $allOrder->status == 11 || $allOrder->status == 4) {                      
+                         
+                     
+                        $html = '<h5 class="completed_files">Submitted Files<div class="order_btns"></h5>'; 
+                    foreach ($orderImages as $allImages) { 
+                        
+                        $temp= explode('.',$allImages->order_image);
+                        $extension = end($temp);
+                       
+                        if($extension == 'pdf' || $extension == 'EMB' || $extension == 'DST' || $extension == 'dst' || $extension == 'emb' ){
 
-                    $html = ''; 
-                    foreach ($orderImages as $allImages) {
+                            if($extension == 'DST' || $extension == 'dst'){
+                                $ImageName = 'dst.png';
+                            }elseif($extension == 'EMB' || $extension == 'emb'){
+
+                                $ImageName = 'emb.png';
+                            }else{
+
+                                $ImageName = 'pdf.png';
+                            }
+
+                               
+                        }else{
+                            $ImageName = $allImages->order_image;
+
+                        }
+                        
                         $html .= '<div class="ftr-modal-box">';
                          $html .= '<div class="ftr-dwnld-left"> 
-                           <img class="img-submitted" src="'.url('/public/orders').'/'.$allImages->order_image.'" height="85px" width="100px" /><span id="sub-img">'.$allImages->order_image.'</span></div>
+                           <img class="img-submitted" src="'.url('/public/orders').'/'.$ImageName.'" height="85px" width="100px" /><span id="sub-img">'.$allImages->order_image.'</span></div>
                             <div class="ftr-dwnld-btn">
                             <a class="btn downloardButton" href="'.route("digitizer-manager-download-image", $allImages->order_image).'">Download</a> 
                             </div>';  
                             $html .= '</div>';                        
-                    } 
+                    }   
+                }
+
+                  return response()->json([                   
+                        "isSucceeded"   => true,
+                        "data"          => $html,
+                         
+                     ]);                 
+            }
+        }
+
+    }
+
+       /**
+    * Order Detail Page
+    */
+   public function reviewOrderDetail(Request $request){
+        if($request->isMethod('get')){
+            $status='10';
+            $allOrder = '';
+            $page_title = 'For review';
+            $orderImages = '';
+            $html = '';
+            if($request->order_id){
+              $allOrder = Order::with(['user','digitizer','rejection_reason','payment_details','order_images'])
+                                ->where(['id' => $request->order_id,'status'=>10])->first(); 
+
+               $orderImages = OrderImage::where(['order_id' => $request->order_id])->get();
+                if($allOrder->status == 10 || $allOrder->status == 13 || $allOrder->status == 11 || $allOrder->status == 4) {  
+                         $html = ''; 
+                    foreach ($orderImages as $allImages) {
+                        $temp= explode('.',$allImages->order_image);
+                        $extension = end($temp);
+                       
+                        if($extension == 'pdf' || $extension == 'EMB' || $extension == 'DST' || $extension == 'dst' || $extension == 'emb' ){
+
+                            if($extension == 'DST' || $extension == 'dst'){
+                                $ImageName = 'dst.png';
+                            }elseif($extension == 'EMB' || $extension == 'emb'){
+                                $ImageName = 'emb.png';
+                            }else{
+                                $ImageName = 'pdf.png';
+                            }                               
+                        }else{
+                            $ImageName = $allImages->order_image;
+                        }
+                        $html .= '<div class="ftr-modal-box  imgbox-'.$allImages->id.'">';
+                         $html .= '<div class="ftr-dwnld-left"><img class="img-submitted" src="'.url('/public/orders').'/'.$ImageName.'" height="85px" width="100px" /><span id="sub-img">'.$allImages->order_image.'</span></div>
+                            <div class="ftr-dwnld-btn"><span class="btn rejectBtn  deleteimg" data-id="'.$allImages->id.'" >Delete</span><a class="btn downloardButton" href="'.route("admin-download-image", $allImages->order_image).'">Download</a></div>';  
+                            $html .= '</div>';                        
+                    }    
                 }
                   return response()->json([                   
                         "isSucceeded"   => true,
@@ -655,7 +741,152 @@ class DigitizerManagerController extends Controller
                          
                      ]);                 
             }
-             return view('digitizer_manager.submittedWorkManagement');
+            
+             return view('digitizer_manager.submittedWorkManagement',compact('page_title','status'));
+        }
+
+    }
+
+     
+      /**
+    * ReworkingOrderDetail Page
+    */
+    public function reworkingOrderDetail(Request $request){
+        if($request->isMethod('get')){
+            $allOrder = '';
+             $status='13';
+            $page_title = 'Reworking';
+            $orderImages = '';
+            if($request->order_id){
+               $allOrder = Order::with(['user','digitizer','rejection_reason','payment_details','order_images'])
+                                ->where(['id' => $request->order_id])->first(); 
+
+               $orderImages = OrderImage::where(['order_id' => $request->order_id])->get();
+                if($allOrder->status == 10 || $allOrder->status == 13 || $allOrder->status == 11 || $allOrder->status == 4) {  
+                         $html = ''; 
+                    foreach ($orderImages as $allImages) {
+                        $temp= explode('.',$allImages->order_image);
+                        $extension = end($temp);
+                       
+                        if($extension == 'pdf' || $extension == 'EMB' || $extension == 'DST' || $extension == 'dst' || $extension == 'emb' ){
+
+                            if($extension == 'DST' || $extension == 'dst'){
+                                $ImageName = 'dst.png';
+                            }elseif($extension == 'EMB' || $extension == 'emb'){
+                                $ImageName = 'emb.png';
+                            }else{
+                                $ImageName = 'pdf.png';
+                            }                               
+                        }else{
+                            $ImageName = $allImages->order_image;
+                        }
+                        $html .= '<div class="ftr-modal-box  imgbox-'.$allImages->id.'">';
+                         $html .= '<div class="ftr-dwnld-left"><img class="img-submitted" src="'.url('/public/orders').'/'.$ImageName.'" height="85px" width="100px" /><span id="sub-img">'.$allImages->order_image.'</span></div><div class="ftr-dwnld-btn"><span class="btn rejectBtn  deleteimg" data-id="'.$allImages->id.'" >Delete</span><a class="btn downloardButton" href="'.route("admin-download-image", $allImages->order_image).'">Download</a></div>';  
+                            $html .= '</div>';                        
+                    }    
+                }
+                  return response()->json([                   
+                        "isSucceeded"   => true,
+                        "data"          => $html,
+                         
+                     ]);                 
+            }
+             return view('digitizer_manager.ordersManagement',compact('page_title','status'));
+        }
+
+    }
+      /**
+    * inProgressOrderDetail Page
+    */
+    public function inProgressOrderDetail(Request $request){
+        if($request->isMethod('get')){
+            $allOrder = '';
+             $status='2';
+            $page_title = 'In Progress';
+            $orderImages = '';
+            if($request->order_id){
+               $allOrder = Order::with(['user','digitizer','rejection_reason','payment_details','order_images'])
+                                ->where(['id' => $request->order_id])->first(); 
+
+               $orderImages = OrderImage::where(['order_id' => $request->order_id])->get();
+                if($allOrder->status == 10 || $allOrder->status == 13 || $allOrder->status == 11 || $allOrder->status == 4) {  
+                         $html = ''; 
+                    foreach ($orderImages as $allImages) {
+                        $temp= explode('.',$allImages->order_image);
+                        $extension = end($temp);
+                       
+                        if($extension == 'pdf' || $extension == 'EMB' || $extension == 'DST' || $extension == 'dst' || $extension == 'emb' ){
+
+                            if($extension == 'DST' || $extension == 'dst'){
+                                $ImageName = 'dst.png';
+                            }elseif($extension == 'EMB' || $extension == 'emb'){
+                                $ImageName = 'emb.png';
+                            }else{
+                                $ImageName = 'pdf.png';
+                            }                               
+                        }else{
+                            $ImageName = $allImages->order_image;
+                        }
+                        $html .= '<div class="ftr-modal-box  imgbox-'.$allImages->id.'">';
+                         $html .= '<div class="ftr-dwnld-left"> 
+                           <img class="img-submitted" src="'.url('/public/orders').'/'.$ImageName.'" height="85px" width="100px" /><span id="sub-img">'.$allImages->order_image.'</span></div><div class="ftr-dwnld-btn"><span class="btn rejectBtn  deleteimg" data-id="'.$allImages->id.'" >Delete</span><a class="btn downloardButton" href="'.route("admin-download-image", $allImages->order_image).'">Download</a></div>';  
+                            $html .= '</div>';                        
+                    }    
+                }
+                  return response()->json([                   
+                        "isSucceeded"   => true,
+                        "data"          => $html,
+                         
+                     ]);                 
+            }
+             return view('digitizer_manager.inProgressManagement',compact('page_title','status'));
+        }
+
+    }
+       /**
+    * rejectOrderDetail Page
+    */
+    public function rejectOrderDetail(Request $request){
+        if($request->isMethod('get')){
+            $allOrder = '';
+             $status='3';
+            $page_title = 'Completed Work Management';
+            $orderImages = '';
+            if($request->order_id){
+               $allOrder = Order::with(['user','digitizer','rejection_reason','payment_details','order_images'])
+                                ->where(['id' => $request->order_id])->first(); 
+
+               $orderImages = OrderImage::where(['order_id' => $request->order_id])->get();
+                if($allOrder->status == 10 || $allOrder->status == 13 || $allOrder->status == 11 || $allOrder->status == 4) {  
+                         $html = ''; 
+                    foreach ($orderImages as $allImages) {
+                        $temp= explode('.',$allImages->order_image);
+                        $extension = end($temp);
+                       
+                        if($extension == 'pdf' || $extension == 'EMB' || $extension == 'DST' || $extension == 'dst' || $extension == 'emb' ){
+
+                            if($extension == 'DST' || $extension == 'dst'){
+                                $ImageName = 'dst.png';
+                            }elseif($extension == 'EMB' || $extension == 'emb'){
+                                $ImageName = 'emb.png';
+                            }else{
+                                $ImageName = 'pdf.png';
+                            }                               
+                        }else{
+                            $ImageName = $allImages->order_image;
+                        }
+                        $html .= '<div class="ftr-modal-box  imgbox-'.$allImages->id.'">';
+                         $html .= '<div class="ftr-dwnld-left"><img class="img-submitted" src="'.url('/public/orders').'/'.$ImageName.'" height="85px" width="100px" /><span id="sub-img">'.$allImages->order_image.'</span></div><div class="ftr-dwnld-btn"><span class="btn rejectBtn  deleteimg" data-id="'.$allImages->id.'" >Delete</span><a class="btn downloardButton" href="'.route("admin-download-image", $allImages->order_image).'">Download</a></div>';  
+                            $html .= '</div>';                        
+                    }    
+                }
+                  return response()->json([                   
+                        "isSucceeded"   => true,
+                        "data"          => $html,
+                         
+                     ]);                 
+            }
+             return view('digitizer_manager.ordersManagement',compact('page_title','status'));
         }
 
     }
@@ -701,18 +932,9 @@ class DigitizerManagerController extends Controller
                 ]);
             }else{
                 if($filterData == true){
-                    $html = '<div class="col-lg-12">
-                     <div class="exp-box" style="text-align: center;font-weight: 500;">
-                        There is no data related to this filter.
-                    </div>
-                    </div>';
+                    $html = '<div class="col-lg-12"><div class="exp-box" style="text-align: center;font-weight: 500;">There is no data related to this filter.</div></div>';
                     }else{
-                       $html = '<div class="col-lg-12">
-                    <div class="orders_empty" style="text-align: center;font-weight: 500;">
-                        <h3> Your orders list is empty Yet.</h3>
-                        <p style="color: #708da8;"></p>
-                    </div>
-                   </div>';
+                       $html = '<div class="col-lg-12"><div class="orders_empty" style="text-align: center;font-weight: 500;"><h3> Your orders list is empty Yet.</h3><p style="color: #708da8;"></p></div></div>';
                 }
                 return response()->json([
                     "message"       => 'There is no order2 found.',
@@ -726,7 +948,9 @@ class DigitizerManagerController extends Controller
 public function completedOrderDetail(Request $request){
         if($request->isMethod('get')){
             $allOrder = '';
+             $status='4';
             $orderImages = '';
+            $page_title = "Completed Work Management";
             if($request->order_id){
               $allOrder = Order::with(['user','digitizer','rejection_reason','payment_details','order_images'])
                                 ->where(['id' => $request->order_id])->first(); 
@@ -737,11 +961,7 @@ public function completedOrderDetail(Request $request){
                     $html = ''; 
                     foreach ($orderImages as $allImages) {
                         $html .= '<div class="ftr-modal-box">';
-                         $html .= '<div class="ftr-dwnld-left"> 
-                           <img class="img-submitted" src="'.url('/public/orders').'/'.$allImages->order_image.'" height="85px" width="100px" /><span id="sub-img">'.$allImages->order_image.'</span></div>
-                            <div class="ftr-dwnld-btn">
-                            <a class="btn downloardButton" href="'.route("digitizer-manager-download-image", $allImages->order_image).'">Download</a> 
-                            </div>';  
+                         $html .= '<div class="ftr-dwnld-left"><img class="img-submitted" src="'.url('/public/orders').'/'.$allImages->order_image.'" height="85px" width="100px" /><span id="sub-img">'.$allImages->order_image.'</span></div><div class="ftr-dwnld-btn"><a class="btn downloardButton" href="'.route("digitizer-manager-download-image", $allImages->order_image).'">Download</a></div>';  
                             $html .= '</div>';                        
                     } 
                 }
@@ -751,7 +971,7 @@ public function completedOrderDetail(Request $request){
                          
                      ]);                 
             }
-             return view('digitizer_manager.completedWorkManagement');
+             return view('digitizer_manager.ordersManagement',compact('page_title','status'));
         }
 
     }
@@ -989,26 +1209,39 @@ public function completedOrderDetail(Request $request){
                   try{  
 
                     $rfID=null;   
+                    $data = $request->except(['_token','reject_or_id','payment_intent_id']);
+                    $data['status'] = '3'; 
                     if($request->payment_intent_id){              
-                     $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
-                     $refundCheck = $stripe->paymentIntents->cancel($request->payment_intent_id);
-                     $rfID=$refundCheck->id;
-                     } 
-                            $data = $request->except(['_token','reject_or_id','payment_intent_id']);
-                            $data['status'] = '3';                      
+                     $stripe = new \Stripe\StripeClient(config('services.stripe.secret')); 
+                     $retrieveCheck =   $stripe->paymentIntents->retrieve(
+                        $request->payment_intent_id,
+                        []
+                      );
+                      if($retrieveCheck->status == 'canceled'){ 
+                        $rejectOrder = Order::where(['id' => $request->reject_or_id])->update($data);
+                        return redirect()->back()->with(['alert-type' => 'success' , 'message' => 'Order rejected successfully']); 
+                      }else{
+                        $refundCheck = $stripe->paymentIntents->cancel($request->payment_intent_id);
+                        $rfID=$refundCheck->id;
+
+                      }
+                     
+                     
+                     }     
+                                                 
                             $data['refund_id'] =  $rfID; 
                             $rejectOrder = Order::where(['id' => $request->reject_or_id])->update($data);
                             if($rejectOrder){
                                 $orderAndUserDetail = Order::with(['user','rejection_reason'])->where(['id' => $request->reject_or_id])->first();
                                 
                                 $data['email'] = $orderAndUserDetail->user->email;
-                                $data['subject'] = 'ACTION REQUIRED  - Your logo needs modification';
+                                $data['subject'] = 'Your order is rejected';
                                 $data['order_name'] = $orderAndUserDetail->order_name;
                                 $data['user_name'] = $orderAndUserDetail->user->first_name;
-                                $data['reject_reason'] = $orderAndUserDetail->rejection_reason->reason;
+                                $data['reject_reason'] = $orderAndUserDetail->rejection_reason->reason; 
                                 $data['reject_comment'] = $request->comment;    
                                 $data['order_unique_id'] = $orderAndUserDetail->order_unique_id;
-                                $sendEmail = Mail::to([$orderDetails->user->email])->send( new SendMail($data,'orderRejected'));
+                                $sendEmail = Mail::to([$orderAndUserDetail->user->email])->send( new SendMail($data,'orderRejected'));
                                 return redirect()->back()->with(['alert-type' => 'success' , 'message' => 'Order rejected successfully.']);                               
                             }
                            
@@ -1023,21 +1256,206 @@ public function completedOrderDetail(Request $request){
                             $data['refund_id'] =  null; 
                             $rejectOrder = Order::where(['id' => $request->reject_or_id])->update($data);
                             if($rejectOrder){
-                                $orderAndUserDetail = Order::with(['user'])->where(['id' => $request->reject_or_id])->first(); 
+                                $orderAndUserDetail = Order::with(['user','rejection_reason'])->where(['id' => $request->reject_or_id])->first(); 
                                 $data['subject'] = 'ACTION REQUIRED ';
                                 $data['order_name'] = $orderAndUserDetail->order_name;
                                 $data['user_name'] = $orderAndUserDetail->user->first_name;
-                                $data['reason'] = $orderAndUserDetail->rejection_reason->reason;
+                                $data['reject_reason'] = $orderAndUserDetail->rejection_reason->reason; 
                                 $data['reject_comment'] = $request->comment;
 
                                 $data['order_unique_id'] = $orderAndUserDetail->order_unique_id;
-                              $sendEmail = Mail::to([$orderDetails->user->email])->send( new SendMail($data,'orderRejected'));
+                              $sendEmail = Mail::to([$orderAndUserDetail->user->email])->send( new SendMail($data,'orderRejected'));
                                 return redirect()->back()->with(['alert-type' => 'success' , 'message' => 'Order rejected successfully.']);                               
                             } 
 
             }
         }
     }
+
+
+    /**
+    * Order List Management
+    */ 
+    public function selfAssinedWork(Request $request){
+        if($request->isMethod('get')){
+            $priceCalculator = PriceCalculator::all();
+            $inch = 0 ; $centimeter = 0;
+            $page_title = "Orders Management";
+            if(count($priceCalculator)){        
+                $priceCalculator = $priceCalculator->toArray();
+                $inch = $priceCalculator[0]['desired_price']; 
+                $centimeter = $priceCalculator[1]['desired_price'];
+            }  
+            return view('digitizer_manager.selfAssigned',compact('page_title','inch','centimeter'));      
+        }
+    }
+ /*
+    * Experience filter method
+    */
+    public function selfAssingedRepresent(Request $request){
+        //echo "<pre>"; print_r($request->all());die;
+        $user = Auth::user();
+        if($request->ajax()){       
+        $filterData = false;     
+            $conditions[]=['order_digitizer_id','=', Auth::user()->id];        
+            if (!empty($request->maximumDate) && !empty($request->minimumDate)) {
+                $startDate = Carbon::createFromFormat('m/d/Y', $request->minimumDate)->format('Y-m-d');
+                $endDate = Carbon::createFromFormat('m/d/Y', $request->maximumDate)->format('Y-m-d');
+                $conditions[]=['created_at','>=', $startDate];
+                $conditions[]=['created_at','<=', $endDate];
+                
+            }
+            $orderList = '';
+            if(!empty($request->desired_output)){
+                $conditions[]=['desired_output','=', $request->desired_output];
+               
+            }if(!empty($request->status)){
+                $conditions[]=['status','=', $request->status];
+                $orderList = Order::with(['garment','payment_details','digitizer','rejection_reason'])->where($conditions)->orderBy('id', 'DESC'); 
+                      
+            }else{
+               $orderList = Order::with(['garment','payment_details','digitizer','rejection_reason'])->where($conditions)->whereIn('status',[2,10,13])->orderBy('id', 'DESC');
+            }      
+            if(!empty($request->maximumDate) && !empty($request->minimumDate) || !empty($request->desired_output) || !empty($request->status)){
+
+                 $filterData = true;
+             }
+            $orderList = $orderList->paginate(6);
+            $digitizerList = User::where(['user_role' => '3'])->get();              
+            $rejectionReason = RejectionReason::all(); 
+            $garmentType = Garment::all();
+            $priceCalculator = PriceCalculator::all();       
+                $inch = 0 ; $centimeter = 0;
+                if(count($priceCalculator)){        
+                    $priceCalculator = $priceCalculator->toArray();
+                    $inch = $priceCalculator[0]['desired_price']; 
+                    $centimeter = $priceCalculator[1]['desired_price'];
+                }
+            $html = View::make('digitizer_manager.selfAssignManagement',compact('orderList','user','digitizerList','rejectionReason','inch','centimeter','garmentType','priceCalculator'))->render();
+            if(count($orderList)){
+                return response()->json([
+                    "message"       => 'Experiences get successfully.',
+                    "isSucceeded"   => TRUE,
+                    "data"          => $html,
+                ]);
+            }else{
+                if($filterData == true){
+                    $html = '<div class="col-lg-12">
+                     <div class="exp-box" style="text-align: center;font-weight: 500;">
+                        There is no data related to this filter.
+                    </div>
+                    </div>';
+                    }else{
+                       $html = '<div class="col-lg-12">
+                    <div class="orders_empty" style="text-align: center;font-weight: 500;">
+                        <h3> Your Self Assigned list is empty Yet.</h3>
+                        <p style="color: #708da8;"></p>
+                    </div>
+                   </div>';
+                }
+                return response()->json([
+                    "message"       => 'There is no order found.',
+                    "isSucceeded"   => FALSE,
+                    "data"          => $html
+                ]);
+            }
+        }
+    }
+
+     /**
+    * self Assined Work
+    */
+    public function selfSubmittedWork(Request $request){
+        if($request->isMethod('post')){
+            $imageName = '';
+            $pdfMove = '';
+            $originalImage = $request->file('order_image');
+          
+
+            // dd($ext);
+            // $filename = time() . '.' . $request->file('order_image')->extension();
+            foreach ($originalImage as $key => $value) {
+                  $folderPath = public_path().'/orders/'; 
+              
+                if($value->extension() == "pdf"){
+                   
+                    $pdfName = time().$value->getClientOriginalName();    
+                    $pdfMove =  $value->move($folderPath, $pdfName); 
+                    
+                    $uploadedImages[] = ['order_id'  => $request->o_id ,'image_format'  => 'pdf','order_image'  => $pdfName];
+               
+                }elseif($value->extension() == "bin" || $value->getClientOriginalExtension() == "EMB" || $value->getClientOriginalExtension() == "emb"){
+
+                     $imgName = time().$value->getClientOriginalName(); 
+                     $fileMove = $value->move($folderPath, $imgName);
+                     $uploadedImages[] = ['order_id'  => $request->o_id ,'image_format'  => $value->getClientOriginalExtension(),'order_image'  => $imgName];
+                      
+                }
+                else{
+                    $thumbnailImage = Image::make($value);
+                    $imgName = time().$value->getClientOriginalName();         
+                    $imageName = $thumbnailImage->save($folderPath.$imgName);
+                    $uploadedImages[] = ['order_id'  => $request->o_id ,'image_format'  => $value->extension(),'order_image'  => $imgName];
+
+                }
+                
+                
+            } 
+
+            
+            if(!empty($imageName)){
+                if ($request->order_status == 13) {
+                    OrderImage::where('order_id', $request->o_id)->delete();                         
+                }
+                $updateOrderStatus = Order::where(['id' => $request->o_id])->update(['status' => '10']);
+                $saveUplordedImage = OrderImage::insert($uploadedImages);                 
+                if($saveUplordedImage && $updateOrderStatus){
+                    $message = 'Work Submitted Uploaded Successfully.';
+                    $isSucceeded = 'success';
+                }else{
+                    $message = 'Image does not uploaded';
+                    $isSucceeded = 'error';
+                }          
+            }elseif(!empty($pdfMove)){
+
+                if ($request->order_status == 13) {
+                    OrderImage::where('order_id', $request->o_id)->delete();                         
+                }
+                $updateOrderStatus = Order::where(['id' => $request->o_id])->update(['status' => '10']);
+                $saveUplordedImage = OrderImage::insert($uploadedImages);                 
+                if($saveUplordedImage && $updateOrderStatus){
+                    $message = 'Work Submitted Uploaded Successfully.';
+                    $isSucceeded = 'success';
+                }else{
+                    $message = 'Image does not uploaded';
+                    $isSucceeded = 'error';
+                }          
+
+
+            }elseif(!empty($fileMove)){
+
+                if ($request->order_status == 13) {
+                    OrderImage::where('order_id', $request->o_id)->delete();                         
+                }
+                $updateOrderStatus = Order::where(['id' => $request->o_id])->update(['status' => '10']);
+                $saveUplordedImage = OrderImage::insert($uploadedImages);                 
+                if($saveUplordedImage && $updateOrderStatus){
+                    $message = 'Work Submitted Uploaded Successfully.';
+                    $isSucceeded = 'success';
+                }else{
+                    $message = 'Image does not uploaded';
+                    $isSucceeded = 'error';
+                }          
+
+
+            }else{
+                $message = 'Image does not uploaded';
+                $isSucceeded = 'error';
+            }
+            return redirect()->back()->with(['alert-type' => $isSucceeded , 'message' => $message]);
+        }
+    }
+
 
 
     public function rejectSubmittedWork(Request $request){
@@ -1047,12 +1465,14 @@ public function completedOrderDetail(Request $request){
                 $data['status'] = '13';                      
                 $rejectOrder = Order::where(['id' => $request->reject_order_id])->update($data);
                 if($rejectOrder){
-                    $orderAndUserDetail = Order::with(['digitizer'])->where(['id' => $request->reject_order_id])->first();
+                    $orderAndUserDetail = Order::with(['user','digitizer','rejection_reason'])->where(['id' => $request->reject_order_id])->first();
                     OrderImage::where('order_id',$request->reject_order_id)->update(['status'=>'2']);
                     $data['subject'] = 'Your Submitted work  is rejected';
                     $data['order_name'] = $orderAndUserDetail->order_name;
-                    $data['reason'] = $request->reason;
+                    $data['user_name'] = $orderAndUserDetail->user->first_name;
+                    $data['reject_reason'] = $orderAndUserDetail->rejection_reason->reason; 
                     $data['order_unique_id'] = $orderAndUserDetail->order_unique_id;
+                    $data['reject_comment'] = $request->comment;  
                      $sendEmail = Mail::to([$orderAndUserDetail->digitizer->email])->send( new SendMail($data,'orderRejected'));
                     return redirect()->back()->with(['alert-type' => 'success' , 'message' => 'Order rejected successfully.']);
                 }else{

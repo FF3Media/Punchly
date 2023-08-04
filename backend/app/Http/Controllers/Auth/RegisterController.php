@@ -34,7 +34,8 @@ class RegisterController extends Controller
      *
      * @var string
      */
-    protected $redirectTo = RouteServiceProvider::HOME;
+    protected $redirectTo = '/register-successfully';
+   // protected $redirectTo = RouteServiceProvider::HOME;
 
     /**
      * Create a new controller instance.
@@ -59,7 +60,7 @@ class RegisterController extends Controller
             'last_name' => ['required', 'string', 'max:255'],
             'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
             'password' => ['required', 'string', 'min:8', 'confirmed'],
-            'mobile' => ['required', 'digits:10' , 'unique:users'],
+            'mobile' => ['required',  'unique:users'],
         ],[
             'last_name.required' => 'The last name field is required.',
             'first_name.required' => 'The first name field is required.',
@@ -94,6 +95,15 @@ class RegisterController extends Controller
     }
 
 
+//     protected function redirectTo()
+// {
+//     // if (auth()->user()->role_id == 1) {
+//     //     return '/admin';
+//     // }
+//     return ;
+// }
+
+
     /**
     *Disable auto login after registration using override this method
     */
@@ -105,9 +115,10 @@ class RegisterController extends Controller
         //$this->guard()->login($user);
         if($user){
             $data = $request->all();
-            $data['subject'] = 'New User Register';
+           
+            $data['subject'] = 'Your Punchly account';
             $data['user_role'] = 'Embroiderer';
-            $sendEmail = Mail::to(['accounts@punchly.io'])->send( new SendMail($data,'newUser'));
+            $sendEmail = Mail::to([$data['email'],'admin@punchli.io'])->send( new SendMail($data,'newUser'));
         }
         return $this->registered($request, $user)
         ?: redirect($this->redirectPath());

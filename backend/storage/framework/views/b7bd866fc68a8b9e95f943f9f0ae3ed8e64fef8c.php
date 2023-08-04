@@ -1,1 +1,0 @@
-hell<?php /**PATH /var/www/punchly/backend/resources/views/privacy-policy.blade.php ENDPATH**/ ?>

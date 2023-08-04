@@ -5,6 +5,7 @@
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
         <meta name="csrf-token" content="<?php echo e(csrf_token()); ?>">
         <title><?php echo e(config('app.name')); ?> | Registration Page</title>
+        <link rel="icon" type="image/x-icon" href="<?php echo e(asset('/images/favicon.png')); ?>">  
         <!-- Tell the browser to be responsive to screen width -->
         <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
@@ -137,16 +138,15 @@ if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?> is-invalid <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
-unset($__errorArgs, $__bag); ?>"   value="<?php echo e(old('mobile')); ?>"  placeholder="Mobile">
-                            
+unset($__errorArgs, $__bag); ?>"   value="<?php echo e(old('mobile')); ?>"  placeholder="Mobile"> 
                             <?php $__errorArgs = ['mobile'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
 if ($__bag->has($__errorArgs[0])) :
 if (isset($message)) { $__messageOriginal = $message; }
 $message = $__bag->first($__errorArgs[0]); ?>
-                            <span class="invalid-feedback" role="alert">
-                            <strong><?php echo e($message); ?></strong>
-                            </span>
+                              <span class="invalid-feedback" role="alert">
+                                <strong><?php echo e($message); ?></strong>
+                               </span>
                             <?php unset($message);
 if (isset($__messageOriginal)) { $message = $__messageOriginal; }
 endif;
@@ -178,7 +178,7 @@ unset($__errorArgs, $__bag); ?>
                         </div>
 
                          <div class="input-group mb-3 my-error">
-                           <label for="first-name">Countries</label>
+                           <label for="first-name">Country</label>
                            <?php
                             $countries = getCounties();
                            ?>
@@ -250,7 +250,7 @@ unset($__errorArgs, $__bag); ?>
                         </div>
                         <div class="input-group mb-3 my-error">
                            <label for="first-name">Postcode</label>
-                            <input type="number"  class="form-control" name="postcode" id="postcode"/> 
+                            <input type="text"  class="form-control"  name="postcode" id="postcode"/> 
                             
                             <?php $__errorArgs = ['postcode'];
 $__bag = $errors->getBag($__errorArgs[1] ?? 'default');
@@ -410,8 +410,8 @@ unset($__errorArgs, $__bag); ?>
                         mobile:{
                             required: true,
                             digits: true,
-                            minlength: 10,
-                            maxlength: 10,
+                           // minlength: 10,
+                           // maxlength: 10,
                             remote: {
                                 url: `<?php echo e(route('check-mobile-exist')); ?>`,
                                 type: "post",
@@ -446,7 +446,7 @@ unset($__errorArgs, $__bag); ?>
                             required : "Please enter your last name",
                         },
                         mobile: {
-                            required : "Please enter your mobile number",
+                          //  required : "Please enter your mobile number",
                             remote: "This mobile number already exists"
                         },
                         email: {

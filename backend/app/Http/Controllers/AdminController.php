@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 use Illuminate\Http\Request;
+use Illuminate\Auth\Events\Registered;
 use Auth;
 use Url;
 use App\User;
@@ -48,14 +49,16 @@ class AdminController extends Controller
      */
     public function dashboard(Request $request)
     {
-        return view('admin.dashboard');
+        $page_title ="dashboard";
+        return view('admin.dashboard',compact('page_title'));
     }
 
     /**
     * List of all users here
     */
-    public function  usersList(Request $request){       
-        $header = 'List Of Users';
+    public function  usersList(Request $request){     
+
+        $page_title = 'List Of Users';
         $homeLink = route('admin-users-list');      
         if ($request->ajax()) {
             $data = User::where('id', '!=' , Auth::user()->id)->get();
@@ -69,7 +72,7 @@ class AdminController extends Controller
                 ->rawColumns(['action'])    
                 ->make(true);
         }
-        return view('admin.usersList',compact('header','homeLink'));
+        return view('admin.usersList',compact('page_title','homeLink'));
     }
 
     /*
@@ -100,6 +103,7 @@ class AdminController extends Controller
     */
     public function editHomePage(Request $request , $id = null){
         if($request->isMethod('get')){
+            $page_title = 'Edit Home Page';
             if(!empty($id)){
                  $homepage = Cms::where(['id' => base64_decode($id)])->first();
                  $CmsMeta  = CmsMeta::where(['id' => base64_decode($id)])->first(); 
@@ -107,14 +111,13 @@ class AdminController extends Controller
                 $banner_content = Cms::with(['cmsmeta' => function($q){
                     $q->where('meta_key','=','banner_content');
                 }])->where(['id' => base64_decode($id)])->first();
-                return view('admin.cms.editHomepage',['cmsmeta'=>$CmsMeta,'homepage' => $homepage, 'banner_content' => $banner_content]);    
+                return view('admin.cms.editHomepage',['page_title'=>$page_title,'cmsmeta'=>$CmsMeta,'homepage' => $homepage, 'banner_content' => $banner_content]);    
             }
         }
     }
 /**
     * Update Home Page Content
     */
-  
     public function updateHomePage(Request $request , $id = null){
         if($request->isMethod('post')){
             //$folderPath = public_path('/pages/homePage/');             
@@ -406,6 +409,7 @@ class AdminController extends Controller
     */
     public function orderManagement(Request $request){
         if($request->isMethod('get')){
+            $page_title = 'Orders Management';
             $priceCalculator = PriceCalculator::all();
             $inch = 0 ; $centimeter = 0;
             if(count($priceCalculator)){        
@@ -413,7 +417,7 @@ class AdminController extends Controller
                 $inch = $priceCalculator[0]['desired_price']; 
                 $centimeter = $priceCalculator[1]['desired_price'];
             }  
-            return view('admin.ordersManagement',compact('inch','centimeter'));      
+            return view('admin.ordersManagement',compact('page_title','inch','centimeter'));      
         }
     }
 
@@ -440,7 +444,7 @@ class AdminController extends Controller
                 $orderList = Order::with(['garment','payment_details','digitizer','rejection_reason'])->where($conditions)->orderBy('id', 'DESC');          
             }else{
 
-               $orderList = Order::with(['garment','payment_details','digitizer','rejection_reason'])->where($conditions)->whereIn('status',[1,2,3,6,9])->orderBy('id', 'DESC');
+               $orderList = Order::with(['garment','payment_details','digitizer','rejection_reason'])->where($conditions)->whereIn('status',[1,6,9])->orderBy('id', 'DESC');
             }
             if(!empty($request->maximumDate) && !empty($request->minimumDate) || !empty($request->desired_output) || !empty($request->status)){
 
@@ -495,6 +499,7 @@ class AdminController extends Controller
     */
     public function searchOrder(Request $request){
         if($request->isMethod('get')){
+            $page_title = 'Search Order';
             $priceCalculator = PriceCalculator::all();
             $inch = 0 ; $centimeter = 0;
             if(count($priceCalculator)){         
@@ -502,7 +507,7 @@ class AdminController extends Controller
                 $inch = $priceCalculator[0]['desired_price']; 
                 $centimeter = $priceCalculator[1]['desired_price'];
             }  
-            return view('admin.searchOrder',compact('inch','centimeter'));      
+            return view('admin.searchOrder',compact('page_title','inch','centimeter'));      
         }
     }
 
@@ -574,8 +579,9 @@ class AdminController extends Controller
     public function submittedWorkManagement(Request $request){       
          $user = Auth::user();
         if($request->ajax()){
+            $html ="";
          $filterData = false;      
-        $conditions=[];     
+           $conditions=[];     
             if (!empty($request->maximumDate) && !empty($request->minimumDate)) {
                 $startDate = Carbon::createFromFormat('m/d/Y', $request->minimumDate)->format('Y-m-d');
                 $endDate = Carbon::createFromFormat('m/d/Y', $request->maximumDate)->format('Y-m-d');
@@ -602,26 +608,20 @@ class AdminController extends Controller
             $rejectionReason = RejectionReason::all();            
             
             $html = View::make('admin.orderRepresentSubmitted',compact('orderList','user','digitizerList','rejectionReason'))->render();
+
             if(count($orderList)){
+
                 return response()->json([
                     "message"       => 'Experiences get successfully.',
                     "isSucceeded"   => TRUE,
                     "data"          => $html,
                 ]);
-            }else{
+
+            }else{                
                 if($filterData == true){
-                    $html = '<div class="col-lg-12">
-                     <div class="exp-box" style="text-align: center;font-weight: 500;">
-                        There is no data related to this filter.
-                    </div>
-                    </div>';
+                    $html = '<div class="col-lg-12"><div class="exp-box" style="text-align: center;font-weight: 500;"> There is no data related to this filter. </div> </div>';
                     }else{
-                       $html = '<div class="col-lg-12">
-                    <div class="orders_empty" style="text-align: center;font-weight: 500;">
-                        <h3> Your Submitted orders list is empty Yet.</h3>
-                        <p style="color: #708da8;"></p>
-                    </div>
-                   </div>';
+                       $html = '<div class="col-lg-12"><div class="orders_empty" style="text-align: center;font-weight: 500;"><h3> Your Submitted orders list is empty Yet.</h3><p style="color: #708da8;"></p></div></div>';
                    }
 
                 return response()->json([
@@ -640,7 +640,9 @@ class AdminController extends Controller
     public function submittedOrderDetail(Request $request){
         if($request->isMethod('get')){
             $allOrder = '';
+            $page_title = 'Submitted Work Management';
             $orderImages = '';
+            $html = '';
             if($request->order_id){
               $allOrder = Order::with(['user','digitizer','rejection_reason','payment_details','order_images'])
                                 ->where(['id' => $request->order_id])->first(); 
@@ -649,13 +651,29 @@ class AdminController extends Controller
                 if($allOrder->status == 10 || $allOrder->status == 13 || $allOrder->status == 11 || $allOrder->status == 4) {  
                          $html = ''; 
                     foreach ($orderImages as $allImages) {
+                        $temp= explode('.',$allImages->order_image);
+                        $extension = end($temp);
+                       
+                        if($extension == 'pdf' || $extension == 'EMB' || $extension == 'DST' || $extension == 'dst' || $extension == 'emb' ){
+
+                            if($extension == 'DST' || $extension == 'dst'){
+                                $ImageName = 'dst.png';
+                            }elseif($extension == 'EMB' || $extension == 'emb'){
+
+                                $ImageName = 'emb.png';
+                            }else{
+
+                                $ImageName = 'pdf.png';
+                            }
+
+                               
+                        }else{
+                            $ImageName = $allImages->order_image;
+
+                        }
+                        
                         $html .= '<div class="ftr-modal-box  imgbox-'.$allImages->id.'">';
-                         $html .= '<div class="ftr-dwnld-left"> 
-                           <img class="img-submitted" src="'.url('/public/orders').'/'.$allImages->order_image.'" height="85px" width="100px" /><span id="sub-img">'.$allImages->order_image.'</span></div>
-                            <div class="ftr-dwnld-btn">
-                            <span class="btn rejectBtn  deleteimg" data-id="'.$allImages->id.'" >Delete</span> 
-                            <a class="btn downloardButton" href="'.route("admin-download-image", $allImages->order_image).'">Download</a> 
-                            </div>';  
+                         $html .= '<div class="ftr-dwnld-left"><img class="img-submitted" src="'.url('/public/orders').'/'.$ImageName.'" height="85px" width="100px" /><span id="sub-img"><b>Image Submitted by the Digitizer</b><br/>'.$allImages->order_image.'</span></div><div class="ftr-dwnld-btn"><span class="btn rejectBtn  deleteimg" data-id="'.$allImages->id.'" >Delete</span><a class="btn downloardButton" href="'.route("admin-download-image", $allImages->order_image).'">Download</a></div>';  
                             $html .= '</div>';                        
                     }    
                 }
@@ -665,7 +683,278 @@ class AdminController extends Controller
                          
                      ]);                 
             }
-             return view('admin.submittedWorkManagement');
+             return view('admin.submittedWorkManagement',compact('page_title'));
+        }
+
+    }
+     /**
+    * Order Detail Page
+    */
+   public function reviewOrderDetail(Request $request){
+        if($request->isMethod('get')){
+            $status='10';
+            $allOrder = '';
+            $html = '';
+            $page_title = 'For review';
+            $orderImages = '';
+            if($request->order_id){
+              $allOrder = Order::with(['user','digitizer','rejection_reason','payment_details','order_images'])
+                                ->where(['id' => $request->order_id,'status'=>10])->first(); 
+
+               $orderImages = OrderImage::where(['order_id' => $request->order_id])->get();
+                if($allOrder->status == 10 || $allOrder->status == 13 || $allOrder->status == 11 || $allOrder->status == 4) {  
+                         $html = ''; 
+                    foreach ($orderImages as $allImages) {
+                        $temp= explode('.',$allImages->order_image);
+                        $extension = end($temp);
+                       
+                        if($extension == 'pdf' || $extension == 'EMB' || $extension == 'DST' || $extension == 'dst' || $extension == 'emb' ){
+
+                            if($extension == 'DST' || $extension == 'dst'){
+                                $ImageName = 'dst.png';
+                            }elseif($extension == 'EMB' || $extension == 'emb'){
+
+                                $ImageName = 'emb.png';
+                            }else{
+
+                                $ImageName = 'pdf.png';
+                            }
+
+                               
+                        }else{
+                            $ImageName = $allImages->order_image;
+
+                        }
+
+                         $html .= '<div class="ftr-modal-box  imgbox-'.$allImages->id.'">';
+                         $html .= '<div class="ftr-dwnld-left"><img class="img-submitted" src="'.url('/public/orders').'/'.$ImageName.'" height="85px" width="100px" /><span id="sub-img">'.$allImages->order_image.'</span></div><div class="ftr-dwnld-btn"><span class="btn rejectBtn  deleteimg" data-id="'.$allImages->id.'" >Delete</span><a class="btn downloardButton" href="'.route("admin-download-image", $allImages->order_image).'">Download</a></div>';  
+                            $html .= '</div>';                        
+                    }    
+                }
+                  return response()->json([                   
+                        "isSucceeded"   => true,
+                        "data"          => $html,
+                         
+                     ]);                 
+            }
+            
+             return view('admin.submittedWorkManagement',compact('page_title','status'));
+        }
+
+    }
+
+    
+       /**
+    * Order Detail Page
+    */
+    public function completedOrderDetail(Request $request){
+        if($request->isMethod('get')){
+            $allOrder = '';
+             $status='4';
+             $html = '';
+            $page_title = 'Completed Work Management';
+            $orderImages = '';
+            if($request->order_id){
+              $allOrder = Order::with(['user','digitizer','rejection_reason','payment_details','order_images'])
+                                ->where(['id' => $request->order_id])->first(); 
+
+               $orderImages = OrderImage::where(['order_id' => $request->order_id])->get();
+                if($allOrder->status == 10 || $allOrder->status == 13 || $allOrder->status == 11 || $allOrder->status == 4) {  
+                         $html = ''; 
+                    foreach ($orderImages as $allImages) {
+                        $temp= explode('.',$allImages->order_image);
+                        $extension = end($temp);
+                       
+                        if($extension == 'pdf' || $extension == 'EMB' || $extension == 'DST' || $extension == 'dst' || $extension == 'emb' ){
+
+                            if($extension == 'DST' || $extension == 'dst'){
+                                $ImageName = 'dst.png';
+                            }elseif($extension == 'EMB' || $extension == 'emb'){
+
+                                $ImageName = 'emb.png';
+                            }else{
+
+                                $ImageName = 'pdf.png';
+                            }
+
+                               
+                        }else{
+                            $ImageName = $allImages->order_image;
+
+                        }
+
+                        $html .= '<div class="ftr-modal-box  imgbox-'.$allImages->id.'">';
+                         $html .= '<div class="ftr-dwnld-left"><img class="img-submitted" src="'.url('/public/orders').'/'.$ImageName.'" height="85px" width="100px" /><span id="sub-img">'.$allImages->order_image.'</span></div><div class="ftr-dwnld-btn"><span class="btn rejectBtn  deleteimg" data-id="'.$allImages->id.'" >Delete</span><a class="btn downloardButton" href="'.route("admin-download-image", $allImages->order_image).'">Download</a></div>';  
+                            $html .= '</div>';                        
+                    }    
+                }
+                  return response()->json([                   
+                        "isSucceeded"   => true,
+                        "data"          => $html,
+                         
+                     ]);                 
+            }
+             return view('admin.submittedWorkManagement',compact('page_title','status'));
+        }
+
+    }
+      /**
+    * ReworkingOrderDetail Page
+    */
+    public function reworkingOrderDetail(Request $request){
+        if($request->isMethod('get')){
+            $allOrder = '';
+             $status='13';
+             $html = '';
+            $page_title = 'Reworking';
+            $orderImages = '';
+            if($request->order_id){
+               $allOrder = Order::with(['user','digitizer','rejection_reason','payment_details','order_images'])
+                                ->where(['id' => $request->order_id])->first(); 
+
+               $orderImages = OrderImage::where(['order_id' => $request->order_id])->get();
+                if($allOrder->status == 10 || $allOrder->status == 13 || $allOrder->status == 11 || $allOrder->status == 4) {  
+                         $html = ''; 
+                    foreach ($orderImages as $allImages) {
+                        $temp= explode('.',$allImages->order_image);
+                        $extension = end($temp);
+                       
+                        if($extension == 'pdf' || $extension == 'EMB' || $extension == 'DST' || $extension == 'dst' || $extension == 'emb' ){
+
+                            if($extension == 'DST' || $extension == 'dst'){
+                                $ImageName = 'dst.png';
+                            }elseif($extension == 'EMB' || $extension == 'emb'){
+
+                                $ImageName = 'emb.png';
+                            }else{
+
+                                $ImageName = 'pdf.png';
+                            }
+
+                               
+                        }else{
+                            $ImageName = $allImages->order_image;
+
+                        }
+                        $html .= '<div class="ftr-modal-box  imgbox-'.$allImages->id.'">';
+                         $html .= '<div class="ftr-dwnld-left"><img class="img-submitted" src="'.url('/public/orders').'/'.$ImageName.'" height="85px" width="100px" /><span id="sub-img">'.$allImages->order_image.'</span></div><div class="ftr-dwnld-btn"><span class="btn rejectBtn  deleteimg" data-id="'.$allImages->id.'" >Delete</span><a class="btn downloardButton" href="'.route("admin-download-image", $allImages->order_image).'">Download</a></div>';  
+                            $html .= '</div>';                        
+                    }    
+                }
+                  return response()->json([                   
+                        "isSucceeded"   => true,
+                        "data"          => $html,
+                         
+                     ]);                 
+            }
+             return view('admin.submittedWorkManagement',compact('page_title','status'));
+        }
+
+    }
+      /**
+    * inProgressOrderDetail Page
+    */
+    public function inProgressOrderDetail(Request $request){
+        if($request->isMethod('get')){
+            $allOrder = '';
+             $status='2';
+            $page_title = 'In Progress';
+            $orderImages = '';
+            if($request->order_id){
+               $allOrder = Order::with(['user','digitizer','rejection_reason','payment_details','order_images'])
+                                ->where(['id' => $request->order_id])->first(); 
+
+               $orderImages = OrderImage::where(['order_id' => $request->order_id])->get();
+                if($allOrder->status == 10 || $allOrder->status == 13 || $allOrder->status == 11 || $allOrder->status == 4) {  
+                         $html = ''; 
+                    foreach ($orderImages as $allImages) {
+
+                        $temp= explode('.',$allImages->order_image);
+                        $extension = end($temp);
+                       
+                        if($extension == 'pdf' || $extension == 'EMB' || $extension == 'DST' || $extension == 'dst' || $extension == 'emb' ){
+
+                            if($extension == 'DST' || $extension == 'dst'){
+                                $ImageName = 'dst.png';
+                            }elseif($extension == 'EMB' || $extension == 'emb'){
+
+                                $ImageName = 'emb.png';
+                            }else{
+
+                                $ImageName = 'pdf.png';
+                            }
+
+                               
+                        }else{
+                            $ImageName = $allImages->order_image;
+
+                        }
+
+                        $html .= '<div class="ftr-modal-box  imgbox-'.$allImages->id.'">';
+                         $html .= '<div class="ftr-dwnld-left"><img class="img-submitted" src="'.url('/public/orders').'/'. $ImageName.'" height="85px" width="100px" /><span id="sub-img">'.$allImages->order_image.'</span></div><div class="ftr-dwnld-btn"><span class="btn rejectBtn  deleteimg" data-id="'.$allImages->id.'" >Delete</span><a class="btn downloardButton" href="'.route("admin-download-image", $allImages->order_image).'">Download</a></div>';  
+                            $html .= '</div>';                        
+                    }    
+                }
+                  return response()->json([                   
+                        "isSucceeded"   => true,
+                        "data"          => $html,
+                         
+                     ]);                 
+            }
+             return view('admin.submittedWorkManagement',compact('page_title','status'));
+        }
+
+    }
+       /**
+    * rejectOrderDetail Page
+    */
+    public function rejectOrderDetail(Request $request){
+        if($request->isMethod('get')){
+            $allOrder = '';
+             $status='3';
+            $page_title = 'Completed Work Management';
+            $orderImages = '';
+            if($request->order_id){
+               $allOrder = Order::with(['user','digitizer','rejection_reason','payment_details','order_images'])
+                                ->where(['id' => $request->order_id])->first(); 
+
+               $orderImages = OrderImage::where(['order_id' => $request->order_id])->get();
+                if($allOrder->status == 10 || $allOrder->status == 13 || $allOrder->status == 11 || $allOrder->status == 4) {  
+                         $html = ''; 
+                    foreach ($orderImages as $allImages) {
+
+                        $temp= explode('.',$allImages->order_image);
+                        $extension = end($temp);
+                       
+                        if($extension == 'pdf' || $extension == 'EMB' || $extension == 'DST' || $extension == 'dst' || $extension == 'emb' ){
+
+                            if($extension == 'DST' || $extension == 'dst'){
+                                $ImageName = 'dst.png';
+                            }elseif($extension == 'EMB' || $extension == 'emb'){
+
+                                $ImageName = 'emb.png';
+                            }else{
+
+                                $ImageName = 'pdf.png';
+                            }
+
+                               
+                        }else{
+                            $ImageName = $allImages->order_image;
+
+                        }
+                        $html .= '<div class="ftr-modal-box  imgbox-'.$allImages->id.'">';
+                         $html .= '<div class="ftr-dwnld-left"><img class="img-submitted" src="'.url('/public/orders').'/'.$ImageName.'" height="85px" width="100px" /><span id="sub-img">'.$allImages->order_image.'</span></div><div class="ftr-dwnld-btn"><span class="btn rejectBtn  deleteimg" data-id="'.$allImages->id.'" >Delete</span><a class="btn downloardButton" href="'.route("admin-download-image", $allImages->order_image).'">Download</a></div>';  
+                            $html .= '</div>';                        
+                    }    
+                }
+                  return response()->json([                   
+                        "isSucceeded"   => true,
+                        "data"          => $html,
+                         
+                     ]);                 
+            }
+             return view('admin.submittedWorkManagement',compact('page_title','status'));
         }
 
     }
@@ -698,9 +987,10 @@ class AdminController extends Controller
      */
     public function userForm(Request $request){
         if($request->isMethod('get')){
-            $header = 'Add Users';
+            
+            $page_title = 'Add Users';
             $homeLink = route('admin-users-list');     
-            return view('admin.addNewUser',compact('header','homeLink'));
+            return view('admin.addNewUser',compact('page_title','homeLink'));
         }                
     }
 
@@ -734,11 +1024,11 @@ class AdminController extends Controller
                  $tokenData = DB::table('password_resets')->where('email',$user_data->email)->first();
                  $link = 'https://punchly.io/backend/password/reset/' . $tokenString . '?email=' . urlencode($user_data->email);
 
-                 $data['subject'] = "Welcome to Punchly.io";   
+                 $data['subject'] = "Your Punchly account";   
                  $data['password_link'] = $link;
                  $data['designation'] = ($data['user_role'] == 1) ? 'Admin' : 'Digitizer Manager'; 
+                 event(new Registered($user));
                  $sendEmail = Mail::to([$data['email']])->send( new SendMail($data,'newUser'));
-
                 return redirect()->route('admin-users-list')->with('success','User created successfully');                
              }else{
                 return redirect()->route('admin-users-list')->with('success','User does not created');
@@ -784,10 +1074,10 @@ class AdminController extends Controller
 
        // echo '<pre>'; print_r($order->toArray()); echo '</pre>';
        
-
+        $page_title = 'Order Details';
         $digitizerList = User::where(['user_role' => '3'])->get();
 
-        return view('admin.orderDetail',compact('order','inch','centimeter','garmentType','priceCalculator','digitizerList','orderImages','rejectionReason'));
+        return view('admin.orderDetail',compact('page_title','order','inch','centimeter','garmentType','priceCalculator','digitizerList','orderImages','rejectionReason'));
     }
  
     /**
@@ -898,6 +1188,16 @@ class AdminController extends Controller
                 $data = $request->except(['_token','approve_or_id','payment_method','pay_authorization_id','order_amount']);                
                 $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
                 if($request->payment_method){
+                    
+                     $retrieveCheck =   $stripe->paymentIntents->retrieve(
+                        $request->payment_intent_id,
+                        []
+                      );
+                      if($retrieveCheck->status == 'canceled'){ 
+                        $data1['status'] = '3'; 
+                        $rejectOrder = Order::where(['id' => $request->reject_or_id])->update($data1);
+                        return redirect()->back()->with(['alert-type' => 'success' , 'message' => 'Order is expired']); 
+                      } 
                  $capturePaymentIntent = $stripe->paymentIntents->capture($request->payment_method,[]);  
                  if($capturePaymentIntent->status == 'succeeded' ){ 
                     $data['status'] = '2';
@@ -1023,9 +1323,7 @@ class AdminController extends Controller
     * Update Order Function
     */
     public function updateOrder(Request $request){
-        if($request->isMethod('post')){
-
-            
+        if($request->isMethod('post')){ 
              $request->validate([
             'order_message' => 'required',
             'garment_id' => 'required',
@@ -1067,27 +1365,41 @@ class AdminController extends Controller
         if($request->isMethod('post')){  
               if($request->reject_or_id){
                   try{   
-                   $rfID=null;   
+                    $rfID=null;   
+                    $data = $request->except(['_token','reject_or_id','payment_intent_id']);
+                    $data['status'] = '3'; 
                     if($request->payment_intent_id){              
-                     $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
-                     $refundCheck = $stripe->paymentIntents->cancel($request->payment_intent_id);
-                     $rfID=$refundCheck->id;
-                     } 
-                            $data = $request->except(['_token','reject_or_id','payment_intent_id']);
-                            $data['status'] = '3';                      
+                     $stripe = new \Stripe\StripeClient(config('services.stripe.secret')); 
+                     $retrieveCheck =   $stripe->paymentIntents->retrieve(
+                        $request->payment_intent_id,
+                        []
+                      );
+                      if($retrieveCheck->status == 'canceled'){ 
+                        $rejectOrder = Order::where(['id' => $request->reject_or_id])->update($data);
+                        return redirect()->back()->with(['alert-type' => 'success' , 'message' => 'Order rejected successfully']); 
+                      }else{
+                        $refundCheck = $stripe->paymentIntents->cancel($request->payment_intent_id);
+                        $rfID=$refundCheck->id;
+
+                      }
+                     
+                     
+                     }     
+                                                 
                             $data['refund_id'] =  $rfID; 
                             $rejectOrder = Order::where(['id' => $request->reject_or_id])->update($data);
                             if($rejectOrder){
                                 $orderAndUserDetail = Order::with(['user','rejection_reason'])->where(['id' => $request->reject_or_id])->first();
+                               
                                 
                                 $data['email'] = $orderAndUserDetail->user->email;
                                 $data['subject'] = 'Your order is rejected';
                                 $data['order_name'] = $orderAndUserDetail->order_name;
                                 $data['user_name'] = $orderAndUserDetail->user->first_name;
-                                $data['reject_reason'] = $orderAndUserDetail->rejection_reason->reason;
+                                $data['reject_reason'] = $orderAndUserDetail->rejection_reason->reason; 
                                 $data['reject_comment'] = $request->comment;    
                                 $data['order_unique_id'] = $orderAndUserDetail->order_unique_id;
-                                $sendEmail = Mail::to([$orderDetails->user->email])->send( new SendMail($data,'orderRejected'));
+                                $sendEmail = Mail::to([$orderAndUserDetail->user->email])->send( new SendMail($data,'orderRejected'));
                                 return redirect()->back()->with(['alert-type' => 'success' , 'message' => 'Order rejected successfully.']);                               
                             }
                            
@@ -1102,15 +1414,15 @@ class AdminController extends Controller
                             $data['refund_id'] =  null; 
                             $rejectOrder = Order::where(['id' => $request->reject_or_id])->update($data);
                             if($rejectOrder){
-                                $orderAndUserDetail = Order::with(['user'])->where(['id' => $request->reject_or_id])->first(); 
+                                $orderAndUserDetail = Order::with(['user','rejection_reason'])->where(['id' => $request->reject_or_id])->first(); 
+                             
                                 $data['subject'] = 'Your order is rejected';
                                 $data['order_name'] = $orderAndUserDetail->order_name;
                                 $data['user_name'] = $orderAndUserDetail->user->first_name;
-                                $data['reason'] = $orderAndUserDetail->rejection_reason->reason;
-                                $data['reject_comment'] = $request->comment;
-
+                                $data['reject_reason'] = $orderAndUserDetail->rejection_reason->reason; 
+                                $data['reject_comment'] = $request->comment; 
                                 $data['order_unique_id'] = $orderAndUserDetail->order_unique_id;
-                              $sendEmail = Mail::to([$orderDetails->user->email])->send( new SendMail($data,'orderRejected'));
+                                 $sendEmail = Mail::to([$orderAndUserDetail->user->email])->send( new SendMail($data,'orderRejected'));
                                 return redirect()->back()->with(['alert-type' => 'success' , 'message' => 'Order rejected successfully.']);                               
                             }
  
@@ -1126,11 +1438,18 @@ class AdminController extends Controller
                 $rejectOrder = Order::where(['id' => $request->reject_order_id])->update($data);
                 if($rejectOrder){
                     $orderAndUserDetail = Order::with(['digitizer'])->where(['id' => $request->reject_order_id])->first();
+                    
                     OrderImage::where('order_id',$request->reject_order_id)->update(['status'=>'2']);
                     $data['subject'] = 'Your Submitted work  is rejected';
                     $data['order_name'] = $orderAndUserDetail->order_name;
+                    $data['user_name'] = $orderAndUserDetail->user->first_name;
+                    $data['reject_reason'] = $orderAndUserDetail->rejection_reason->reason; 
                     $data['reason'] = $request->reason;
+                    $data['reject_comment'] = $request->comment; 
                     $data['order_unique_id'] = $orderAndUserDetail->order_unique_id;
+
+
+                  
                     $sendEmail = Mail::to([$orderAndUserDetail->digitizer->email])->send( new SendMail($data,'orderRejected'));
                     return redirect()->back()->with(['alert-type' => 'success' , 'message' => 'Order rejected successfully.']);
                 }else{
@@ -1222,7 +1541,8 @@ class AdminController extends Controller
 
 
     public function customerReports(Request $request){
-        $header = 'Customer Reprots';
+        $page_title = 'Customer Reprots';
+         
         $homeLink = route('customer-reports');      
         if ($request->ajax()) {
             $data = User::with('get_country','get_state', 'get_city')->whereHas('payment_total', function($q){
@@ -1251,12 +1571,12 @@ class AdminController extends Controller
                 ->rawColumns(['total_spent','total_orders'])
                 ->make(true);
         }
-        return view('admin.customerReports',compact('header','homeLink'));
+        return view('admin.customerReports',compact('page_title','homeLink'));
 
     }
 
     public function salesReports(Request $request){
-        $header = 'Sales Reprots';
+        $page_title = 'Sales Reprots';
         $homeLink = route('customer-reports');      
         if ($request->ajax()) {
 
@@ -1352,7 +1672,7 @@ class AdminController extends Controller
                 ->rawColumns(['currency'])
                 ->make(true);
         }
-        return view('admin.salesReports',compact('header','homeLink'));
+        return view('admin.salesReports',compact('page_title','homeLink'));
     }
 
     public function addBlogForm(Request $request,$id=null){
@@ -1497,6 +1817,7 @@ class AdminController extends Controller
         
         if($request->isMethod('post')){
             $data = $request->except(['_token','service_id','files']);
+           $data['service_slug']= Str::slug($request['service_title'], '-');
            $data['created_by']= Auth::user()->id;
            $folderPath = 'pages/blogs'; 
            if($request->hasFile('feature_image')) {                 
@@ -1506,8 +1827,6 @@ class AdminController extends Controller
                $blogCat=  Cms_services::where('id', '=', $request['service_id'])->update($data);
                $msg="Service updated successfully";
             }else{
-
-                 $data['service_slug']= Str::slug($request['service_title'], '-');
                  $blogCat = Cms_services::create($data);
                 $msg="Service created successfully";
             }
@@ -1585,12 +1904,13 @@ class AdminController extends Controller
    public function contactUsPage(Request $request , $id = null){
      if($request->isMethod('get')){   
             if(!empty($id)){
+                $page_title = 'Edit Contact Us';
                 $Conatactpage = Cms::where(['id' => base64_decode($id)])->first();
                 $CmsMeta      = CmsMeta::where(['id' => base64_decode($id)])->first(); 
                 $contact_us_content = Cms::with(['cmsmeta' => function($q){
                     $q->where('meta_key','=','contact_content');
                 }])->where(['id' => base64_decode($id)])->first();
-                return view('admin.cms.editContactUs',['cmsmeta'=>$CmsMeta,'contact' => $Conatactpage,'contact_us_content' => $contact_us_content]);    
+                return view('admin.cms.editContactUs',['page_title'=>$page_title,'cmsmeta'=>$CmsMeta,'contact' => $Conatactpage,'contact_us_content' => $contact_us_content]);    
             }
         }
 
@@ -1599,6 +1919,7 @@ class AdminController extends Controller
         if($request->isMethod('post')){
             //$folderPath = public_path('/pages/homePage/');             
             $folderPath = 'pages/homePage/';
+            
             if(!empty($id)){
                 $id = base64_decode($id); 
                 foreach($request['title'] as $key=>$res){  
@@ -1645,12 +1966,14 @@ class AdminController extends Controller
 public function aboutUsPage(Request $request , $id = null){
      if($request->isMethod('get')){             
             if(!empty($id)){
+
+                $page_title = 'Edit About';
                 $about_us = Cms::where(['id' => base64_decode($id)])->first();
                 $CmsMeta  = CmsMeta::where(['id' => base64_decode($id)])->first();
                 $about_us_content = Cms::with(['cmsmeta' => function($q){
                     $q->where('meta_key','=','about_us_content');
                 }])->where(['id' => base64_decode($id)])->first();
-                return view('admin.cms.editAbout',['cmsmeta'=>$CmsMeta,'aboutUs' => $about_us,'about_us_content' => $about_us_content]);    
+                return view('admin.cms.editAbout',['page_title'=>$page_title,'cmsmeta'=>$CmsMeta,'aboutUs' => $about_us,'about_us_content' => $about_us_content]);    
             }
         }
 
@@ -1704,13 +2027,14 @@ public function aboutUsPage(Request $request , $id = null){
 public function privacyPolicyPage(Request $request , $id = null){
      if($request->isMethod('get')){             
             if(!empty($id)){
+                $page_title = 'Privacy Policy';
                 $privacyPolicy = Cms::where(['id' => base64_decode($id)])->first();
                 $CmsMeta      = CmsMeta::where(['id' => base64_decode($id)])->first();
                 $privacy_policy_content = Cms::with(['cmsmeta' => function($q){
                     $q->where('meta_key','=','privacy_policy_content');
                 }])->where(['id' => base64_decode($id)])->first();
 
-                return view('admin.cms.privacy-policy',['cmsmeta'=>$CmsMeta,'privacyPolicy' => $privacyPolicy,'privacy_policy_content' => $privacy_policy_content]);    
+                return view('admin.cms.privacy-policy',['page_title'=>$page_title,'cmsmeta'=>$CmsMeta,'privacyPolicy' => $privacyPolicy,'privacy_policy_content' => $privacy_policy_content]);    
             }
         }
 
@@ -1720,6 +2044,7 @@ public function privacyPolicyPage(Request $request , $id = null){
             //$folderPath = public_path('/pages/homePage/');             
             $folderPath = 'pages/homePage/';
             if(!empty($id)){
+                
                 $id = base64_decode($id); 
                 foreach($request['title'] as $key=>$res){  
                     if(!empty($request->file('banner_image')[$key])) {                 
@@ -1756,12 +2081,13 @@ public function privacyPolicyPage(Request $request , $id = null){
 public function returnPolicyPage(Request $request , $id = null){
      if($request->isMethod('get')){             
             if(!empty($id)){
+                 $page_title = 'Return Policy';
                  $returnPolicy = Cms::where(['id' => base64_decode($id)])->first();
                  $CmsMeta      = CmsMeta::where(['id' => base64_decode($id)])->first();  
                  $return_policy_content = Cms::with(['cmsmeta' => function($q){
                     $q->where('meta_key','=','return_policy_content');
                 }])->where(['id' => base64_decode($id)])->first();
-                return view('admin.cms.return-policy',['slug'=>$request['slug'],'cmsmeta'=>$CmsMeta,'returnPolicy' => $returnPolicy,'return_policy_content' => $return_policy_content]);    
+                return view('admin.cms.return-policy',['slug'=>$request['slug'],'page_title'=>$page_title,'cmsmeta'=>$CmsMeta,'returnPolicy' => $returnPolicy,'return_policy_content' => $return_policy_content]);    
             }
         }
 
@@ -1806,6 +2132,7 @@ public function returnPolicyPage(Request $request , $id = null){
 public function termConditionPage(Request $request , $id = null){
      if($request->isMethod('get')){             
             if(!empty($id)){
+                $page_title = 'Term Condtion';
                 $termCondtion = Cms::where(['id' => base64_decode($id)])->first();
                 $terms_condions_content = Cms::with(['cmsmeta' => function($q){
                     $q->where('meta_key','=','terms_condions_content');
@@ -1858,11 +2185,12 @@ public function termConditionPage(Request $request , $id = null){
 public function generalSetting(Request $request , $id = null){
      if($request->isMethod('get')){             
             if(!empty($id)){
+                $page_title = "General Setting";
                 $generalSetting = Cms::where(['id' => base64_decode($id)])->first();
                 $general_setting_content = Cms::with(['cmsmeta' => function($q){
                     $q->where('meta_key','=','general_setting_content');
                 }])->where(['id' => base64_decode($id)])->first();
-                return view('admin.cms.generalSetting',['generalSetting' => $generalSetting,'general_setting_content' => $general_setting_content]);    
+                return view('admin.cms.generalSetting',['page_title' => $page_title,'generalSetting' => $generalSetting,'general_setting_content' => $general_setting_content]);    
             }
         }
 
@@ -1984,7 +2312,8 @@ public function deleteBlogCategory(Request $request){
             $inputAll = $request->except(['_token','discount_type']);            
  
             if($inputAll){
-                $inputAll['coupon_id'] = $this->generateRandomString();
+                $inputAll['coupon_id'] = $inputAll['coupon'];
+                //$inputAll['coupon_id'] = $this->generateRandomString();
                 $inputAll['publish'] = '0';
                 $inputAll['currency'] = 'USD';
                 $inputAll['start_date'] = DateTime::createFromFormat('m-d-Y', $request->start_date)->format('Y-m-d');
@@ -1996,7 +2325,20 @@ public function deleteBlogCategory(Request $request){
             }
         }
     }
+ public function checkCouponName(Request $request){
+        if($request->isMethod('post')){
+            $coupan_exist = '';
+            $coupon =  Coupon::where(['coupon_id'=>$request->coupon,'valid' => '1'])->first();
+            $today = date("Y-m-d");
+            if($coupon){
+            $data['coupan_exist'] = 1;  
+                }else{
+                    $data['coupan_exist'] = 0;
+                }
 
+               return $data;
+        }
+    }
     public function generateRandomString($length = 10) {
         $characters = '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ';
         $charactersLength = strlen($characters);
@@ -2011,7 +2353,9 @@ public function deleteBlogCategory(Request $request){
     *Get the details of the coupons
     */
     public function couponsList(Request $request){
+        $page_title = "Coupons List";
         if ($request->ajax()) {
+           
             $data = Coupon::all();             
             return Datatables::of($data)
                     ->addIndexColumn()
@@ -2038,22 +2382,24 @@ public function deleteBlogCategory(Request $request){
                     ->rawColumns(['action'])
                     ->make(true);
         }
-        return view('admin.coupons.couponsList');
+        return view('admin.coupons.couponsList',compact('page_title'));
     }
 
     public function sendDataToCouponForm(Request $request){      
-
-         $data = Coupon::where('id',base64_decode($request->id))->first();        
-     
-         return view('admin.coupons.editCouponForm',compact('data'));
+         $page_title = "Edit Coupon Form";
+         $data = Coupon::where('id',base64_decode($request->id))->first();  
+         return view('admin.coupons.editCouponForm',compact('page_title','data'));
       
      }
 
      public function editCouponForm(Request $request){       
 
            if ($request->isMethod('post')) {
-              $data = $request->except(['_token','c_id','discount_type']);        
-               
+              $data = $request->except(['_token','c_id','discount_type']);       
+             
+              $data['coupon_id'] = $data['coupon'];
+              unset($data['coupon']); 
+             
                   if($data){
                       $updateCoupon = Coupon::where(['id' => $request->c_id])->update($data);
                       return redirect()->route('admin-coupons-list')->with('success','Coupon created successfully.');
@@ -2071,7 +2417,8 @@ public function deleteBlogCategory(Request $request){
     */
     public function couponForm(){
         $currency = $this->countriesGet();
-        return view('admin.coupons.couponForm',['currency' => $currency]);
+        $page_title = "Coupon Form";
+        return view('admin.coupons.couponForm',['page_title' => $page_title,'currency' => $currency]);
     }
 
     /**
@@ -2127,9 +2474,10 @@ public function managePrice(Request $request){
               $data = $priceCalculator->toArray();
 
               $inch = $data[0]['desired_price']; 
-              $centimeter = $data[1]['desired_price'];              
+              $centimeter = $data[1]['desired_price'];   
+              $page_title = "Manage Priceing";           
 
-             return view('admin.managePriceing',compact('inch','centimeter'));
+             return view('admin.managePriceing',compact('page_title','inch','centimeter'));
  
      }
      public function managePriceForm(Request $request){         
@@ -2172,7 +2520,7 @@ public function managePrice(Request $request){
     }
     public function sendMail2(Request $request) {
         $data = $request->all();
-    echo "Herllo";
+   
         $messageBody =' hi dear student';
     
         Mail::raw($messageBody, function ($message) {

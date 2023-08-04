@@ -1,3 +1,5 @@
+
+
 <?php $__env->startSection('content'); ?>
 <div class="order-history-list-grid">
 <div class="container-fluid">
@@ -5,7 +7,7 @@
             <div class="row">
                 <div class="col-lg-12 my-3">
                   <div class="float-left">
-                  <h3>For Review Orders</h3>
+                  <h3><?php echo e($page_title); ?></h3>
                   </div>
                 <div class="float-right">
                     <div class="btn-group">
@@ -121,7 +123,15 @@
     });
     
     function filter_data(page){
-      status = $('#status').val();
+      filterstatus = $('#status').val();
+      status = '';
+      if(filterstatus == ""){ 
+         status = "<?php echo e($status); ?>";
+      }else{ 
+         status = filterstatus;
+      }
+     
+       
       desired_output = $('#desired_output').val();
         $.ajax({
           headers: {
@@ -345,6 +355,9 @@ function rejectOrderForm (){
               jQuery(field_name).focus(); 
           }        
             return false;
+         }else{
+          $("#rejectSubmittedWork").attr("disabled", true);
+          
          } 
 }
  function assignDigitizerValidation(data){
@@ -407,6 +420,24 @@ $(document).on('click', '.deleteimg', function(event){
 			 	});
       }); 
 			});  
+
+
+      $(document).ready(function () {
+
+$("#accept-submitted-work").submit(function (e) {
+
+    //stop submitting the form to see the disabled button effect
+    e.preventDefault();
+
+    //disable the submit button
+    $("#wrkcompleted").attr("disabled", true);
+
+ 
+
+    return true;
+
+});
+});
  
 </script>
 

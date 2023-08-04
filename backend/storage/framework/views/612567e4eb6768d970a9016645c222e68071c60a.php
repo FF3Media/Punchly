@@ -1,3 +1,5 @@
+
+
 <?php $__env->startSection('content'); ?>
     <div class="container-fluid">
         <h1 class="text-black-50">Hello Embroider , You are logged in!</h1>

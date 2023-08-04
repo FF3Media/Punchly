@@ -26,7 +26,11 @@ class ViewComposerServiceProvider extends ServiceProvider
     public function boot()
     {
         view()->composer(['layouts.app'], function ($view) {
-            $view->with('cartCount', Order::where(['user_id' => Auth::user()->id , 'status' => 5 ])->count());
+            if(!Auth::user()){
+                $view->with('cartCount', 0);
+            }else{
+                $view->with('cartCount', Order::where(['user_id' => Auth::user()->id, 'status' => 5])->count());
+            }
         });
     }
 }

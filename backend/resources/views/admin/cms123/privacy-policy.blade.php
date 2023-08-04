@@ -97,18 +97,17 @@ $i=1;
                                                     placeholder="Enter title" required>
                                             </div> 
                                             
-          <div class="col-lg-6 my-error">
-                     <label>Banner Image:</label>
-                  <div class="input-group">
-                 <div class="custom-file">
-                     <input type="file"
-                      name="banner_image[{{ $i }}]" value=""
-                     id="banner_image"
-                      class="form-control banner_image custom-file-input"
-                      placeholder="{{ isset($banner['banner_image']) ? $banner['banner_image'] : 'Browse Image' }}"
-                     accept="image/*"
-                 {{ isset($banner['banner_image']) ? ' ' : 'required' }} />
-                   <input type="hidden" name="old_banner_image[{{ $i }}]"
+                                            <div class="col-lg-6 my-error">
+                                              <label>Banner Image:</label>
+                                              <div class="input-group">
+                                                  <div class="custom-file">
+                                                      <input type="file" name="banner_image[{{ $i }}]" value=""
+                                                          id="banner_image"
+                                                          class="form-control banner_image custom-file-input"
+                                                          placeholder="{{ isset($banner['banner_image']) ? $banner['banner_image'] : 'Browse Image' }}"
+                                                          accept="image/*"
+                                                          {{ isset($banner['banner_image']) ? ' ' : 'required' }} />
+                                                      <input type="hidden" name="old_banner_image[{{ $i }}]"
                                                           value="{{ isset($banner['banner_image']) ? $banner['banner_image'] : '' }}" />
                                                       <label class="custom-file-label"
                                                           for="banner_image">{{ isset($banner['banner_image']) ? $banner['banner_image'] : '' }}</label>
@@ -118,22 +117,11 @@ $i=1;
                                          </div>     
                                           <div class="form-group row">              
                                             
-                                          <div class="col-lg-6 my-error">               
+                                          <div class="col-lg-6 my-error">                                                
                                                 <label>Content:</label>
                                                 <textarea class="form-control editor" name="content" id="content">{{ isset($banner['content']) ? $banner['content'] : '' }}</textarea>
-                                            </div>                         
-
-
-                                         </div> 
-        <div class="col-lg-6 my-error"> 
- <label>Banner Image Alt Tag Text:</label>
- <input type="text" class="form-control"
-  value="{{ isset($banner['alt_banner_tag']) ? $banner['alt_banner_tag'] : '' }}"
-  id="alt_banner_tag" 
-  name="alt_banner_tag[{{ $i }}]"
-  class="form-control" 
-  placeholder="Banner Image Alt Tag Text">
-</div>   
+                                            </div>                                                                                        
+                                         </div>      
                                     </div>
                                       
                                    

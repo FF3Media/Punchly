@@ -36,7 +36,7 @@
                             <p>
                                 <span class="order_index">Status:</span>
                                 @if($order->status == 1)
-                                    <span class="badge badge-warning order_value">Awaiting Approval</span>
+                                    <span class="badge badge-warning order_value">Waiting for Approval</span>
                                 @elseif($order->status == 2)
                                     <span class="badge badge-info order_value">In progress</span>
                                 @elseif($order->status == 3)

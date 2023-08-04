@@ -32725,3 +32725,15 @@ span.reason_rejection {
 .links-bottom {display: flex; align-items: center; justify-content: space-between; padding: 10px 0px 0px 0px; }
 .links-bottom p a{color:#2BC0BA; margin-bottom: 0px;}
 .links-bottom p{margin-bottom: 0px;}
+.new-order-slide .modal-footer button.sky-blue {
+  background: #2BC0BA !important;
+}
+
+.beforecoupen label.w-100 {
+    font-size: 17px;
+    background: #4dcac5;
+    text-align: center;
+    color: #fff;
+    padding: 10px 0px;
+    font-weight: 700 !important;
+}

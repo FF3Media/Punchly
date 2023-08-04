@@ -4,15 +4,14 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{{ config('app.name') }}</title>
-
+    <link rel="icon" type="image/x-icon" href="{{ asset('/images/favicon.png') }}">  
     <!-- Tell the browser to be responsive to screen width -->
     <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.14.0/css/all.min.css"
           integrity="sha512-1PKOgIY59xJ8Co8+NE6FZ+LOAZKjy+KY8iq0G4B3CyeY6wYHN3yt9PW0XpSriVlkMXe40PTKnXrLnZ9+fkDaog=="
           crossorigin="anonymous"/>
-    <link rel="icon" href="{{ asset('images/favicon.png') }}"/>
-    <script src="https://code.jquery.com/jquery-1.11.3.min.js"></script>
+
     <link href="{{ asset('css/app.css') }}" rel="stylesheet">
 
 </head>
@@ -25,22 +24,17 @@
     <!-- /.login-logo -->
     <div class="card">
         <div class="card-body login-card-body">
-            <p class="login-box-msg hideAfterSend">Enter your email below and we will send you a link to reset your password.</p>
+            <!-- <p class="login-box-msg">You forgot your password? Here you can easily retrieve a new password.</p> -->
 
             @if (session('status'))
-                <div style="text-align: center;" class="alert alert-success">
+                <div class="alert alert-success">
                     {{ session('status') }}
                 </div>
-                <script type="text/javascript"> 
-                        jQuery(document).ready(function() {
-                           jQuery('.hideAfterSend').hide();
-
-                        });
-                </script>
             @endif
 
-            <form action="{{ route('password.email') }}" method="post" class="hideAfterSend">
-                @csrf 
+            <form action="{{ route('password.email') }}" method="post">
+                @csrf
+
                 <div class="input-group mb-3">
                     <input type="email"
                            name="email"
@@ -49,14 +43,14 @@
                     <div class="input-group-append">
                         <div class="input-group-text"><span class="fas fa-envelope"></span></div>
                     </div>
-                    @if($errors->has('email'))
-                      <span style="margin: 0px auto;" class="error invalid-feedback">{{ $errors->first('email') }}</span>  
+                    @if ($errors->has('email'))
+                        <span class="error invalid-feedback">{{ $errors->first('email') }}</span>
                     @endif
                 </div>
 
                 <div class="row">
                     <div class="col-12">
-                        <button type="submit" class="btn btn-primary btn-block">Send Password Reset Link</button>
+                        <button type="submit" class="btn btn-primary btn-block">Send Link</button>
                     </div>
                     <!-- /.col -->
                 </div>
@@ -66,7 +60,7 @@
                 <a href="{{ route("login") }}">Login</a>
             </p>
             <p class="link-p">
-                <a href="{{ route("register") }}" class="text-center">Sign up</a>
+                <a href="{{ route("register") }}" class="text-center">Register a new membership</a>
             </p>
         </div>
         </div>

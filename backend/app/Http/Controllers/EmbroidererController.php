@@ -37,26 +37,28 @@ class EmbroidererController extends Controller
      * Embroiderer dashboard..
      */
     public function dashboard(Request $request){
-        return view('embroiderer.dashboard');
-    } 
+
+        $page_title = "Dashboard";  
+        return view('embroiderer.dashboard',compact('page_title'));
+    }
 
     public function confirmationPage(Request $request,$id){
 
 
         if($id){
               $isExist =   Order::select("*")->where("order_group_id", $id)->exists();
-              
+              $page_title = "Order Confirmation";  
                if($isExist) {
                 $allOrder = Order::select("order_unique_id")->where(['order_group_id' =>$id ])->orderBy('id', 'desc')->get();
-                 foreach ($allOrder as $key => $allOrder_ids) { 
-                   $orderIds[] = array('order_id' => $allOrder_ids->order_unique_id); 
+                 foreach ($allOrder as $key => $allOrder_ids) {
+                   $orderIds[] = array('order_id' => $allOrder_ids->order_unique_id);
                  }
-                return view('embroiderer.orderConfirmation',compact('orderIds'));
+                return view('embroiderer.orderConfirmation',compact('orderIds','page_title'));
                 }
-         
-                return view('embroiderer.orderConfirmation');
+
+                return view('embroiderer.orderConfirmation',compact('page_title'));
         }
-    } 
+    }
 
     /**
     * Checkout Method For Embroiderer
@@ -64,25 +66,27 @@ class EmbroidererController extends Controller
     public function checkoutPayment(Request $request){
         if($request->isMethod('get')){
         	$finaleTaxsNames='';
+            $page_title = "Checkout Payment";  
             $allOrder = Order::with('garment')->where(['user_id' => Auth::user()->id , 'status' => 5])->orderBy('id', 'desc')->get();
-              $cardDetail = CardDetail::where(['user_id' => Auth::user()->id])->get(); 
+              $cardDetail = CardDetail::where(['user_id' => Auth::user()->id])->get();
               $taxsForThisUsers = $this->getAlltaxsforstates();
               $taxs = $this->getAlltaxsforstates();
-              if($taxsForThisUsers['total_percentage'] > 0 ){ 
+              if($taxsForThisUsers['total_percentage'] > 0 ){
 				foreach ($taxsForThisUsers as $key => $taxsValues) {
 							if($key == "total_percentage") {
-							  unset($taxsForThisUsers[$key]); 
+							  unset($taxsForThisUsers[$key]);
 							}else{
-								 $taxsNames[] = $key;								  
-							} 
-				} 
+								 $taxsNames[] = $key;
+							}
+				}
                 if(!empty($taxsNames))
                 {
                	$finaleTaxsNames = implode("+",$taxsNames);
                }
-                      
-             } 
-            return view('embroiderer.checkoutPayment',compact('allOrder','cardDetail','finaleTaxsNames','taxs'));
+
+             }
+             session()->put('cartOrdres', $allOrder);
+            return view('embroiderer.checkoutPayment',compact('page_title','allOrder','cardDetail','finaleTaxsNames','taxs'));
         }
     }
 
@@ -90,46 +94,52 @@ class EmbroidererController extends Controller
     * Create Order Paypal
     */
     public function createOrderPaypal(Request $request){
+     
         if($request->isMethod('post')){
-            try{     
+            try{
                 $userDetail = User::find(Auth::user()->id, ['first_name', 'last_name', 'email','stripe_id','id']);
-                $taxsForThisUsers = $this->getAlltaxsforstates(); 
+                $taxsForThisUsers = $this->getAlltaxsforstates();
                 $allOrder = Order::where(['user_id' => $userDetail->id , 'status' => '5'])->get();
-                $data = $request->except(['_token','authorization','coupon_id']);                
+                $data = $request->except(['_token','authorization','coupon_id']);
                 $order_group_id = $this->generateRandomString();
-                foreach ($allOrder as $key => $order) {
+                $afterCoupon = [];
+                $totalAmount=0;
+                foreach ($allOrder as $key => $order) {                 
                     $amt = 0;
-                    $allDone = false;    
-                   $cCheck=false;
+                    $allDone = false;
+                    $cCheck=false;
                     if(!empty($request->coupon_id)){
                         $cCheck = true;
                         $coupenData = Coupon::where('coupon_id',$request->coupon_id)->first();
-                        if($coupenData->amount_off){                         
-                          if($taxsForThisUsers['total_percentage'] > 0 ){	 
-                            $amt = ($order->amount)-($coupenData->amount_off);  
-                            $amount_after_coupon = $amt;                      
+                        if($coupenData->amount_off){
+                          if($taxsForThisUsers['total_percentage'] > 0 ){
+                            $amt = ($order->amount)-($coupenData->amount_off);
+                            $amount_after_coupon = $amt;
 							$percentage = $taxsForThisUsers['total_percentage'];
 							$amt += $amt*($percentage/100);
 							$totalAmount = round($amt, 2);
                          }else{
                          	$amt = ($order->amount)-($coupenData->amount_off);
                          	$amount_after_coupon = $amt;
-                         }  
+                            
+                             $totalAmount = $order->amount;
+                         }
                         }elseif($percentage = $coupenData->percent_off){
-                          if($taxsForThisUsers['total_percentage'] > 0 ){	 
+                          if($taxsForThisUsers['total_percentage'] > 0 ){
                             $final_amount = ($percentage / 100) * $order->amount;
-                            $amt = ($order->amount)-($final_amount);                           
-                            $amount_after_coupon = $amt; 
+                            $amt = ($order->amount)-($final_amount);
+                            $amount_after_coupon = $amt;
                             $percentage = $taxsForThisUsers['total_percentage'];
 							$amt += $amt*($percentage/100);
 							$totalAmount = round($amt, 2);
                            }else{
                            	 $final_amount = ($percentage / 100) * $order->amount;
+                             
                              $amt = ($order->amount)-($final_amount);
                              $amount_after_coupon = $amt;
                            }
-                        } 
-                    }else{                                                                          
+                        }
+                    }else{
                           if($taxsForThisUsers['total_percentage'] > 0 ){
 	                        $amt = $order->amount;
 							$percentage = $taxsForThisUsers['total_percentage'];
@@ -138,20 +148,29 @@ class EmbroidererController extends Controller
                          }else{
                          	$amt = $order->amount;
                          	$totalAmount = round($amt, 2);
-                         } 
+                         }
                     }
-                    $amt = floor($amt); 
+                     sleep(.2);
+                    $amt = floor($amt);
 
-                    if($cCheck){
+                    if($cCheck){ 
                     	$updateOrder = Order::where(['id' => $order->id])->update(['order_group_id' => $order_group_id , 'status' => '1' , 'coupon_id' => $request->coupon_id , 'amount_after_coupon' => $amount_after_coupon,'total_amount'=>$totalAmount,'created_at'=>now()]);
+
+                       // $afterCoupon[] = ['afterCouponAmt'=> $amount_after_coupon,'order_group_id'=> $order_group_id]
+                       
+
+                        
                      }else{
                        $amount_after_coupon = 0;
                      	$updateOrder = Order::where(['id' => $order->id])->update(['order_group_id' => $order_group_id , 'status' => '1' , 'coupon_id' => $request->coupon_id , 'amount_after_coupon' => $amount_after_coupon,'total_amount'=>$totalAmount,'created_at'=>now()]);
                      }
- 
+
+
                     $allDone = true;
                 }
+           
                 if($allDone){
+                    
                     $authArray = $request['authorization']['purchase_units'][0]['payments']['authorizations'][0];
                     $data['status'] = $authArray['status'];
                     $data['pay_authorization_id'] = $authArray['id'];
@@ -161,29 +180,71 @@ class EmbroidererController extends Controller
                     $data['currency'] = 'usd';
                     $data['amount'] = $authArray['amount']['value'];
                     $userAdmin = User::where(['user_role' => 1])->first();
-
+                    $userDetail = User::where(['id' => $data['user_id']])->first();
                     $userdigitizerManager = User::where(['user_role' => 2])->first();
-                    $paymentDone = PaymentDetail::create($data);  
+                    $paymentDone = PaymentDetail::create($data);
                     $data['order_id'] = $order->order_unique_id;
-                    $data['fullname'] = Auth::user()->first_name .' '. Auth::user()->last_name; 
-                    $data['subject'] = 'New order placed successfully';
-                    $sendEmail = mail::to([$userDetail->email, $userAdmin->email,$userdigitizerManager->email])->send( new SendMail($data,'newOrderPlaced'));
+                    $data['fullname'] = Auth::user()->first_name .' '. Auth::user()->last_name;                   
+                    $cartOrdres = session()->get('cartOrdres');
+                    $data['cartOrdres'] = '';
+                    if($cartOrdres != null && !empty($cartOrdres)){
+         
+                        $data['cartOrdres'] = $cartOrdres; 
+                        
+                        foreach($cartOrdres as $orders){
+                            $orderdate  = $orders->created_at;
+                            if($cCheck){
+                                $ordersData =  Order::where(['id' => $orders->id])->first();
+                               // $afterCoupon[] = $ordersData->amount_after_coupon;
+                            }
+                        }
+                        if($cCheck){
+                             $data['ccheck'] =  1;                            
+                             $coupenData = Coupon::where('coupon_id',$request->coupon_id)->first();
+                             if($coupenData->amount_off){
+                               $data['amountDiscount'] = $coupenData->amount_off;
 
-                  /*  $sendEmail = mail::to([$userDetail->email, 'userregister317@yopmail.com',$userAdmin->email,$userdigitizerManager->email])->send( new SendMail($data,'newOrderPlaced'));*/
+                             }elseif($percentage = $coupenData->percent_off){
+                                $data['discountPercentage'] = $coupenData->percent_off;
+                             }
+
+                         }else{
+
+                            $data['ccheck'] = 0;
+                         }
+                          
+                        $data['orderdate'] = date('d F Y', strtotime($orderdate));
+                                      
+                      }
+                    $userAdress = isset($userDetail->address) ? $userDetail->address : '';
+                    $userCity = isset($userDetail->city) ? $userDetail->city : '';
+                    $userState = isset($userDetail->country) ? $userDetail->country : '';
+                    $data['userAdress'] =  $userAdress.' '. $userCity.''.$userState;
+                    $data['subject'] = 'Punchly order confirmation '.$data['order_id'];
+                   
+                    if(isset($userdigitizerManager->email)){
+                        $sendEmail = mail::to([$userDetail->email, $userAdmin->email,$userdigitizerManager->email])->send( new SendMail($data,'newOrderPlaced'));
+
+                    }else{
+
+                        $sendEmail = mail::to([$userDetail->email, $userAdmin->email])->send( new SendMail($data,'newOrderPlaced'));
+                    }
+                   // $forget =  session()->forget('cartOrdres');
+                   /*$sendEmail = mail::to([$userDetail->email, 'userregister317@yopmail.com',$userAdmin->email,$userdigitizerManager->email])->send( new SendMail($data,'newOrderPlaced'));*/
                     return response()->json([
-                        'message' => 'Your order placed successfully', 
+                        'message' => 'Your order placed successfully',
                         'isSucceeded' => TRUE,
                         'order_group_id' => $order_group_id,
                     ]);
-                }        
+                }
             }catch(\Exception $e) {
                 return response()->json([
-                    'message' => $e->getMessage(), 
+                    'message' => $e->getMessage(),
                     'isSucceeded' => FALSE
                 ]);
             }
-        } 
-    } 
+        }
+    }
 
     public function authorizeOrder(Request $request,$qrCode=null){
         if($request->isMethod('get') && ($qrCode == Session::get('paymentCheck'))){
@@ -194,7 +255,7 @@ class EmbroidererController extends Controller
             $request->prefer('return=representation');
             try {
                 // Call API with your client and get a response for your call
-                $response = $client->execute($request);                
+                $response = $client->execute($request);
                 // If call returns body in response, you can get the deserialized version from the result attribute of the response
               //  echo "<pre>"; print_r($response);
                 $data = [];
@@ -211,7 +272,7 @@ class EmbroidererController extends Controller
                 echo "<pre>";
                 print_r($data);
                 die;
-            }catch (HttpException $ex) { 
+            }catch (HttpException $ex) {
                 echo "<pre>";
                 echo $ex->statusCode;
                 print_r($ex->getMessage());
@@ -239,12 +300,12 @@ class EmbroidererController extends Controller
             try {
                 // Call API with your client and get a response for your call
                 $response = $client->execute($request);
-                
+
                 // If call returns body in response, you can get the deserialized version from the result attribute of the response
                 echo "<pre>";
                 print_r($response);
                 die;
-            }catch (HttpException $ex) { 
+            }catch (HttpException $ex) {
                 echo "<pre>";
                 echo $ex->statusCode;
                 print_r($ex->getMessage());
@@ -264,12 +325,12 @@ class EmbroidererController extends Controller
             try {
                 // Call API with your client and get a response for your call
                 $response = $client->execute($request);
-                
+
                 // If call returns body in response, you can get the deserialized version from the result attribute of the response
                 echo "<pre>";
                 print_r($response);
                 die;
-            }catch (HttpException $ex) { 
+            }catch (HttpException $ex) {
                 echo "<pre>";
                 echo $ex->statusCode;
                 print_r($ex->getMessage());
@@ -288,12 +349,12 @@ class EmbroidererController extends Controller
             try {
                 // Call API with your client and get a response for your call
                 $response = $client->execute($request);
-                
+
                 // If call returns body in response, you can get the deserialized version from the result attribute of the response
                 echo "<pre>";
                 print_r($response);
                 die;
-            }catch (HttpException $ex) { 
+            }catch (HttpException $ex) {
                 echo "<pre>";
                 echo $ex->statusCode;
                 print_r($ex->getMessage());
@@ -306,30 +367,31 @@ class EmbroidererController extends Controller
     * Order form for embroider
     */
     public function orderForm(Request $request){
+        $page_title = "Order Form"; 
         $userDetail = User::where(['id' => Auth::user()->id])->first();
         $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
         $garments = Garment::all();
         $priceCalculator = PriceCalculator::all();
         $inch = 0 ; $centimeter = 0;
-        if(count($priceCalculator)){        
+        if(count($priceCalculator)){
             $priceCalculator = $priceCalculator->toArray();
-            $inch = $priceCalculator[0]['desired_price']; 
+            $inch = $priceCalculator[0]['desired_price'];
             $centimeter = $priceCalculator[1]['desired_price'];
         }
-        return view('embroiderer.orderForm',compact('garments','userDetail','inch','centimeter'));
+        return view('embroiderer.orderForm',compact('page_title','garments','userDetail','inch','centimeter'));
     }
 
     /**
     * Cancel Order By Embroiderer
     */
-    public function cancelOrder(Request $request){        
-        if($request->isMethod('post')){            
-            
+    public function cancelOrder(Request $request){
+        if($request->isMethod('post')){
+
             if($request->payment_intent_id){
                 try{
                     $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
                     $refundCheck = $stripe->paymentIntents->cancel($request->payment_intent_id);
-                    if($refundCheck->id){                         
+                    if($refundCheck->id){
                         $st = '';
                         if($refundCheck->status == 'succeeded'){
                             $st = '6';
@@ -339,7 +401,7 @@ class EmbroidererController extends Controller
                             $st = '8';
                         }elseif($refundCheck->status == 'canceled'){
                             $st = '9';
-                        }  
+                        }
                         $checkOrderUp = Order::where(['id' => $request->cancel_order_id])->update(['refund_id' => $refundCheck->id , 'status' => $st]);
                         if($checkOrderUp){
                            return redirect()->route('embroiderer-order-management')->with(['alert-type'=>'success','message'=>'Order canceled successfully.']);;
@@ -347,16 +409,16 @@ class EmbroidererController extends Controller
                             // return response()->json([
                             //     "message"       => 'Order canceled successfully.',
                             //     "isSucceeded"   => TRUE
-                            // ]);   
+                            // ]);
 
                         }
-                        
+
                     }
                 }catch(\Exception $e){
                     return response()->json([
                         "message"       => $e->getMessage(),
                         "isSucceeded"   => FALSE
-                    ]); 
+                    ]);
                 }
             }
         }
@@ -369,8 +431,8 @@ class EmbroidererController extends Controller
     public function downloadImage($feature_image){
         if(!empty($feature_image)){
             $pathToFile = public_path('orders/').$feature_image;
-            return response()->download($pathToFile);    
-        }        
+            return response()->download($pathToFile);
+        }
     }
 
      /**
@@ -386,8 +448,8 @@ class EmbroidererController extends Controller
                 $data['user_id'] = Auth::user()->id;
                 $data['status'] = '5';
                 $data['amount'] = $request->cost_calculate;
-                $clickbtn = $request->all();              
-                if($request->has('file')){ 
+                $clickbtn = $request->all();
+                if($request->has('file')){
                     $img =$data['file'];
                     $folderPath = public_path().'/orders/';
                     $image_parts = explode(";base64,", $img);
@@ -396,35 +458,35 @@ class EmbroidererController extends Controller
                     $image_base64 = base64_decode($image_parts[1]);
                     $fileName = uniqid().'.'.$image_type;
                     $file = $folderPath.$fileName;
-                    $getData = file_put_contents($file, $image_base64);  
-                    // $imgName = time().$originalImage->getClientOriginalName(); 
-                    $data['feature_image'] = $fileName;  
-                } 
+                    $getData = file_put_contents($file, $image_base64);
+                    // $imgName = time().$originalImage->getClientOriginalName();
+                    $data['feature_image'] = $fileName;
+                }
                 if(isset($data['height_in'])){
                         $data['measurement'] = 1;
                  }elseif(isset($data['height_cm'])){
                         $data['measurement'] = 2;
                     }
                 $data['order_unique_id'] = time() . Auth::user()->id;
-                $taxs = $this->getAlltaxsforstates(); 
+                $taxs = $this->getAlltaxsforstates();
                 if($taxs){
                    $userTaxes = array_change_key_case ($taxs ,CASE_LOWER );
                    $userTaxes['total_taxes']=$userTaxes['total_percentage'];
-                   unset($userTaxes['total_percentage']); 
+                   unset($userTaxes['total_percentage']);
                 }else{
-                    $userTaxes=[]; 
+                    $userTaxes=[];
                 }
-                $alldata = array_merge($data, $userTaxes); 
+                $alldata = array_merge($data, $userTaxes);
                 //when coupon id exist
 
-                // if($request->coupon_id){                   
+                // if($request->coupon_id){
                 //     $coupenData = Coupon::where('coupon_id',$request->coupon_id)->first();
                 //     if($coupenData->amount_off){
                 //       $data['amount'] = $data['amount']-$coupenData->amount_off;
-                //     }elseif($percentage = $coupenData->percent_off){  
+                //     }elseif($percentage = $coupenData->percent_off){
                 //         $Finale_amount = ($percentage / 100) * $data['amount'];
                 //         $data['amount'] = $data['amount']-$Finale_amount;
-                //     }                    
+                //     }
                 // }
                 $orderCheck = Order::create($alldata);
                 if($orderCheck){
@@ -436,36 +498,35 @@ class EmbroidererController extends Controller
                     $data['fullname'] = Auth::user()->first_name .' '. Auth::user()->last_name;
                     $data['garment_name'] = Garment::where('id',$request->garment_id)->value('name');
                     $data['subject'] = 'New Order Received';
-                     $sendEmail = mail::to(['netqommain@gmail.com','netqommanager1@gmail.com'])->send( new SendMail($data,'newOrderCreated'));
-
-
+                     $sendEmail = mail::to(['netqommain@gmail.com','netqommanager1@gmail.com'])->send( new SendMail($data,'newOrderCreated')); 
                     return response()->json([
                         'message' => 'Your order added into cart successfully.',
                         'isSucceeded' => TRUE,
                         'redirect' => $clickbtn['clickbtn'],
                     ]);
-                } 
+                }
             } catch(\Exception $e) {
                 return response()->json([
                     'message' => $e->getMessage(),
                     'isSucceeded' => FALSE
                 ]);
-            }    
+            }
         }
     }
 
-   
+
    public function reOrder(Request $request){
-    if($request->isMethod('post')){ 
+    if($request->isMethod('post')){
+        $page_title = "Reload Order"; 
             if($request->reorder_id){
                 $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
             try{
-                $data = $request->except(['_token', ]);                
+                $data = $request->except(['_token', ]);
                 $data['order_date'] = date('Y-m-d h:i:s');
                 $data['user_id'] = Auth::user()->id;
                 $data['status'] = '5';
                 $data['amount'] = $request->cost_calculate;
-                //$data['delivery_date'] = DateTime::createFromFormat('m-d-Y', $request->delivery_date)->format('Y-m-d');          
+                //$data['delivery_date'] = DateTime::createFromFormat('m-d-Y', $request->delivery_date)->format('Y-m-d');
                 if(isset($data['height_in'])){
                         $data['measurement'] = 1;
                     }elseif(isset($data['height_cm'])){
@@ -480,32 +541,32 @@ class EmbroidererController extends Controller
                     $image_base64 = base64_decode($image_parts[1]);
                     $fileName = uniqid().'.'.$image_type;
                     $file = $folderPath.$fileName;
-                    $getData = file_put_contents($file, $image_base64);  
-                    // $imgName = time().$originalImage->getClientOriginalName(); 
-                    $data['feature_image'] = $fileName;  
+                    $getData = file_put_contents($file, $image_base64);
+                    // $imgName = time().$originalImage->getClientOriginalName();
+                    $data['feature_image'] = $fileName;
                 }else{
-                    $data['feature_image'] = $request->order_name;  
-                }  
+                    $data['feature_image'] = $request->order_name;
+                }
                 $data['order_unique_id'] = time() . Auth::user()->id;
-                $taxs = $this->getAlltaxsforstates(); 
+                $taxs = $this->getAlltaxsforstates();
                 if($taxs){
                    $userTaxes = array_change_key_case ($taxs ,CASE_LOWER );
                    $userTaxes['total_taxes']=$userTaxes['total_percentage'];
-                   unset($userTaxes['total_percentage']); 
+                   unset($userTaxes['total_percentage']);
                 }else{
-                    $userTaxes=[]; 
+                    $userTaxes=[];
                 }
-                $alldata = array_merge($data, $userTaxes); 
-                //when coupon id exist 
-                // if($request->coupon_id){                   
+                $alldata = array_merge($data, $userTaxes);
+                //when coupon id exist
+                // if($request->coupon_id){
                 //     $coupenData = Coupon::where('coupon_id',$request->coupon_id)->first();
                 //     if($coupenData->amount_off){
                 //       $data['amount'] = $data['amount']-$coupenData->amount_off;
-                //     }elseif($percentage = $coupenData->percent_off){  
+                //     }elseif($percentage = $coupenData->percent_off){
                 //         $Finale_amount = ($percentage / 100) * $data['amount'];
                 //         $data['amount'] = $data['amount']-$Finale_amount;
-                //     }                    
-                // } 
+                //     }
+                // }
                 $orderCheck = Order::find($request->reorder_id)->update($alldata);
                 if($orderCheck){
                     if(isset($data['height_in'])){
@@ -522,105 +583,113 @@ class EmbroidererController extends Controller
                         'isSucceeded' => TRUE,
                         'redirect' => $request->clickbtn,
                     ]);
-                } 
+                }
             } catch(\Exception $e) {
                 return response()->json([
                     'message' => $e->getMessage(),
                     'isSucceeded' => FALSE
                 ]);
-            }    
+            }
 
             }
             $priceCalculator = PriceCalculator::all();
             $inch = 0 ; $centimeter = 0;
-            if(count($priceCalculator)){        
+            if(count($priceCalculator)){
                 $priceCalculator = $priceCalculator->toArray();
-                $inch = $priceCalculator[0]['desired_price']; 
+                $inch = $priceCalculator[0]['desired_price'];
                 $centimeter = $priceCalculator[1]['desired_price'];
-            }  
-            return view('embroiderer.reloadOrder',compact('inch','centimeter')); 
+            }
+            return view('embroiderer.reloadOrder',compact('page_title','inch','centimeter'));
         }
- 
-   } 
+
+   }
 
     public function checkCoupon(Request $request){
-        if($request->isMethod('post')){               
-            $coupan_exist = ''; 
-            $coupon =  Coupon::where(['coupon_id'=>$request->coupon,'valid' => '1'])->first();             
-            $today = date("Y-m-d");   
-            if($coupon){  
+        if($request->isMethod('post')){
+            $coupan_exist = '';
+            $coupon =  Coupon::where(['coupon_id'=>$request->coupon,'valid' => '1'])->first();
+            $today = date("Y-m-d");
+            if($coupon){
             if ($today <= $coupon->end_date) {
                 $data = array();
                 $cartOrderDetails =  Order::where(['user_id' => Auth::user()->id , 'status' => 5])->orderBy('id', 'desc')->get();
-                  $addTaxsParcentages = $this->getAlltaxsforstates(); 
+                  $addTaxsParcentages = $this->getAlltaxsforstates();
                   $sumtotalAmt = 0;
                   $i = 1;
                   $data['subtotaldiscount']=0;
                   $data['afterCouponSubtotal'] =0;
-                foreach ($cartOrderDetails as $key => $cartOrderValue) {   
-                         $sumtotalAmt =   $sumtotalAmt + $cartOrderValue->amount;  
+                foreach ($cartOrderDetails as $key => $cartOrderValue) {
+                         $sumtotalAmt =   $sumtotalAmt + $cartOrderValue->amount;
                          if($coupon->amount_off){
-                         $data[$cartOrderValue->id]['discount']   = round($coupon->amount_off, 2); 
-                         $afterDiscount  = $cartOrderValue->amount-$coupon->amount_off; 
-                         $percentage = $addTaxsParcentages['total_percentage'];  
-                         $data[$cartOrderValue->id]['taxs'] = max(round($afterDiscount*($percentage/100), 2), 0);  
+                         $data[$cartOrderValue->id]['discount']   = round($coupon->amount_off, 2);
+                         $afterDiscount  = $cartOrderValue->amount-$coupon->amount_off;
+                         $percentage = $addTaxsParcentages['total_percentage'];
+                         $data[$cartOrderValue->id]['taxs'] = max(round($afterDiscount*($percentage/100), 2), 0);
                          $afterDiscount  +=  $afterDiscount*($percentage/100);
-                         $data[$cartOrderValue->id]['total']  = max(round($afterDiscount, 2), 0); 
-                         //subtotalDiscount  
-                         if($coupon->amount_off >= $cartOrderValue->amount ){  
+                         $data[$cartOrderValue->id]['total']  = max(round($afterDiscount, 2), 0);
+                         //subtotalDiscount
+                         if($coupon->amount_off >= $cartOrderValue->amount ){
                             $data[$cartOrderValue->id]['orderamount'] = 0;
-                           }    
+                           }
                          $CouponID = $coupon->amount_off;
                          $afterDiscountCoupon = $CouponID*$i;
                          $data['afterCouponSubtotal'] = max($sumtotalAmt-$afterDiscountCoupon, 0);
                          $data['subtotaldiscount'] = max($sumtotalAmt-$data['afterCouponSubtotal'], 0) ;
 
 
-                        }elseif($percentage  = $coupon->percent_off){  
+                        }elseif($percentage  = $coupon->percent_off){ 
+                         
+
                          $Finale_amount  = ($coupon->percent_off / 100) * $cartOrderValue->amount;
+                         
+                         if($coupon->percent_off >= 100){ 
+                            $data['orderWithZeroAmount'] = 1;
+                         }else{
+                            $data['orderWithZeroAmount'] = 0;
+                         }
                          $data[$cartOrderValue->id]['discount']  = round($Finale_amount, 2);
-                         $afterDiscount  = $cartOrderValue->amount-$Finale_amount; 
+                         $afterDiscount  = $cartOrderValue->amount-$Finale_amount;
                          $percentage = $addTaxsParcentages['total_percentage'];
                          $data[$cartOrderValue->id]['taxs'] = max(round($afterDiscount*($percentage/100), 2), 0);
                          $afterDiscount +=   $afterDiscount*($percentage/100);
-                         $data[$cartOrderValue->id]['total']  = max(round($afterDiscount, 2), 0); 
-                         //subtotalDiscount      
-                       // $data['afterCouponSubtotal'] = max($sumtotalAmt-round($Finale_amount, 2), 0); 
+                         $data[$cartOrderValue->id]['total']  = max(round($afterDiscount, 2), 0);
+                         //subtotalDiscount
+                         // $data['afterCouponSubtotal'] = max($sumtotalAmt-round($Finale_amount, 2), 0);
                          $data['subtotaldiscount'] += round($Finale_amount, 2);
                          $data['afterCouponSubtotal'] = max($sumtotalAmt-round($data['subtotaldiscount'], 2), 0);
 
-                    }  
-                    $i++; 
-                 }  
+                    }
+                    $i++;
+                 }
                  if($addTaxsParcentages['total_percentage'] != 0){
                     array_pop($addTaxsParcentages);
                      $taxtotal = 0;
                      // $data['alltaxs']= '';
-                    foreach ($addTaxsParcentages as $key => $taxsParcentageValues) { 
+                    foreach ($addTaxsParcentages as $key => $taxsParcentageValues) {
                               $totaltaxs = round($data['afterCouponSubtotal']*($taxsParcentageValues/100),2);
-                              $taxtotal = $taxtotal + $totaltaxs; 
+                              $taxtotal = $taxtotal + $totaltaxs;
                               $data['alltaxs'][$key.' '.$taxsParcentageValues] = $totaltaxs;
-                              $data['afterCouponFinalTotal'] = round($data['afterCouponSubtotal'],2) + $taxtotal; 
-                                   } 
-                   
+                              $data['afterCouponFinalTotal'] = round($data['afterCouponSubtotal'],2) + $taxtotal;
+                                   }
+
 
                     $data['html'] = '<ul class="list-unstyled p-0 m-0">
                     <li><span>Sub Total</span> <b>$'.$data["afterCouponSubtotal"].'</b></li>
                     <li class="subtotalDiscount"><span>Discount</span><b>$'.$data["subtotaldiscount"].'</b></li>';
-                    foreach ($data['alltaxs'] as $key => $alltaxsValue) {  
+                    foreach ($data['alltaxs'] as $key => $alltaxsValue) {
                       $data['html'] .= '<li><span>'.$key.'%</span> <b>$'.$alltaxsValue.'</b></li>';
                      }
                     $data['html'] .= '<li><span>Total</span> <b>$'.$data['afterCouponFinalTotal'].'</b></li>
-                    </ul>'; 
-                     
+                    </ul>';
+
                      }else{
                         $data['html'] = '<ul class="list-unstyled p-0 m-0">
                     <li><span>Sub Total</span> <b>$'.$data["afterCouponSubtotal"].'</b></li>
                     <li class="subtotalDiscount"><span>Discount</span><b>$'.$data["subtotaldiscount"].'</b></li>';
-                     
+
                     $data['html'] .= '<li><span>Total</span> <b>$'.$data["afterCouponSubtotal"].'</b></li>
-                    </ul>'; 
-                     
+                    </ul>';
+
                      }
 
                      $data['coupan_exist'] = 1;
@@ -630,14 +699,14 @@ class EmbroidererController extends Controller
                         $data['coupan_price'] = $coupon->percent_off.'%';
                     }
 
-               
+
                    } else{
                      $data['coupan_exist'] = 2;
-                   }                   
+                   }
                 }else{
                     $data['coupan_exist'] = 0;
                 }
-            
+
                return $data;
         }
     }
@@ -650,12 +719,12 @@ class EmbroidererController extends Controller
           //echo "<pre>"; echo "hi"; print_r($request->all());die;
         if($request->isMethod('post')){
             try{
-                //$stripe = new \Stripe\StripeClient(config('services.stripe.secret'));           
+                //$stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
                 $userDetail = User::find(Auth::user()->id, ['first_name', 'last_name', 'email','stripe_id','id','state','country']);
-                $taxsForThisUsers = $this->getAlltaxsforstates(); 
+                $taxsForThisUsers = $this->getAlltaxsforstates();
                 $allOrder = Order::where(['user_id' => $userDetail->id , 'status' => '5'])->get();
                 $card_id = '';
-                $coupenData = '';                      
+                $coupenData = '';
                 foreach ($allOrder as $key => $order) {
                     $amt = 0;
                     $totalAmount = 0;
@@ -666,22 +735,22 @@ class EmbroidererController extends Controller
                     if(!empty($request->coupon_id)){
                         $cCheck = true;
                         $coupenData = Coupon::where('coupon_id',$request->coupon_id)->first();
-                        if($coupenData->amount_off){                         
-                          if($taxsForThisUsers['total_percentage'] > 0 ){    
-                            $amt = ($order->amount)-($coupenData->amount_off);  
-                            $amount_after_coupon = $amt;                      
+                        if($coupenData->amount_off){
+                          if($taxsForThisUsers['total_percentage'] > 0 ){
+                            $amt = ($order->amount)-($coupenData->amount_off);
+                            $amount_after_coupon = $amt;
                             $percentage = $taxsForThisUsers['total_percentage'];
                             $amt += $amt*($percentage/100);
                             $totalAmount = round($amt, 2);;
                          }else{
                             $amt = ($order->amount)-($coupenData->amount_off);
                             $amount_after_coupon = $amt;
-                         }  
+                         }
                         }elseif($percentage = $coupenData->percent_off){
-                          if($taxsForThisUsers['total_percentage'] > 0 ){    
+                          if($taxsForThisUsers['total_percentage'] > 0 ){
                             $final_amount = ($percentage / 100) * $order->amount;
-                            $amt = ($order->amount)-($final_amount);                           
-                            $amount_after_coupon = $amt; 
+                            $amt = ($order->amount)-($final_amount);
+                            $amount_after_coupon = $amt;
                             $percentage = $taxsForThisUsers['total_percentage'];
                             $amt += $amt*($percentage/100);
                             $totalAmount = round($amt, 2);
@@ -690,8 +759,8 @@ class EmbroidererController extends Controller
                              $amt = ($order->amount)-($final_amount);
                              $amount_after_coupon = $amt;
                            }
-                        } 
-                    }else{                                                                          
+                        }
+                    }else{
                           if($taxsForThisUsers['total_percentage'] > 0 ){
                             $amt = $order->amount;
                             $percentage = $taxsForThisUsers['total_percentage'];
@@ -700,50 +769,98 @@ class EmbroidererController extends Controller
                          }else{
                             $amt = $order->amount;
                             $totalAmount = round($amt, 2);
-                         } 
-                    } 
-                    $amt = ceil($amt); 
+                         }
+                    }
+                    $amt = ceil($amt);
                         if($cCheck){
-                            $updateOrder = Order::where(['id' => $order->id])->update(['order_group_id' => $order_group_id , 'status' => '1' , 'coupon_id' => $request->coupon_id , 'amount_after_coupon' => $amount_after_coupon,'total_amount' => 0]);    
-                        }else{ 
+                            $updateOrder = Order::where(['id' => $order->id])->update(['order_group_id' => $order_group_id , 'status' => '1' , 'coupon_id' => $request->coupon_id , 'amount_after_coupon' => $amount_after_coupon,'total_amount' => 0]);
+                        }else{
                             $amount_after_coupon = 0;
                             $updateOrder = Order::where(['id' => $order->id])->update(['order_group_id' => $order_group_id , 'status' => '1' , 'amount_after_coupon' => $amount_after_coupon,'total_amount'=>0]);
                         }
                         if($coupenData)  {
-                            $times_redeemed = $coupenData->times_redeemed + 1; 
+                            $times_redeemed = $coupenData->times_redeemed + 1;
                             $updateCoupone = Coupon::where('coupon_id',$request->coupon_id)->update(['redeem_by'=>date('Y/m/d H:i:s'),'times_redeemed'=>$times_redeemed]);
-                        }                
+                        }
                     $allDone = true;
                 }
                 if($allDone){
+
+                   // $data['status'] = $authArray['status'];
+                  //  $data['pay_authorization_id'] = $authArray['id'];
+                  //  $data['pay_order_id'] = $request['authorization']['id'];
+                    $data['user_id'] = Auth::user()->id;
+                    $data['order_group_id'] = $order_group_id;
+                    $data['currency'] = 'usd';
+                   // $data['amount'] = $authArray['amount']['value'];
+                    $userAdmin = User::where(['user_role' => 1])->first();
+                    $userDetail = User::where(['id' => $data['user_id']])->first();
+                  //  $userdigitizerManager = User::where(['user_role' => 2])->first();
+                   
+                    $data['order_id'] = $order->order_unique_id;
+                    $data['fullname'] = Auth::user()->first_name .' '. Auth::user()->last_name;                   
+                    $cartOrdres = session()->get('cartOrdres');
+                    $data['cartOrdres'] = '';
+                    if($cartOrdres != null && !empty($cartOrdres)){
+         
+                        $data['cartOrdres'] = $cartOrdres; 
+                        foreach($cartOrdres as $orders){
+                            $orderdate  = $orders->created_at;
+
+                        }
+                        if($cCheck){
+                            $data['ccheck'] =  1;                            
+                            $coupenData = Coupon::where('coupon_id',$request->coupon_id)->first();
+                            if($coupenData->amount_off){
+                              $data['amountDiscount'] = $coupenData->amount_off;
+
+                            }elseif($percentage = $coupenData->percent_off){
+                               $data['discountPercentage'] = $coupenData->percent_off;
+                            }
+
+                        }else{
+
+                           $data['ccheck'] = 0;
+                        }
+                        $data['orderdate'] = date('d F Y', strtotime($orderdate));
+                                      
+                      }
+                    $userAdress = isset($userDetail->address) ? $userDetail->address : '';
+                    $userCity = isset($userDetail->city) ? $userDetail->city : '';
+                    $userState = isset($userDetail->country) ? $userDetail->country : '';
+                    $data['userAdress'] =  $userAdress.' '. $userCity.''.$userState;
+                    $data['subject'] = 'Punchly order confirmation '.$data['order_id'];
+
+                   $sendEmail = mail::to([$userDetail->email, $userAdmin->email ])->send( new SendMail($data,'newOrderPlaced'));
                     return response()->json([
-                        'message' => 'Your order is placed successfully', 
+                        'message' => 'Your order is placed successfully',
                         'isSucceeded' => TRUE,
                         'order_group_id' => $order_group_id,
                     ]);
-                }        
+                }
             }catch(\Exception $e) {
                 return response()->json([
-                    'message' => $e->getMessage(), 
+                    'message' => $e->getMessage(),
                     'isSucceeded' => FALSE
                 ]);
             }
-        } 
+        }
     }
     /**
     * Create charge from embroiderer side
     */
     public function createPaymentIntent(Request $request){
-        
+
         if($request->isMethod('post')){
             try{
-                $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));           
+                
+                $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
                 $userDetail = User::find(Auth::user()->id, ['first_name', 'last_name', 'email','stripe_id','id','state','country']);
-                $taxsForThisUsers = $this->getAlltaxsforstates(); 
+                $taxsForThisUsers = $this->getAlltaxsforstates();
                 $stripeCustomerId = $userDetail->stripe_id;
-                if (empty($stripeCustomerId) ) { 
-                    //Create customer if not before created               
-                    $stripeCustomer = $stripe->customers->create([ "email"  => $userDetail->email, 'name' => $userDetail->first_name.' '.$userDetail->last_name ]); 
+                if (empty($stripeCustomerId) ) {
+                    //Create customer if not before created
+                    $stripeCustomer = $stripe->customers->create([ "email"  => $userDetail->email, 'name' => $userDetail->first_name.' '.$userDetail->last_name ]);
                     $stripeCustomerId = $stripeCustomer->id;
                     $updateCus = User::where(['id' => Auth::user()->id])->update(['stripe_id' => $stripeCustomerId]);
                 }
@@ -751,17 +868,18 @@ class EmbroidererController extends Controller
                 $card_id = '';
                 $coupenData = '';
                 if($request->paymentMethod == 'stripe'){
+                    
                     $card_id = $request['token']['card']['id'];
                     if($request->saveMethod){
                         $attachCustomer = $stripe->customers->createSource($stripeCustomerId,['source' => $request['token']['id']]);
-                        $this->saveMethod($attachCustomer);                         
+                        $this->saveMethod($attachCustomer);
                     }else{
 
                         $attachCustomer = $stripe->customers->createSource($stripeCustomerId,['source' => $request['token']['id']]);
                     }
                 }elseif ($request->paymentMethod != 'paypal') {
                     $card_id = $request->paymentMethod;
-                }                      
+                }
                 foreach ($allOrder as $key => $order) {
                     $amt = 0;
                     $totalAmount = 0;
@@ -772,22 +890,22 @@ class EmbroidererController extends Controller
                     if(!empty($request->coupon_id)){
                         $cCheck = true;
                         $coupenData = Coupon::where('coupon_id',$request->coupon_id)->first();
-                        if($coupenData->amount_off){                         
-                          if($taxsForThisUsers['total_percentage'] > 0 ){	 
-                            $amt = ($order->amount)-($coupenData->amount_off);  
-                            $amount_after_coupon = $amt;                      
+                        if($coupenData->amount_off){
+                          if($taxsForThisUsers['total_percentage'] > 0 ){
+                            $amt = ($order->amount)-($coupenData->amount_off);
+                            $amount_after_coupon = $amt;
 							$percentage = $taxsForThisUsers['total_percentage'];
 							$amt += $amt*($percentage/100);
-							$totalAmount = round($amt, 2);;
+							$totalAmount = round($amt, 2);
                          }else{
                          	$amt = ($order->amount)-($coupenData->amount_off);
                          	$amount_after_coupon = $amt;
-                         }  
+                         }
                         }elseif($percentage = $coupenData->percent_off){
-                          if($taxsForThisUsers['total_percentage'] > 0 ){	 
+                          if($taxsForThisUsers['total_percentage'] > 0 ){
                             $final_amount = ($percentage / 100) * $order->amount;
-                            $amt = ($order->amount)-($final_amount);                           
-                            $amount_after_coupon = $amt; 
+                            $amt = ($order->amount)-($final_amount);
+                            $amount_after_coupon = $amt;
                             $percentage = $taxsForThisUsers['total_percentage'];
 							$amt += $amt*($percentage/100);
 							$totalAmount = round($amt, 2);
@@ -796,8 +914,8 @@ class EmbroidererController extends Controller
                              $amt = ($order->amount)-($final_amount);
                              $amount_after_coupon = $amt;
                            }
-                        } 
-                    }else{                                                                          
+                        }
+                    }else{
                           if($taxsForThisUsers['total_percentage'] > 0 ){
 	                        $amt = $order->amount;
 							$percentage = $taxsForThisUsers['total_percentage'];
@@ -806,9 +924,11 @@ class EmbroidererController extends Controller
                          }else{
                          	$amt = $order->amount;
                          	$totalAmount = round($amt, 2);;
-                         } 
-                    } 
-                    $amt = ceil($amt);                     
+                         }
+                    }
+                    $amt = ceil($amt);
+
+                    if($amt > 0 ){
                     $createPaymentIntent = $stripe->paymentIntents->create([
                         'amount' => $amt * 100,
                         'currency' => 'usd',
@@ -819,56 +939,123 @@ class EmbroidererController extends Controller
                     ]);
                     if($createPaymentIntent->status == 'requires_confirmation'){
                         //Confirm intent one line code
-                        $confirmPaymentIntent = $stripe->paymentIntents->confirm($createPaymentIntent->id,[]);                    
+                        $confirmPaymentIntent = $stripe->paymentIntents->confirm($createPaymentIntent->id,[]);
                         $paymentDone = $this->savePaymentDetail($confirmPaymentIntent,$order_group_id);
                         if($paymentDone){
                             if($cCheck){
-                                $updateOrder = Order::where(['id' => $order->id])->update(['order_group_id' => $order_group_id , 'status' => '1' , 'coupon_id' => $request->coupon_id , 'amount_after_coupon' => $amount_after_coupon,'total_amount' => $totalAmount]);    
-                            }else{ 
+                                $updateOrder = Order::where(['id' => $order->id])->update(['order_group_id' => $order_group_id , 'status' => '1' , 'coupon_id' => $request->coupon_id , 'amount_after_coupon' => $amount_after_coupon,'total_amount' => $totalAmount]);
+                            }else{
                             	$amount_after_coupon = 0;
                                 $updateOrder = Order::where(['id' => $order->id])->update(['order_group_id' => $order_group_id , 'status' => '1' , 'amount_after_coupon' => $amount_after_coupon,'total_amount'=>$totalAmount]);
-                            }  
+                            }
                             if($coupenData)  {
-                                $times_redeemed = $coupenData->times_redeemed + 1; 
+                                $times_redeemed = $coupenData->times_redeemed + 1;
                                 $updateCoupone = Coupon::where('coupon_id',$request->coupon_id)->update(['redeem_by'=>date('Y/m/d H:i:s'),'times_redeemed'=>$times_redeemed]);
-                            }                       
-                             
+                            }
+
                         }
                     }
+
+                  }else{ 
+                   
+                    if($cCheck){ 
+                        $totalAmount = 0;
+                        $updateOrder = Order::where(['id' => $order->id])->update(['order_group_id' => $order_group_id , 'status' => '1' , 'coupon_id' => $request->coupon_id , 'amount_after_coupon' => $amount_after_coupon,'total_amount' => $totalAmount]);
+                    }else{
+                        $amount_after_coupon = 0;
+                        $totalAmount = 0;
+                        $updateOrder = Order::where(['id' => $order->id])->update(['order_group_id' => $order_group_id , 'status' => '1' , 'amount_after_coupon' => $amount_after_coupon,'total_amount'=>$totalAmount]);
+                    }
+                    if($coupenData)  {
+                        $times_redeemed = $coupenData->times_redeemed + 1;
+                        $updateCoupone = Coupon::where('coupon_id',$request->coupon_id)->update(['redeem_by'=>date('Y/m/d H:i:s'),'times_redeemed'=>$times_redeemed]);
+                    }
+
+
+                  }
                     $allDone = true;
                 }
                 if($allDone){
+
+                  // $data['status'] = $authArray['status'];
+                  //  $data['pay_authorization_id'] = $authArray['id'];
+                  //  $data['pay_order_id'] = $request['authorization']['id'];
+                  $data['user_id'] = Auth::user()->id;
+                  $data['order_group_id'] = $order_group_id;
+                  $data['currency'] = 'usd';
+                 // $data['amount'] = $authArray['amount']['value'];
+                  $userAdmin = User::where(['user_role' => 1])->first();
+                  $userDetail = User::where(['id' => $data['user_id']])->first();
+                //  $userdigitizerManager = User::where(['user_role' => 2])->first();
+                 
+                  $data['order_id'] = $order->order_unique_id;
+                  $data['fullname'] = Auth::user()->first_name .' '. Auth::user()->last_name;                   
+                  $cartOrdres = session()->get('cartOrdres');
+                  $data['cartOrdres'] = '';
+                  if($cartOrdres != null && !empty($cartOrdres)){
+       
+                      $data['cartOrdres'] = $cartOrdres; 
+                      foreach($cartOrdres as $orders){
+                          $orderdate  = $orders->created_at;
+
+                      }
+                      if($cCheck){
+                        $data['ccheck'] =  1;                            
+                        $coupenData = Coupon::where('coupon_id',$request->coupon_id)->first();
+                        if($coupenData->amount_off){
+                          $data['amountDiscount'] = $coupenData->amount_off;
+
+                        }elseif($percentage = $coupenData->percent_off){
+                           $data['discountPercentage'] = $coupenData->percent_off;
+                        }
+
+                    }else{
+
+                       $data['ccheck'] = 0;
+                    }
+                    
+                      $data['orderdate'] = date('d F Y', strtotime($orderdate));
+                                    
+                    }
+                  $userAdress = isset($userDetail->address) ? $userDetail->address : '';
+                  $userCity = isset($userDetail->city) ? $userDetail->city : '';
+                  $userState = isset($userDetail->country) ? $userDetail->country : '';
+                  $data['userAdress'] =  $userAdress.' '. $userCity.''.$userState;
+                  $data['subject'] = 'Punchly order confirmation '.$data['order_id'];
+
+                 $sendEmail = mail::to([$userDetail->email, $userAdmin->email ])->send( new SendMail($data,'newOrderPlaced'));
+
                     return response()->json([
-                        'message' => 'Your order is placed successfully', 
+                        'message' => 'Your order is placed successfully',
                         'isSucceeded' => TRUE
                     ]);
-                }        
+                }
             }catch(\Exception $e) {
                 return response()->json([
-                    'message' => $e->getMessage(), 
+                    'message' => $e->getMessage(),
                     'isSucceeded' => FALSE
                 ]);
             }
-        }            
+        }
     }
 /*
   Invoice
 */
 public function paymentInvoices(Request $request){
              if($request->isMethod('post')){
-            try{       
+            try{
                  return response()->json([
-                    'message' => 'Invoice Id created', 
+                    'message' => 'Invoice Id created',
                     'isSucceeded' => true,
                 ]);
             }catch(\Exception $e) {
                 return response()->json([
-                    'message' => $e->getMessage(), 
+                    'message' => $e->getMessage(),
                     'isSucceeded' => FALSE
                 ]);
             }
 
-              
+
         }
     }
     /*
@@ -879,12 +1066,12 @@ public function paymentInvoices(Request $request){
         $data['st_payment_intent_id'] = $confirmPaymentIntent->id;
         $data['st_amount_capturable'] = $confirmPaymentIntent->amount_capturable/100;
         $data['st_amount_received'] = $confirmPaymentIntent->amount_received/100;
-        $data['st_charge_id'] = $confirmPaymentIntent->charges->data[0]->id;                    
+        $data['st_charge_id'] = $confirmPaymentIntent->charges->data[0]->id;
         $data['st_payment_method'] = $confirmPaymentIntent->payment_method;
         if($confirmPaymentIntent->status == 'requires_capture'){
             $data['st_status'] = '2';
         }elseif($confirmPaymentIntent->status == 'requires_confirmation'){
-            $data['st_status'] = '1';    
+            $data['st_status'] = '1';
         }
         $data['invoice'] = $confirmPaymentIntent->invoice;
         $data['billing_country'] = $confirmPaymentIntent->charges->data[0]->billing_details->address->country;
@@ -899,7 +1086,7 @@ public function paymentInvoices(Request $request){
             return '1';
         }
         return '0';
-    } 
+    }
 
     /*
     * During payment Save Method as well
@@ -927,30 +1114,33 @@ public function paymentInvoices(Request $request){
     */
     public function orderManagement(Request $request){
         if($request->isMethod('get')){
+            $page_title = "Orders Management"; 
             $priceCalculator = PriceCalculator::all();
             $inch = 0 ; $centimeter = 0;
-            if(count($priceCalculator)){        
+            if(count($priceCalculator)){
                 $priceCalculator = $priceCalculator->toArray();
-                $inch = $priceCalculator[0]['desired_price']; 
+                $inch = $priceCalculator[0]['desired_price'];
                 $centimeter = $priceCalculator[1]['desired_price'];
-            }  
-            return view('embroiderer.ordersManagement',compact('inch','centimeter'));      
+            }
+            return view('embroiderer.ordersManagement',compact('page_title','inch','centimeter'));
         }
     }
    public function createNew(Request $request){
         if($request->isMethod('get')){
+            $page_title = "Create New Order Page"; 
             $priceCalculator = PriceCalculator::all();
             $inch = 0 ; $centimeter = 0;
-            if(count($priceCalculator)){        
+            if(count($priceCalculator)){
                 $priceCalculator = $priceCalculator->toArray();
-                $inch = $priceCalculator[0]['desired_price']; 
+                $inch = $priceCalculator[0]['desired_price'];
                 $centimeter = $priceCalculator[1]['desired_price'];
-            }  
-            return view('embroiderer.CreateNewOrderPage',compact('inch','centimeter'));      
+            }
+            return view('embroiderer.CreateNewOrderPage',compact('page_title','inch','centimeter'));
         }
     }
 
     public function test(Request $request){
+         
         return view('embroiderer.test');
     }
 
@@ -960,10 +1150,10 @@ public function paymentInvoices(Request $request){
     public function orderRepresent(Request $request){
         //echo "<pre>"; print_r($request->all());die;
          $user = Auth::user();
-        if($request->ajax()){            
-            $conditions[]=['status','!=', 5];     
-            $conditions[]=['user_id','=', $user->id];   
-             $filterData = false; 
+        if($request->ajax()){
+            $conditions[]=['status','!=', 5];
+            $conditions[]=['user_id','=', $user->id];
+             $filterData = false;
             if (!empty($request->maximumDate) && !empty($request->minimumDate)) {
                 $startDate = Carbon::createFromFormat('m/d/Y', $request->minimumDate)->format('Y-m-d');
                 $endDate = Carbon::createFromFormat('m/d/Y', $request->maximumDate)->format('Y-m-d');
@@ -976,19 +1166,19 @@ public function paymentInvoices(Request $request){
                 $conditions[]=['desired_output','=', $request->desired_output];
                 $filterData = true;
             }if(!empty($request->status)){
-                $conditions[]=['status','=', $request->status];   
-                $filterData = true;  
-            }   
-            $orderList = Order::with(['garment','payment_details','digitizer','rejection_reason'])->where($conditions)->orderBy('id', 'DESC');   
+                $conditions[]=['status','=', $request->status];
+                $filterData = true;
+            }
+            $orderList = Order::with(['garment','payment_details','digitizer','rejection_reason'])->where($conditions)->orderBy('id', 'DESC');
             $orderList = $orderList->paginate(9);
-            $digitizerList = User::where(['user_role' => '3'])->get();              
-            $rejectionReason = RejectionReason::all(); 
+            $digitizerList = User::where(['user_role' => '3'])->get();
+            $rejectionReason = RejectionReason::all();
             $garmentType = Garment::all();
-            $priceCalculator = PriceCalculator::all();       
+            $priceCalculator = PriceCalculator::all();
                 $inch = 0 ; $centimeter = 0;
-                if(count($priceCalculator)){        
+                if(count($priceCalculator)){
                     $priceCalculator = $priceCalculator->toArray();
-                    $inch = $priceCalculator[0]['desired_price']; 
+                    $inch = $priceCalculator[0]['desired_price'];
                     $centimeter = $priceCalculator[1]['desired_price'];
                 }
             $html = View::make('embroiderer.orderRepresent',compact('orderList','user','digitizerList','rejectionReason','inch','centimeter','garmentType','priceCalculator'))->render();
@@ -1032,7 +1222,7 @@ public function paymentInvoices(Request $request){
             $imageName = '';
             $originalImage = $request->feature_image;
             $thumbnailImage = Image::make($originalImage);
-            $imgName = time().$originalImage->getClientOriginalName();         
+            $imgName = time().$originalImage->getClientOriginalName();
             $imageName = $thumbnailImage->save($folderPath.$imgName);
             if(!empty($imageName)){
                 $updateOrder = Order::where(['id' => $request->o_id])->update(['status' => '1','feature_image' => $imgName]);
@@ -1056,7 +1246,7 @@ public function paymentInvoices(Request $request){
     //     $order = Order::with(['user'])->where(['id' => base64_decode($id)])->first();
     //     $garmentType = Garment::all();
     //     $priceCalculator = PriceCalculator::all();
-    //     $orderImages = OrderImage::where(['order_id' => base64_decode($id)])->get(); 
+    //     $orderImages = OrderImage::where(['order_id' => base64_decode($id)])->get();
     //     return view('embroiderer.orderDetail',compact('order','garmentType','priceCalculator','orderImages'));
     // }
 
@@ -1067,29 +1257,29 @@ public function paymentInvoices(Request $request){
             $html = '';
             if($request->order_id){
               $allOrder = Order::with(['user','digitizer','rejection_reason','payment_details','order_images'])
-                                ->where(['id' => $request->order_id])->first(); 
+                                ->where(['id' => $request->order_id])->first();
 
                $orderImages = OrderImage::where(['order_id' => $request->order_id])->get();
                 if($allOrder->status == 4) {
-                         $html = '<h5 class="completed_files">Submitted Files<div class="order_btns"></h5>'; 
+                         $html = '<h5 class="completed_files">Submitted Files<div class="order_btns"></h5>';
                     foreach ($orderImages as $allImages) {
                         $html .= '<div class="ftr-modal-box">';
-                         $html .= '<div class="ftr-dwnld-left"> 
+                         $html .= '<div class="ftr-dwnld-left">
                            <img class="img-submitted" src="'.url('/public/orders').'/'.$allImages->order_image.'" height="85px" width="100px" /></div>
                             <div class="ftr-dwnld-btn">
-                            <a class="btn downloardButton" href="'.route("embroiderer-download-image", $allImages->order_image).'">Download</a> 
-                            </div>';  
-                            $html .= '</div>';                        
+                            <a class="btn downloardButton" href="'.route("embroiderer-download-image", $allImages->order_image).'">Download</a>
+                            </div>';
+                            $html .= '</div>';
                     }
-                            
+
                 }
-                  return response()->json([                   
+                  return response()->json([
                         "isSucceeded"   => true,
                         "data"          => $html,
-                         
-                     ]);                 
+
+                     ]);
             }
-             
+
         }
 
     }
@@ -1119,8 +1309,8 @@ public function paymentInvoices(Request $request){
                 $paymentMethod = $request->paymentMethod;
                 $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
                 $stripeCustomerId = Auth::user()->stripe_id;
-                if ( empty($stripeCustomerId) ) {                
-                    $stripeCustomer = $stripe->customers->create([ "email"  => $customer->email, 'name' => Auth::user()->first_name.' '.Auth::user()->last_name]); 
+                if ( empty($stripeCustomerId) ) {
+                    $stripeCustomer = $stripe->customers->create([ "email"  => $customer->email, 'name' => Auth::user()->first_name.' '.Auth::user()->last_name]);
                     $stripeCustomerId = $stripeCustomer->id;
                 }
                 if( $stripeCustomerId ){
@@ -1159,38 +1349,39 @@ public function paymentInvoices(Request $request){
                             return response()->json([
                                 "message" => 'Your card does not create.',
                                 "isSucceeded" => FALSE,
-                            ]);    
-                        }  
-                    }  
-                }                     
-                
+                            ]);
+                        }
+                    }
+                }
+
             } catch(\Stripe\Exception\CardException $e) {
                 return response()->json([
                     "message" => $e->getError()->message,
                     "isSucceeded" => FALSE
                 ]);
-            }         
+            }
         }
     }
 
     /**
-    * Card List Management 
+    * Card List Management
     */
     public function cardsManagement(Request $request){
         $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
         $dataCheck = CardDetail::where(['user_id' => Auth::user()->id])->first();
+        $page_title = "Edit Profile"; 
         if ($request->ajax()) {
             $data = CardDetail::where(['user_id' => Auth::user()->id])->orderBy('id', 'desc')->get();
             return Datatables::of($data)
                     ->addIndexColumn()
                     ->addColumn('action', function($row){
                         return '<a href="" class="edit btn btn-danger btn-sm mb-enabl action-card-btn" style="margin-left: 2px;margin-top: 2px;" card_id="'.base64_encode($row->card_id).'" ><i data-toggle="tooltip" data-placement="top" title="Delete Card" class="fa fa-trash" aria-hidden="true"></i></a>';
-                        
+
                     })
                     ->rawColumns(['action'])
                     ->make(true);
         }
-        return view('edit-profile',['dataCheck' => $dataCheck]);
+        return view('edit-profile',['dataCheck' => $dataCheck,'page_title' => $page_title]);
     }
 
 
@@ -1199,8 +1390,8 @@ public function paymentInvoices(Request $request){
     * Delete Card functinality
     */
     public function deleteCard(Request $request)
-    {   
-        if($request->isMethod('post')){              
+    {
+        if($request->isMethod('post')){
             try {
                 $crdId = $request['card_id'];
                 $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
@@ -1215,14 +1406,14 @@ public function paymentInvoices(Request $request){
                     return response()->json([
                         "message"       => 'Your card does not remove.',
                         "isSucceeded"   => FALSE
-                    ]);    
-                }      
+                    ]);
+                }
             } catch(\Stripe\Exception\CardException $e) {
                 return response()->json([
                     "message"       => $e->getError()->message,
                     "isSucceeded"   => FALSE
                 ]);
-            }   
+            }
         }
     }
 
@@ -1234,7 +1425,7 @@ public function paymentInvoices(Request $request){
         if($request->isMethod('post')){
             try {
                 $stripe = new \Stripe\StripeClient(config('services.stripe.secret'));
-                $setdefaultCheck =  $stripe->customers->update( Auth::user()->stripe_id, ['default_source' => $request->card_id ]); 
+                $setdefaultCheck =  $stripe->customers->update( Auth::user()->stripe_id, ['default_source' => $request->card_id ]);
                 if($setdefaultCheck->id){
                     CardDetail::where(['status' => '1'])->update(['status' => '0']);
                     CardDetail::where(['user_id' => Auth::user()->id , 'card_id' => $request->card_id])->update(['status' => '1']);
@@ -1248,14 +1439,14 @@ public function paymentInvoices(Request $request){
                         "message"     => 'Your card does not set as default payment method.',
                         "isSucceeded" => FALSE,
                         "data"        => []
-                    ]);    
-                }     
+                    ]);
+                }
             } catch(\Stripe\Exception\CardException $e) {
                 return response()->json([
                     "message" => $e->getError()->message,
                     "isSucceeded" => FALSE
                 ]);
-            }  
+            }
         }
     }
 
@@ -1276,8 +1467,8 @@ public function paymentInvoices(Request $request){
                 "message"       => 'There is no card.',
                 "isSucceeded"   => FALSE,
                 "data"          => []
-            ]);    
-        }     
+            ]);
+        }
     }
 
     /**
@@ -1287,12 +1478,13 @@ public function paymentInvoices(Request $request){
         if($request->isMethod('get')){
             $priceCalculator = PriceCalculator::all();
             $inch = 0 ; $centimeter = 0;
-            if(count($priceCalculator)){         
+            $page_title = "Search Order"; 
+            if(count($priceCalculator)){
                 $priceCalculator = $priceCalculator->toArray();
-                $inch = $priceCalculator[0]['desired_price']; 
+                $inch = $priceCalculator[0]['desired_price'];
                 $centimeter = $priceCalculator[1]['desired_price'];
-            }  
-            return view('embroiderer.searchOrder',compact('inch','centimeter'));      
+            }
+            return view('embroiderer.searchOrder',compact('page_title','inch','centimeter'));
         }
     }
 
@@ -1301,11 +1493,13 @@ public function paymentInvoices(Request $request){
     * Experience filter method
     */
     public function searchOrderRepresent(Request $request){
-        
+
         $user = Auth::user();
-        if($request->ajax()){            
-            $conditions[]=['user_id','=',Auth::user()->id ];            
-            $conditions2=[];            
+        if($request->ajax()){
+            if(isset($user->id)){
+                $conditions[] = ['user_id', '=', $user->id];
+            }
+            $conditions2=[];
             if (!empty($request->maximumDate) && !empty($request->minimumDate)) {
                 $startDate = Carbon::createFromFormat('m/d/Y', $request->minimumDate)->format('Y-m-d');
                 $endDate = Carbon::createFromFormat('m/d/Y', $request->maximumDate)->format('Y-m-d');
@@ -1325,9 +1519,10 @@ public function paymentInvoices(Request $request){
                 $conditions2[]=['order_unique_id','=', $request->searchParam];
             }
             $orderList = Order::with(['garment','payment_details'])->where($conditions)->orWhere($conditions2);
+            $orderListValue = (clone $orderList)->get();
             $orderList = $orderList->paginate(10);
             $html = View::make('embroiderer.orderRepresent',compact('orderList','user'))->render();
-            if(count($orderList)){
+            if(count($orderListValue)){
                 return response()->json([
                     "message"       => 'Experiences get successfully.',
                     "isSucceeded"   => TRUE,
@@ -1353,23 +1548,23 @@ public function paymentInvoices(Request $request){
     * Embroider Checkout Functionality
     */
     public function cart(Request $request){
-        $data =  Order::with('garment')->where(['user_id' => Auth::user()->id , 'status' => 5])->orderBy('id', 'desc')->get();        
-
+        $data =  Order::with('garment')->where(['user_id' => Auth::user()->id , 'status' => 5])->orderBy('id', 'desc')->get();
+        $page_title = "Cart"; 
         $garmentType = Garment::all();
         $priceCalculator = PriceCalculator::all();
         $inch = 0 ; $centimeter = 0;
-        if(count($priceCalculator)){        
+        if(count($priceCalculator)){
             $priceCalculator = $priceCalculator->toArray();
-            $inch = $priceCalculator[0]['desired_price']; 
+            $inch = $priceCalculator[0]['desired_price'];
             $centimeter = $priceCalculator[1]['desired_price'];
-        }    
-        if ($request->ajax()) {             
+        }
+        if ($request->ajax()) {
             return Datatables::of($data)
                 ->addIndexColumn()
                 ->addColumn('action', function($row){
                     return $actionBtn = '<a href="javascript:void(0)" class="btn btn-outline-danger delete-btn delete-item-from-shopping-cart" order_amt="'.$row->amount.'" order_id="'.base64_encode($row->id).'"><i class="far fa-trash-alt"></i> </a>
                     <a id="edit-order-btn"  href="javascript:void(0)" act-name="edit-order" order_id="'.base64_encode($row->id).'" class="completed-tag editBtn action_order float-right" data-dismiss="modal" aria-label="Close" style=""  ><i class="fa fa-edit"></i> </a>
- 
+
 
                     ';
                 })
@@ -1377,21 +1572,22 @@ public function paymentInvoices(Request $request){
                 ->make(true);
         }
         $allOrder = $data;
-        return view('embroiderer.cart',compact('allOrder','garmentType','priceCalculator','inch','centimeter'));
+        
+        return view('embroiderer.cart',compact('page_title','allOrder','garmentType','priceCalculator','inch','centimeter'));
     }
-   
+
 
      /**
     * Update Order Function
     */
     public function updateCartOrder(Request $request){
-      
-        if($request->isMethod('post')){ 
-            if($request->editOrder_id){              
+
+        if($request->isMethod('post')){
+            if($request->editOrder_id){
             try{
                 $data = $request->except(['_token', ]);
-                $data['order_date'] = date('Y-m-d h:i:s'); 
-                $data['amount'] = $request->cost_calculate;                       
+                $data['order_date'] = date('Y-m-d h:i:s');
+                $data['amount'] = $request->cost_calculate;
                 if(isset($data['height_in'])){
                         $data['measurement'] = 1;
                     }elseif(isset($data['height_cm'])){
@@ -1406,41 +1602,41 @@ public function paymentInvoices(Request $request){
                     $image_base64 = base64_decode($image_parts[1]);
                     $fileName = uniqid().'.'.$image_type;
                     $file = $folderPath.$fileName;
-                    $getData = file_put_contents($file, $image_base64);              
-                    $data['feature_image'] = $fileName;  
+                    $getData = file_put_contents($file, $image_base64);
+                    $data['feature_image'] = $fileName;
                 }else{
-                    $data['feature_image'] = $request->order_name;  
-                }  
+                    $data['feature_image'] = $request->order_name;
+                }
                 $data['order_unique_id'] = time() . Auth::user()->id;
-                $taxs = $this->getAlltaxsforstates(); 
+                $taxs = $this->getAlltaxsforstates();
                 if($taxs){
                    $userTaxes = array_change_key_case ($taxs ,CASE_LOWER );
                    $userTaxes['total_taxes']=$userTaxes['total_percentage'];
-                   unset($userTaxes['total_percentage']); 
+                   unset($userTaxes['total_percentage']);
                 }else{
-                    $userTaxes=[]; 
+                    $userTaxes=[];
                 }
-                $alldata = array_merge($data, $userTaxes);                
+                $alldata = array_merge($data, $userTaxes);
                 $orderCheck = Order::find($request->editOrder_id)->update($alldata);
-                if($orderCheck){                    
+                if($orderCheck){
                     return response()->json([
                         'message' => 'Your order updated into cart successfully.',
                         'isSucceeded' => TRUE,
                         'redirect' => $request->clickbtn,
                     ]);
-                } 
+                }
             } catch(\Exception $e) {
                 return response()->json([
                     'message' => $e->getMessage(),
                     'isSucceeded' => FALSE
                 ]);
-            }    
+            }
 
             }
- 
+
         }
- 
-  
+
+
     }
 
 
@@ -1448,7 +1644,7 @@ public function paymentInvoices(Request $request){
     * Update Order Function
     */
     public function getCartOrder(Request $request){
-        if($request->isMethod('post')){           
+        if($request->isMethod('post')){
             if($request->order_id){
                    $getOrder = Order::where(['id' => base64_decode($request->order_id)])->first();
                    return response()->json([
@@ -1474,7 +1670,7 @@ public function paymentInvoices(Request $request){
                     "isSucceeded"   => FALSE,
                     'message' => 'Oops something went wrong.'
                 ]);
-            }            
+            }
         }
     }
 
@@ -1485,10 +1681,10 @@ public function paymentInvoices(Request $request){
         $checkCartEmpty = Order::where(['user_id' => Auth::user()->id , 'status' => 5])->delete();
         $checkOrders = Order::where(['user_id' => Auth::user()->id , 'status' => 5])->first();
         if(empty($checkOrders)){
-            return redirect()->route('embroiderer-order-form')->with(['alert-type'=>'success','message'=>'Your cart empty successfully.']);    
+            return redirect()->route('embroiderer-order-form')->with(['alert-type'=>'success','message'=>'Your cart empty successfully.']);
         }else{
             return redirect()->back()->with(['alert-type' => 'error','message' => 'Opps,some problem occur to clear the cart,please try again.']);
-        }        
+        }
     }
 
     /**
@@ -1511,26 +1707,36 @@ public function paymentInvoices(Request $request){
 			  $userDetail = User::find(Auth::user()->id, ['first_name', 'last_name', 'email','stripe_id','id','state','country']);
 		      if($userDetail->country == 38){
 	                $canadaStatesTaxs = States::where('country_id',$userDetail->country)->get();
-	            	foreach ($canadaStatesTaxs as $key => $taxStates) {                		
-	        		   if($userDetail->state == $taxStates->id && $userDetail->country == $taxStates->country_id ){   
-	        		      if($taxStates->type){   
+	            	foreach ($canadaStatesTaxs as $key => $taxStates) {
+	        		   if($userDetail->state == $taxStates->id && $userDetail->country == $taxStates->country_id ){
+	        		      if($taxStates->type){
 	                        $taxsTypes = explode(",",$taxStates->type);
-	                        foreach ($taxsTypes as $key => $taxs) {	                      	
-	                      	 $taxNamesAndValues[$taxs]  = $taxStates->$taxs;  
-	                        } 
-                          } 
-	        		    }              		 
+	                        foreach ($taxsTypes as $key => $taxs) {
+	                      	 $taxNamesAndValues[$taxs]  = $taxStates->$taxs;
+	                        }
+                          }
+	        		    }
 	        	   }
-	        	   $taxsValues = array_values($taxNamesAndValues); 
+	        	   $taxsValues = array_values($taxNamesAndValues);
 	        	   $total = array_sum( $taxsValues);
 	        	   $taxNamesAndValues['total_percentage'] = $total;
-	        	   return $taxNamesAndValues; 
+	        	   return $taxNamesAndValues;
 	          }else{
 
 	          	$taxNamesAndValues['total_percentage'] = 0;
-	        	   return $taxNamesAndValues; 
+	        	   return $taxNamesAndValues;
 	          }
 	    }
-    
-   
+
+          /**
+    * Place Order
+    */
+    public function successfullyPlaceOrder(Request $request) {
+
+
+         return view('embroiderer.afterOrderPlaced');
+               
+        }
+
+
 }

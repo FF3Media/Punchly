@@ -90,7 +90,7 @@
                                                 <input type="email" name="email" {{ isset($userData) ? "readonly" : "" }} value="{{ isset($userData) ? $userData->email : '' }}" class="form-control {{ isset($userData) ? 'read-only' : '' }}" placeholder="Enter your email address" /> </div>
                                         </div>
 
-                                        <div class="col-lg-12 my-error p-0 form-group">                                       
+                                        <div class="col-lg-12 my-error">                                       
                                             <label>Profile Image</label>
                                             <div class="custom-file">
                                             <input type="file" class="form-control custom-file-input" id="avatar_image" name="avatar">           
@@ -98,7 +98,9 @@
                                         </div>                          
                                     
                                       </div>
-                                        <div class="form-group col-lg-12 p-0"> 
+                                       
+                                        
+                                        <div class="form-group row"> 
                                                 <label>Country</label>
                                                  @php
                                                 $countries = getCounties();
@@ -112,9 +114,9 @@
                                         </select> 
                                         </div>
 
-                                          <div class="form-group col-lg-12 p-0 my-error">
+                                          <div class="form-group row">
                                                <label for="first-name">State</label>
-                                                <select   class="form-control" name="state" id="state">
+                                                <select class="form-control" name="state" id="state">
                                                  </select>
                                                  
                                           </div>
@@ -130,7 +132,6 @@
                                                 <label>Postcode</label>
                                                 <input type="text" name="postcode" value="{{ isset($userData) ? $userData->postcode : '' }}" class="form-control" placeholder="Enter your postcode" /> </div>
                                         </div>
-                                        
                                         <div class="form-group row">
                                             <div class="col-lg-12 my-error">
                                                 <label>Address</label>
@@ -463,16 +464,9 @@
                 address: {
                     required: true
                 },
-                country: {
-                    required: true
-                },state: {
-                    required: true
-                },
                 mobile: {
-                    required: true,
-                    // digits: true,
-                    // minlength: 10,
-                    // maxlength: 10,
+                   // required: true,
+                    digits: true, 
                     remote: {
                         url: `{{ route('check-mobile-exist') }}`,
                         data: {
@@ -512,14 +506,8 @@
                 email: {
                     required: "Please enter your email address",
                 },
-                country: {
-                    required: "Please select your country",
-                },
-                state: {
-                    required: "Please select your state",
-                },                
                 mobile: {
-                    required: "Please enter your mobile number",
+                  //  required: "Please enter your mobile number",
                     remote: "This mobile number already exist"
                 },
                 avatar: {
@@ -840,7 +828,7 @@ $('#country').change(function(){
                 {
                     $("#state").empty();
                     $("#city").empty();
-                    $("#state").append('<option value="">Select State</option>');
+                    $("#state").append('<option>Select State</option>');
                     $.each(res,function(key,value){
                         var sel='';
                         if(key==state){
@@ -854,9 +842,6 @@ $('#country').change(function(){
         });
         }
  }
- $("input[name='mobile']").keyup(function() {
-    $(this).val($(this).val().replace(/^(\d{3})(\d{3})(\d+)$/, "($1)$2-$3"));
-});
 </script>
 
 @endsection

@@ -1,3 +1,4 @@
+
 <?php $__env->startSection('content'); ?>
 <script src="https://js.stripe.com/v3/"></script>
     <section class="section-content cart-section bg padding-y">
@@ -24,7 +25,10 @@
                         <div class="table-responsive">
                             <?php $totalAmt=0; ?>
                             <?php $__empty_1 = true; $__currentLoopData = $allOrder; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $orderDetail): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
-                                <?php $totalAmt = $orderDetail->amount + $totalAmt; ?>
+                                <?php
+                                $totalAmt = $orderDetail->amount + $totalAmt;  
+                              
+                                  ?>
                             <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
 
                             <?php endif; ?>
@@ -46,7 +50,7 @@
                         </div>
                         <div class="total-checkout">
                             <div class="total">
-                                <h4>Total Cost: <span class="total-price">$<span id="totalAmt"><?php echo e(round($totalAmt,2)); ?></span></span></h4>
+                                <h4>Total Cost: <span class="total-price">$<span id="totalAmt"><?php echo e(number_format($totalAmt, 2)); ?></span></span></h4>
                             </div>
                             <div class="total">
                                 <a href="<?php echo e(url('/embroiderer/checkout-payment')); ?>" class="btn btn-purple btn-primary proceedBtn" style="display: <?php echo e($totalAmt != 0 ? 'block' : 'none'); ?>">Proceed to checkout</a>
@@ -133,7 +137,7 @@
       <div class="row"> 
         <div class="col my-error">
           <label>Desired height</label>
-            <input  type="number" id="desired_height_editOrder" onKeyPress="if(this.value.length==4) return false;" class="pri-cal4" name="desired_height">            
+            <input  type="number" id="desired_height_editOrder"   class="pri-cal4" name="desired_height">            
             <div class="radio-btns">              
               <p><input type="radio" id="in3" class="pri-cal4" name="height_in" value="1" checked><label id="inchlabeleditOrder"  for="in3">in</label></p>
               <p><input type="radio" id="cm3" class="pri-cal4"  name="height_cm" value="2" ><label id="cmlabeleditOrder"   for="cm3">cm</label></p>
@@ -142,7 +146,7 @@
 
         <div class="col my-error">
           <label>Desired width</label>
-            <input type="number" id="desired_width_editOrder" onKeyPress="if(this.value.length==4) return false;" class="pri-cal4" name="desired_width">
+            <input type="number" id="desired_width_editOrder"   class="pri-cal4" name="desired_width">
             <div class="radio-btns">              
               <p><input type="radio" id="in13" class="pri-cal4" name="width_in" value="1" checked><label id="inchlabel2555" for="in13">in</label></p>
               <p><input type="radio" id="cm13" class="pri-cal4" name="width_cm" value="2" ><label id="cmlabel2555" for="cm13">cm</label></p>
@@ -164,8 +168,8 @@
       </div>
 
       <div class="modal-footer">
-        <button type="submit" class="gray-btn tourquoise-color  " name="clickbtn" value="instant_cart" id="add-editOrder-order" >Update Cart</button>
-        <button type="submit" class="gray-btn purple-color" name="clickbtn" value="instant_checkout" >Instant checkout</button>
+        <button type="submit" class="gray-btn sky-blue" name="clickbtn" value="instant_cart" id="add-editOrder-order" >Update Cart</button>
+        <button type="submit" class="gray-btn" name="clickbtn" value="instant_checkout" >Instant checkout</button>
 
       </div> 
         
@@ -436,9 +440,9 @@ $('.slideclose4').on('click', function(e){
                     required: true,
                 },
                 
-               /* order_message:{
-                    required: true,
-                },*/
+                // order_message:{
+                //     required: true,
+                // },
                  
                 desired_output:{
                     required:true
@@ -458,9 +462,9 @@ $('.slideclose4').on('click', function(e){
                     required : "Please select garment type",
                 },
                   
-                order_message:{
-                    required: "Please enter your desired message"
-                },
+                // order_message:{
+                //     required: "Please enter your desired message"
+                // },
                 desired_output:{
                     required: "Please select the File Type"
                 }

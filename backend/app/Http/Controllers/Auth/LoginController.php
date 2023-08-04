@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Controllers\Auth; 
+namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
@@ -32,22 +32,28 @@ class LoginController extends Controller
      */
     #protected $redirectTo = RouteServiceProvider::HOME;
     public function redirectTo() {
-        $role = Auth::user()->user_role; 
+        $role = Auth::user()->user_role;
+        $email_verified_at = Auth::user()->email_verified_at; 
+        
         switch ($role) {
             case 1:
+
                 return '/admin/order-management';
                 break;
             case 3:
                 return '/digitizer/order-management';
-                break; 
+                break;
             case 2:
                 return '/digitizer-manager/order-management';
-                break; 
+                break;
             case 4:
-                return '/embroiderer/createNew';
-                break;     
+                if($email_verified_at == null){
+                    return '/email/verify';
+                }
+                return '/embroiderer/order-management';
+                break;
             default:
-                return '/login'; 
+                return '/login';
                 break;
         }
     }
@@ -62,10 +68,10 @@ class LoginController extends Controller
         $this->middleware('guest')->except('logout');
     }
   protected function credentials(Request $request)
-    {        
+    {
        return ['email' => $request->{$this->username()}, 'password' => $request->password, 'status' => 1];
     }
-  
+
     protected $providers = [
         'facebook','google','twitter'
     ];
@@ -89,13 +95,13 @@ class LoginController extends Controller
         }
     }
 
-  
+
     public function handleProviderCallback( $driver )
     {
-       
+
         try {
             $user = Socialite::driver($driver)->user();
-            
+
         } catch (Exception $e) {
             return $this->sendFailedResponse($e->getMessage());
         }
@@ -130,7 +136,7 @@ class LoginController extends Controller
         if($driver=='facebook')
            {
              $firstName=$providerUser->user['name'];
-             $lastName = ''; 
+             $lastName = '';
            }
            else{
              $firstName=$providerUser->user['given_name'];
@@ -164,26 +170,26 @@ class LoginController extends Controller
             ]);
 
              }else{
-            
+
             //Show message here what you want to show
-            
+
            }
         }
 
         // login the user
         if(isset($user)){
-          $cookie_name = "user"; 
+          $cookie_name = "user";
             $data['user']="loggedIn";
             $data['user_data']=$user->first_name;
             $data['user_cart']=0;
-            setcookie($cookie_name,json_encode($data), time() + (60 * 180), "/"); // 86400 = 1 day  
-        }   
+            setcookie($cookie_name,json_encode($data), time() + (60 * 180), "/"); // 86400 = 1 day
+        }
         Auth::login($user, true);
 
         return $this->sendSuccessResponse();
     }
     public function logout(Request $request) {
-            $id = Auth::user()->id;    
+            $id = Auth::user()->id;
             if($id) {
                 $user = User::find($id);
                  $user->login_access = 0;
@@ -191,36 +197,36 @@ class LoginController extends Controller
                  Auth::logout();
               //unset cooki for react app
               if (isset($_COOKIE['user']) || isset($_COOKIE['user_data'])) {
-                unset($_COOKIE['user']); 
-                unset($_COOKIE['user_data']); 
-                setcookie('user', null, -1, '/'); 
-                setcookie('user_data', null, -1, '/'); 
-            
-            } 
-             return redirect('../'); 
+                unset($_COOKIE['user']);
+                unset($_COOKIE['user_data']);
+                setcookie('user', null, -1, '/');
+                setcookie('user_data', null, -1, '/');
+
+            }
+             return redirect('../');
            }else{
              return redirect('../');
            }
-          
+
     }
 
     public function authenticated(Request $request, $user)
-        { 
+        {
       			if($user->role == 4){
-      			  return redirect()->route('/embroiderer/createNew') ;
-      			}   
-            $cookie_name = "user"; 
+      			  return redirect()->route('/embroiderer/order-management') ;
+      			}
+            $cookie_name = "user";
             $data['user']="loggedIn";
             $data['user_data']=$user->first_name;
             $data['user_cart']=0;
-            setcookie($cookie_name,json_encode($data), time() + (60 * 180), "/"); //  2 minus  
+            setcookie($cookie_name,json_encode($data), time() + (60 * 180), "/"); //  2 minus
             $user->update([
                 'last_login_at' => Carbon::now()->toDateTimeString(),
                 'last_login_ip' => $request->getClientIp(),
                 'login_access' =>   1,
             ]);
-      
-        } 
+
+        }
     private function isProviderAllowed($driver)
     {
         return in_array($driver, $this->providers) && config()->has("services.{$driver}");

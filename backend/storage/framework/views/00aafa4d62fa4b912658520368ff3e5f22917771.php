@@ -1,3 +1,6 @@
+
+
+
 <?php $__env->startSection('content'); ?>
 <div class="container-fluid">
     <div class="row">
@@ -115,9 +118,9 @@
                 email:{
                     required: true,
                 },
-                address:{
+                /*address:{
                     required: true
-                },
+                },*/
                 password:{
                     required: true,
                      
@@ -126,8 +129,8 @@
                     required: true,
                     equalTo: '#password'
                 },
-                mobile:{
-                    required: true,
+                /*mobile:{
+                  //  required: true,
                     digits: true,
                    // minlength: 10,
                    // maxlength: 10,
@@ -139,7 +142,7 @@
                         },
                         type: "post",
                     },
-                },
+                },*/
                 avatar:{
                    // required: true,
                     extension: "jpg,jpeg,png",
@@ -170,7 +173,7 @@
                     required : "Please enter the password",
                 },
                 mobile: {
-                    required : "Please enter your mobile number",
+                  //  required : "Please enter your mobile number",
                     remote: "This mobile number already exist"
                 },
                 avatar:{

@@ -1,3 +1,5 @@
+
+
 <?php $__env->startSection('content'); ?>
 
     <!-- Content Wrapper. Contains page content -->
@@ -47,7 +49,13 @@
                 <div class="card-body row pb-0">
                   <div class="form-group col-md-4">
                     <label for="exampleInputName1">Name</label>
-                    <input type="text" value="" name="name" class="form-control" id="name" placeholder="Please Enter Coupon Name">
+                    <input type="text" value="" name="name"     class="form-control" id="name" placeholder="Please Enter Name">
+                    
+                  </div>
+                  <div class="form-group col-md-4">
+                    <label for="exampleInputName1">Coupon</label>
+                    <input type="text" value="" name="coupon"  onkeyup="CheckcouponBeforeApply();" pattern="[A-Za-z0-9]+" class="form-control" id="coupon" placeholder="Please Enter Coupon">
+                    <div style="color:red"  class="errorcoupone"></div>
                   </div>
                   <div class="form-group col-md-4">
                     <label class = "checkbox-inline">Discount Type</label><br>
@@ -205,6 +213,46 @@ $(document).ready(function () {
       }
     });
 });
+
+ function CheckcouponBeforeApply(){
+           var coupon = $('#coupon').val();   
+
+         if (coupon) {              
+          $.ajax({
+            type: "POST",
+            url: "<?php echo e(route('admin-check-coupon')); ?>",
+            data: {coupon:coupon},
+            dataType: "json",
+             headers: {
+            'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+          },
+            success: function(res) {
+                if(res.coupan_exist == 1){   
+                  $('.errorcoupone').text('Coupon Already Exist');
+                                console.log(res);
+                }else{                                                    
+                   $('.errorcoupone').text('');
+                    
+                } 
+            },
+            error: function (jqXHR, exception) {
+
+              console.log(jqXHR);
+            }
+        });
+      }else{
+          $('.checkoutBtn').removeAttr('disabled');
+          $('.checkoutBtnWithoutFormSubmit').removeAttr('disabled');
+          $('.errorcoupone').text(' ');
+      }
+    }
+
+ $('#coupon').on('keypress', function(e) {
+            if (e.which == 32){
+                console.log('Space Detected');
+                return false;
+            }
+        });
 </script>
 <?php $__env->stopSection(); ?>
 
