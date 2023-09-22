@@ -117,6 +117,14 @@
                 },
                 email:{
                     required: true,
+                    email: true,
+                    remote: {
+                                url: `<?php echo e(route('check-email-exist')); ?>`,
+                                type: "post",
+                                headers: {
+                                    'X-CSRF-TOKEN': $('meta[name="csrf-token"]').attr('content')
+                                }
+                            },
                 },
                 /*address:{
                     required: true
@@ -164,6 +172,7 @@
                 },
                 email: {
                     required : "Please enter your email address",
+                    remote: "This email already exists",
                 },
                 confirm_password: {
                     required : "Please enter your confirm password",
