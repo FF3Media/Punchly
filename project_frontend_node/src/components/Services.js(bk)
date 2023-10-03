@@ -1,0 +1,63 @@
+import React ,{Component} from 'react';
+import { withRouter  } from 'react-router-dom';
+import { Redirect ,Link } from 'react-router-dom'
+import axios from '../axios' 
+import Carousel from 'react-elastic-carousel';
+import Loading from "react-loader-spinner";
+const breakPoints = [
+    { width: 1, itemsToShow: 1 },
+    { width: 550, itemsToShow: 2, itemsToScroll: 2 },
+    { width: 768, itemsToShow: 3 },
+    { width: 1200, itemsToShow: 3}
+  ];
+ class Services extends Component {
+    constructor (props) {
+      super(props)
+      this.state = {
+         getServiceData: [],
+         loading :false,
+         redirect:false,
+         slug:''
+          
+         
+      }
+       
+    }
+    handleClick(slug, e){   
+      this.setState({redirect: true, slug : slug });
+   }
+    componentDidMount() { 
+        this.setState({ loading: true }, () => {
+          axios.get('/cms/services/')
+            .then(response => this.setState({      
+                getServiceData : response.data.data             
+            }));
+        }); 
+      }
+
+
+render () {
+const { getServiceData } = this.state;
+    if(typeof getServiceData == 'undefined' ||  Object.keys(getServiceData).length < 1) {
+       return '';
+     }
+      if (this.state.redirect) {
+        return <Redirect push to = {`/service/${this.state.slug}`} />
+    } 
+  return (
+    <Carousel className="carousalcustomcss home_nav_cat" breakPoints={breakPoints} pagination={false} >
+    {getServiceData.map((item, index) => <div key={index} className='inner_slide_item'>
+    <div className='front_cat_list'>
+      <img onClick={()=>{this.handleClick(item.service_slug)}} className='img-fluid' src={item.feature_image} alt='' />
+    </div>
+    <h3  onClick={()=>{this.handleClick(item.service_slug)}}>{item.service_title}</h3>
+</div>)}
+  </Carousel>
+
+    
+            
+  );
+}
+  }
+  export default withRouter(Services);
+

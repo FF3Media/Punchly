@@ -1,0 +1,257 @@
+import React ,{Component} from 'react';
+import { withRouter  } from 'react-router-dom';
+import { Redirect ,Link } from 'react-router-dom'
+import axios from "../axios";
+import Moment from 'moment';
+import Loading from "react-loader-spinner";
+import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
+import {faCalendarCheck} from "@fortawesome/free-regular-svg-icons";
+import Carousel from 'react-elastic-carousel';
+const breakPoints = [
+  { width: 499, itemsToShow: 2 },
+  { width: 500, itemsToShow: 4, itemsToScroll: 1 },
+  { width: 768, itemsToShow: 4 },
+  { width: 1200, itemsToShow: 4 }
+];
+
+class Blog extends Component {
+      constructor (props) {
+        super(props)
+        this.state = {
+           getBlogdata: [],
+           getHomedata: {},
+           getBlogcategories: [],
+           loading: true,
+           blog_id: '',
+           redirect:false,
+           visible: 7,
+           email: '',
+            errors: {
+                email: ''
+              }
+        }
+         this.loadMore = this.loadMore.bind(this);
+      }
+
+loadMore = () => {
+    this.setState((prev) => {
+      return {visible: prev.visible + 6};
+    });
+  }
+
+ componentDidMount() { 
+  this.setState({ loading: true }, () => {
+    axios.get('/cms/blog/')
+      .then(response => this.setState({      
+        getBlogdata : response.data.data,
+        getBlogcategories : response.data.data,
+        visible: 10,
+        loading: false
+      }));
+  axios.get('/cms/cms-meta/1/').then(response => {
+        this.setState({getHomedata : response.data.data,  loading: false })
+   }).catch(err => {
+    console.log("ERROR: " + err);
+ })
+  }); 
+}
+ handleClick(id, e){   
+     this.setState({redirect: true, blog_id : id });
+  }
+ getBlogsById(id, e) {
+    axios.get('/cms/getBlogsByCategory/'+id).then(response => {
+        this.setState({getBlogdata : response.data.data })
+      }).catch(err => {
+          console.log("ERROR: " + err);
+    })
+ }
+showAllBlogs = () => {
+  this.setState({ loading: true }, () => {
+    axios.get('/cms/blog/')
+      .then(response => this.setState({
+        loading: false,
+        getBlogdata : response.data.data,
+        visible: 7
+      }));
+      this.showBlogs(this.state.getBlogdata) 
+  });
+}
+
+showBlogs = (getBlogdata) => {
+return getBlogdata.slice(0, this.state.visible,this.state.loading).map((blog, index) => {
+const categoryTitle = blog.blog_cat.name;
+const categoryId = blog.blog_cat.id;
+const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+const now = new Date(blog.created_at);
+const posted_date = (months[now.getMonth()] + ' ' + now.getDate() + ', ' + now.getFullYear());
+const blogs = index == 0   ?  <div key={index} className='full-item d-flex flex-wrap align-items-center mb-5 pb-2'>
+                        <div className='col-lg-6 col-sm-12'>
+                            <img className='img-fluid' src={blog.feature_image} alt='' />
+                        </div>
+                        <div className='col-lg-6 col-sm-12 pl-blog-custom'>
+                            <p class="category-tag green-bg"><span>{categoryTitle}</span></p>
+                            <h3 onClick={()=>{this.handleClick(blog.id)}}>{blog.blog_title}</h3>
+                            <p>Contrary to popular belief, print is not dead. In fact, the printing industry has evolved over time to compete with the new digital age.</p>
+                            <span><FontAwesomeIcon icon={faCalendarCheck}></FontAwesomeIcon> {posted_date}</span>
+                        </div>
+                    </div> : <div key={index} className="col-lg-4 col-md-6 col-sm-12 mb-5 pb-2"> 
+        <img className="img-fluid" src={blog.feature_image} alt="" />
+         <div className="blog-inner-content mt-3 pt-1">
+          <p class="category-tag green-bg"><span onClick={() => this.getBlogsById(categoryId)}>{categoryTitle}</span></p>
+           <h4 onClick={()=>{this.handleClick(blog.id)}}>{blog.blog_title}</h4>
+            <span className="mt-4 d-block"><FontAwesomeIcon icon={faCalendarCheck}></FontAwesomeIcon> {posted_date}</span>
+           </div>
+        </div>;
+ return blogs; 
+})
+};
+
+getBlogCategories = (getBlogcategories) => {
+let getCategory = getBlogcategories.filter( (ele, ind) => ind === getBlogcategories.findIndex( elem => elem.blog_cat.id === ele.blog_cat.id))
+return (
+      <Carousel className="carousalcustomcss" breakPoints={breakPoints} pagination={false} >
+       <li><a className="tabslinks" href={void(0)} onClick={() => this.showAllBlogs()}>All</a></li>
+       {getCategory.map((blog,index) => 
+  
+    <li key={index} ><a className="tabslinks" href={void(0)} onClick={() => this.getBlogsById(blog.blog_cat.id)}>{blog.blog_cat.name}</a></li>)}
+      </Carousel>
+    )
+};
+
+handleSubmit =  (event) => {
+this.setState({ loading: true, succmessage : ''});
+event.preventDefault();  
+const email = this.state.email; 
+    if(email == '' ){
+       this.setState({loading: false})
+      document.getElementById("email").style.display = "block";
+      return false;
+     }
+    else { document.getElementById("email").style.display = "none";}
+    if(validateForm(this.state.errors)) {
+    const config = {     
+    headers: { 'content-type': 'multipart/form-data' }
+     }
+        let formData = new FormData();
+        formData.append('email', this.state.email);
+        const url = '/cms/newsletter/'
+        axios.post(url, formData, config)
+            .then(response => {
+            this.setState({loading: false})
+            this.setState({email: '', succmessage : 'Thank you For Subscription'}); 
+            document.getElementById("create-course-form").reset();  
+            })
+            .catch(error => {
+                console.log(error);
+            });
+             console.info('Form Submitted')
+            }else{
+              this.setState({loading: false})
+            }
+  }
+
+
+handleChange = (event) => {
+    event.preventDefault();
+    const { name, value } = event.target;
+    let errors = this.state.errors;  
+    document.getElementById(name).style.display = "none";
+        switch (name) {
+        case 'email': 
+        errors.email = 
+          validEmailRegex.test(value)
+            ? ''
+            : 'Email is not valid!';
+        break;
+        default:
+        break;
+    }
+    this.setState({errors, [name]: value});
+  }
+render () {
+const { getBlogdata, loading, errors, succmessage,getHomedata,items  } = this.state;
+ const style = {textAlign: 'center',height: 600, flex: 1,marginTop:240, flex: 1,justifyContent: 'center',alignItems:'center'};  
+if(typeof getBlogdata == 'undefined' || typeof getHomedata == 'undefined' || Object.keys(getHomedata).length < 1 || Object.keys(getBlogdata).length < 1 ){
+        return <div style={style} ><Loading
+        type="Puff"
+        color="#2BC0BA"
+        height={70}
+        width={70}
+        timeout={2000} 
+      /></div>;
+     }
+const  SectionSubscription =  getHomedata.cmsmetaapi.meta_value[0].section_seven_description;            
+const  SectionSubbackImage =  getHomedata.home_path+'/'+getHomedata.cmsmetaapi.meta_value[0].section_seven_image
+const  SectionEightDescription =  getHomedata.cmsmetaapi.meta_value[0].section_eight_description;            
+const  SectionEightImage =  getHomedata.home_path+'/'+getHomedata.cmsmetaapi.meta_value[0].section_eight_image;
+
+  if (this.state.redirect) {
+        return <Redirect push to = {`/blog/${this.state.blog_id}`} />
+    }    
+    return (
+        <>
+ 
+            <section className='page-heading-main blog-main-heading'>
+                <h1 className='text-center text-white'>Punchly Blog</h1>
+                <div className="mycaro">
+                <ul className='filter-tabs d-flex list-unstyled justify-content-center'>                     
+                      {this.getBlogCategories(this.state.getBlogcategories)} 
+                </ul>
+                </div>
+            </section>
+
+            <section className='blog-listing'>
+                <div className='container'>                
+                    <div className='row listing-columns mt-5 pt-1'>
+                           {this.showBlogs(this.state.getBlogdata) }
+                          <Loading
+                            type="Puff"
+                            color="#1FABA5"
+                            height={50}
+                            width={50}
+                            timeout={1000}
+                          />
+                            <div className='load-more col-md-12 p-0 text-center'>
+                            {this.state.visible < this.state.getBlogdata.length &&
+                            <button onClick={this.loadMore} type="button" className="btn btn-common btn-green">Load more</button>
+                             }  
+                        </div>
+                    </div>
+                </div>
+            </section>
+            <section className='subscribe subscribe-inner-pages' style={{
+              backgroundImage: `url(${(SectionSubbackImage && SectionSubbackImage)})`
+            }}>
+                  <div class="container">
+                    <div class="row flex-column" dangerouslySetInnerHTML={{__html: SectionSubscription}} />
+                     
+                     <form className='w-100 m-auto' id='create-course-form'>
+                        <div className='align-items-center justify-content-between w-100'> 
+                          <div className='form-group'>  
+                            { succmessage ? <span className='succesmessage text-center'>{succmessage}</span> : ""  }                    
+                           <input required  value={this.state.email} type='email' name="email" onChange={this.handleChange} noValidate placeholder='Enter Email Address' />
+                       <span style={{display:'none',color: "red",position:"absolute"}} id="email">Please enter Email!</span>
+                            {errors.email.length > 0 && <span style={{color: "red",position:"absolute"}} className='error'>{errors.email}</span>}
+                          <button  type='submit' className='btn btn-common bg-white'  onClick={ (e) => { this.handleSubmit(e) }}>
+                             {this.state.loading ? "Sending..." : "Subscribe"}
+                          </button> 
+                         </div>           
+                        </div> 
+                    </form>
+                </div>
+            </section>
+          
+        </>
+    );
+}
+}
+const validEmailRegex = RegExp(/^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\"))@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,})$/i);
+const validateForm = (errors) => {
+  let valid = true;
+  Object.values(errors).forEach(
+    (val) => val.length > 0 && (valid = false)
+  );
+  return valid;
+}
+export default withRouter(Blog);
