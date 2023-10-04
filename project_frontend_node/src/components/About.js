@@ -42,7 +42,8 @@ axios.get('/cms/cms-meta/3/').then(response => {
     const  rightImage =  getAboutata.home_path+'/'+getAboutata.cmsmetaapi.meta_value[0].right_image;
     const  leftcontent =  getAboutata.cmsmetaapi.meta_value[0].leftcontent;
     const  alttag =  getAboutata.cmsmetaapi.meta_value[0].Alt_right_image_tag;
-    console.log("ddddd",leftcontent)
+    const  videoUrl =  getAboutata.cmsmetaapi.meta_value[0].video_url;
+    //console.log("ddddd",getAboutata.cmsmetaapi.meta_value[0].video_url)
     const BannerImageUrl =  getAboutata.home_path+'/'+getAboutata.cmsmetaapi.meta_value[0].banner_image;  
     return (
         <>
@@ -58,22 +59,24 @@ axios.get('/cms/cms-meta/3/').then(response => {
             <meta id="og-image" property="og:image" content={BannerImageUrl} />
            </MetaTags> 
         </div>
+        <section className='about-content'>
+                <div className='container'>
+                    <div className='row'>
+                        <div className='col-lg-6 col-md-6 col-sm-12 img-shadow shadow-bg-change'>
+                            {/* <img className='img-fluid' src={rightImage && rightImage} alt={alttag} /> */}
+                         <iframe width="560" height="315" src={videoUrl} title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                        </div>
+                        <div className='col-lg-6 col-md-6 col-sm-12 pl-5' dangerouslySetInnerHTML={{__html: leftcontent}} />
+                    </div>
+                </div>
+            </section>
             <section className='page-heading-main' style={{
               backgroundImage: `url(${(BannerImageUrl && BannerImageUrl)})`
             }}>
                 <h1 className='text-center text-white'>{main_title}</h1>
                 <p className='text-center text-white m-0' dangerouslySetInnerHTML={{__html: description}} />
             </section>
-            <section className='about-content'>
-                <div className='container'>
-                    <div className='row'>
-                        <div className='col-lg-6 col-md-6 col-sm-12 img-shadow shadow-bg-change'>
-                            <img className='img-fluid' src={rightImage && rightImage} alt={alttag} />
-                        </div>
-                        <div className='col-lg-6 col-md-6 col-sm-12 pl-5' dangerouslySetInnerHTML={{__html: leftcontent}} />
-                    </div>
-                </div>
-            </section>
+          
         </>
     );
 }

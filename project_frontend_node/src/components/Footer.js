@@ -68,6 +68,7 @@ if (this.state.redirect) {
 const facebookLink = getContactdata.cmsmetaapi.meta_value[0].facebook 
 const instagramLink = getContactdata.cmsmetaapi.meta_value[0].instagram 
 const twitterLink = getContactdata.cmsmetaapi.meta_value[0].twitter 
+const currentYear = new Date().getFullYear();
 
 console.log("getServiceDatagetServiceData", getServiceData)
     return (
@@ -113,7 +114,8 @@ console.log("getServiceDatagetServiceData", getServiceData)
                     <div className='footer-bottom d-inline-flex w-100 align-items-center justify-content-between pt-4 mt-3'>
                         <div className='left-bottom d-inline-flex align-items-center'>
                             <Link to="/"><img src={Logo} alt='' /></Link>
-                            <p className='m-0 ml-4 pl-3'>© Punchly 2021. All rights reserved.</p>
+                            
+                            <p className='m-0 ml-4 pl-3'>© Punchly {currentYear}. All rights reserved.</p>
                              <img className='godadyimg' onClick={this.showAlert} src="https://punchly.myfileshosting.com/images/siteseal_gd_3_h_l_m.gif"   alt="SSL site seal - click to verify"/>
 
                         </div>
