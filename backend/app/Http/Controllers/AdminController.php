@@ -1999,12 +1999,14 @@ public function aboutUsPage(Request $request , $id = null){
                        "title"          =>$request['title'][$key],                        
                        "alt_banner_tag" =>$request['alt_banner_tag'][$key],                        
                        "Alt_right_image_tag" =>$request['Alt_right_image_tag'][$key],                        
+                       "video_url" =>   $request['video_url'][$key],                        
                        "description"    =>$request['description'],   
                        "leftcontent"    =>$request['leftcontent'], 
                        "banner_image"   =>$banner_image,               
                        "right_image"    =>$right_image  
                     ];
                 }
+               // dd($bannerContent);
                 $updateCms = Cms::find($id);
                 if(!empty($updateCms)){
                     $updateCms->meta_description = $request->general_info['meta_description'];           

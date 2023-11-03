@@ -82,6 +82,7 @@ $i=1;
                                 <div class="contact_us_content">
                                     @php
                                     $cms_meta = $about_us_content['cmsmeta'];
+                                   
                                     foreach($cms_meta as $banners):
                                     $bannerData = json_decode($banners->meta_value,true);
                                     foreach($bannerData as $key => $banner):
@@ -156,14 +157,21 @@ $i=1;
                                             </div>
                                           
                                          
-    <div class="col-lg-6 my-error"> 
-    <label> Right Image Alt Tag Text:</label>
-    <input type="text" class="form-control"
-   value="{{isset($banner['Alt_right_image_tag']) ? $banner['Alt_right_image_tag'] : '' }}"
-   id="Alt_right_image_tag" name="Alt_right_image_tag[{{ $i }}]" class="form-control" 
-   placeholder="Right Image Alt Tag Text">
- </div>
- 
+                                      <div class="col-lg-6 my-error"> 
+                                            <label> Right Image Alt Tag Text:</label>
+                                            <input type="text" class="form-control"
+                                            value="{{isset($banner['Alt_right_image_tag']) ? $banner['Alt_right_image_tag'] : '' }}"
+                                            id="Alt_right_image_tag" name="Alt_right_image_tag[{{ $i }}]" class="form-control" 
+                                            placeholder="Right Image Alt Tag Text">
+                                    </div>
+                                   
+                                 <div class="col-lg-6 my-error"> 
+                                            <label> Video url:</label>
+                                            <input type="url" class="form-control"
+                                            value="{{isset($banner['video_url']) ? $banner['video_url'] : '' }}"
+                                            id="video_url" name="video_url[{{ $i }}]" class="form-control" 
+                                            placeholder="Video url">
+                                    </div>
                                     </div>
                                   </div>
                                   @php

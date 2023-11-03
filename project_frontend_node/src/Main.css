@@ -197,7 +197,7 @@ span#siteseal img {height: 0;width: 0;}
 /**FOOTER CSS ENDS HERE**/
 
 /**ABOUT PAGE CSS STARTS HERE**/
-.about-content {padding:100px 0;}
+.about-content {padding:50px 0;}
 .about-content .main-heading {font-size: 40px;line-height: 50px;margin: 10px 0;}
 .about-content p {font-size: 18px;color: #708DA8;line-height: 28px;}
 .inner-about-content h5 {font-size: 22px;font-weight: 600;}

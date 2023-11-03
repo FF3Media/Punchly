@@ -28,7 +28,7 @@ if (strpos($user_avatar, 'http') !== false) {
     <div class="copyright-box">
         <a href="/terms-of-sale/">Terms & Conditions</a>
         <a href="/return-policy/">Return Policy</a>
-        <p>© Punchly 2022.<br>
+        <p>© Punchly {{date('Y')}}.<br>
             All rights reserved.</p>
     </div>
 

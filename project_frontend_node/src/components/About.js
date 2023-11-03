@@ -59,23 +59,34 @@ axios.get('/cms/cms-meta/3/').then(response => {
             <meta id="og-image" property="og:image" content={BannerImageUrl} />
            </MetaTags> 
         </div>
+        <section className='page-heading-main' style={{
+              backgroundImage: `url(${(BannerImageUrl && BannerImageUrl)})`
+            }}>
+                <h1 className='text-center text-white'>{Title}</h1> 
+
+            </section>
         <section className='about-content'>
                 <div className='container'>
                     <div className='row'>
-                        <div className='col-lg-6 col-md-6 col-sm-12 img-shadow shadow-bg-change'>
+                    <div className="col-lg-12 col-md-12 col-sm-12 d-flex justify-content-center shadow-bg-change text-center">
+            <div className="embed-responsive embed-responsive-16by9" style={{ maxWidth: '850px'}}>
                             {/* <img className='img-fluid' src={rightImage && rightImage} alt={alttag} /> */}
-                         <iframe width="560" height="315" src={videoUrl} title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+                         <iframe className='embed-responsive-item' width="80%" height="400" src={videoUrl} title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
                         </div>
-                        <div className='col-lg-6 col-md-6 col-sm-12 pl-5' dangerouslySetInnerHTML={{__html: leftcontent}} />
-                    </div>
+                        </div>
+                       </div>
+                       <div className='row align-items-center justify-content-center mt-5 '>
+                        <div className='col-xl-8' dangerouslySetInnerHTML={{__html: leftcontent}} />
+                       </div>
+                     
                 </div>
             </section>
-            <section className='page-heading-main' style={{
+            {/* <section className='page-heading-main' style={{
               backgroundImage: `url(${(BannerImageUrl && BannerImageUrl)})`
             }}>
                 <h1 className='text-center text-white'>{main_title}</h1>
                 <p className='text-center text-white m-0' dangerouslySetInnerHTML={{__html: description}} />
-            </section>
+            </section> */}
           
         </>
     );
